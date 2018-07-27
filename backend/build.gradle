@@ -43,6 +43,11 @@ protobuf {
     //generatedFilesBaseDir = "$rootProject.buildDir/generated-code/proto"
 }
 
+bootJar {
+    launchScript()
+}
+
+
 idea {
     module {
         sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java")
