@@ -101,7 +101,7 @@ public class LoginActivity extends BaseActivity {
                 .subscribe(new ApiObserver<Authentication.LoginResponse>(this) {
                     @Override
                     public void onNext(Authentication.LoginResponse value) {
-                        Logs.v("login suc: token=" + value.getToken() + ", key= "
+                        Logs.e("login suc: token=" + value.getToken() + ", key= "
                                 + value.getKeystore());
                         Toast.makeText(getApplication(), "success: " + value.getUserId(),
                                 Toast.LENGTH_LONG).show();

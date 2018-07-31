@@ -43,6 +43,11 @@ protobuf {
     //generatedFilesBaseDir = "$rootProject.buildDir/generated-code/proto"
 }
 
+bootJar {
+    launchScript()
+}
+
+
 idea {
     module {
         sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java")
@@ -52,13 +57,16 @@ idea {
 
 
 dependencies {
-    //compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.springframework.boot:spring-boot-starter-data-redis')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-websocket')
     compile('com.google.protobuf:protobuf-java:3.5.0')
     runtime('mysql:mysql-connector-java')
     testCompile('org.springframework.boot:spring-boot-starter-test')
+
+    compile 'com.alibaba:fastjson:1.2.47'
+
 }
 
 sourceSets{
