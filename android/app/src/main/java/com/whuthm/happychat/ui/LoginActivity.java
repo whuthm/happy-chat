@@ -1,5 +1,6 @@
 package com.whuthm.happychat.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
@@ -15,10 +16,10 @@ import com.barran.lib.utils.log.Logs;
 import com.barran.lib.view.text.LimitEditText;
 import com.barran.lib.view.text.LimitTextWatcher;
 import com.whuthm.happychat.R;
+import com.whuthm.happychat.data.UserAccount;
 import com.whuthm.happychat.data.api.ApiObserver;
 import com.whuthm.happychat.data.api.RetrofitClient;
 import com.whuthm.happychat.proto.api.Authentication;
-import com.whuthm.happychat.proto.api.User;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -64,6 +65,17 @@ public class LoginActivity extends BaseActivity {
         
         mTVSubmit = findViewById(R.id.fragment_pwd_login_tv_submit);
         mTVSubmit.setOnClickListener(listener);
+        
+        checkLogin();
+    }
+    
+    private void checkLogin() {
+        if (!TextUtils.isEmpty(UserAccount.getToken())) {
+            toMainActivity();
+        }
+        else if (!TextUtils.isEmpty(UserAccount.getUserName())) {
+            mETAccount.setText(UserAccount.getUserName());
+        }
     }
     
     private void checkSubmitButton() {
@@ -77,10 +89,13 @@ public class LoginActivity extends BaseActivity {
     }
     
     private void reqLogin() {
+        final String username = mETAccount.getText().toString();
+        UserAccount.setUserName(username);
+        
         Authentication.LoginRequest.Builder builder = Authentication.LoginRequest
                 .newBuilder();
-        builder.setUsername(mETAccount.getText().toString())
-                .setPassword(mETPassword.getText().toString()).setPublicKey("");
+        builder.setUsername(username).setPassword(mETPassword.getText().toString())
+                .setPublicKey("");
         RetrofitClient.api().login(builder.build()).subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new ApiObserver<Authentication.LoginResponse>(this) {
@@ -88,11 +103,20 @@ public class LoginActivity extends BaseActivity {
                     public void onNext(Authentication.LoginResponse value) {
                         Logs.v("login suc: token=" + value.getToken() + ", key= "
                                 + value.getKeystore());
-                        Toast.makeText(getApplication(), "success:" + value.getUserId(),
+                        Toast.makeText(getApplication(), "success: " + value.getUserId(),
                                 Toast.LENGTH_LONG).show();
+                        
+                        UserAccount.saveUser(value);
+                        
+                        toMainActivity();
                     }
                 });
         
+    }
+    
+    private void toMainActivity() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
     }
     
     private class ClickListener implements View.OnClickListener {

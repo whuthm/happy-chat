@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.barran.lib.utils.log.Logs;
 import com.whuthm.happychat.data.DBOperator;
+import com.whuthm.happychat.data.UserAccount;
 import com.whuthm.happychat.data.api.RetrofitClient;
 
 /**
@@ -27,6 +28,7 @@ public class HappyApp extends Application {
     private void initEnv() {
         Logs.init(this);
         Logs.setDebug(true);
+        UserAccount.init(this);
     }
     
     private void initApp() {

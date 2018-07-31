@@ -2,4 +2,9 @@
     <string name="app_name">嗨起来</string>
 
     <string name="text_login">登 录</string>
+
+    <string name="text_main_conversation_list">嗨聊</string>
+    <string name="text_main_me">狗子</string>
+
+    <string name="text_add_conversation">加入秘密聊天室</string>
 </resources>

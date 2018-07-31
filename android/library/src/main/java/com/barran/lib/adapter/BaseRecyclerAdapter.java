@@ -36,12 +36,7 @@ public abstract class BaseRecyclerAdapter
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final RecyclerView.ViewHolder viewHolder = createHolder(parent, viewType);
         if (itemClickListener != null) {
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    
-                }
-            });
+            viewHolder.itemView.setOnClickListener(mOnClickListener);
         }
         return viewHolder;
     }
