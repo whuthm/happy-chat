@@ -7,4 +7,8 @@
     <string name="text_main_me">狗子</string>
 
     <string name="text_add_conversation">加入秘密聊天室</string>
+
+    <string name="toast_net_error_timeout">请求超时,请稍后重试</string>
+    <string name="toast_net_error_http">请求出错,请稍后重试</string>
+    <string name="toast_net_error_default">请求出错,请稍后重试或者检查网络状态</string>
 </resources>

@@ -3,8 +3,12 @@ package com.whuthm.happychat.ui;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,11 +16,14 @@ import android.widget.TextView;
 
 import com.barran.lib.adapter.BaseRecyclerAdapter;
 import com.barran.lib.app.BaseFragment;
+import com.barran.lib.ui.recycler.VerticalDividerDecoration;
 import com.barran.lib.view.text.ColorfulTextView;
 import com.whuthm.happychat.R;
+import com.whuthm.happychat.data.Constants;
 import com.whuthm.happychat.data.DBOperator;
 import com.whuthm.happychat.domain.model.Conversation;
 
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -38,8 +45,48 @@ public class MainConversationFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         
         conversationList = DBOperator.getConversations();
+    }
+    
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_add_conversation, menu);
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_add) {
+            addConversation();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    
+    private void addConversation() {
+        List<Conversation> conversations = DBOperator.getConversations(1);
+        String id;
+        if (conversations.size() > 0) {
+            try {
+                int idInt = Integer.parseInt(conversations.get(0).getConversionId());
+                id = String.valueOf(idInt + 1);
+            } catch (NumberFormatException e) {
+                id = "0";
+            }
+        }
+        else {
+            id = String.valueOf(1);
+        }
+        Conversation conversation = new Conversation();
+        conversation.setConversionId(id);
+        conversation.setConversionName("狗子起来嗨 " + id);
+        conversation.setCreateTime(System.currentTimeMillis());
+        conversation.setConversationType(Constants.ConversationType.SINGLE.ordinal());
+        DBOperator.addConversation(conversation);
+        
+        conversationList.add(conversation);
+        mAdapter.notifyDataSetChanged();
     }
     
     @Nullable
@@ -58,6 +105,8 @@ public class MainConversationFragment extends BaseFragment {
         
         mAdapter = new ConversationAdapter();
         
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.addItemDecoration(new VerticalDividerDecoration(getActivity()));
         recyclerView.setAdapter(mAdapter);
         
         if (conversationList.isEmpty()) {
@@ -73,6 +122,7 @@ public class MainConversationFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
                 // TODO 前期加入默认聊天室，后期可以创建聊天室
+                addConversation();
             }
         });
     }

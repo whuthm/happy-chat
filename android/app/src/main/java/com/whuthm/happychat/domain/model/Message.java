@@ -2,6 +2,7 @@ package com.whuthm.happychat.domain.model;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
 
 /**
  * 消息实体
@@ -11,7 +12,8 @@ import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class Message {
-    
+
+    @Id
     private String messageId;
     
     private String body;

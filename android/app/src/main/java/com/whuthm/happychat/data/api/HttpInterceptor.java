@@ -32,7 +32,7 @@ public class HttpInterceptor implements Interceptor {
         if (headers != null && !headers.isEmpty()) {
             
             for (String key : headers.keySet()) {
-                builder.addHeader(key, headers.get(key)).build();
+                builder.addHeader(key, headers.get(key));
             }
         }
         return chain.proceed(builder.build());

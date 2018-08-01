@@ -5,6 +5,7 @@ import android.widget.Toast;
 
 import com.barran.lib.utils.log.Logs;
 import com.google.protobuf.MessageLite;
+import com.whuthm.happychat.R;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -26,8 +27,8 @@ public abstract class ApiObserver<T extends MessageLite> implements Observer<T> 
     public ApiObserver(Context context) {
         mContext = context;
     }
-    
-    private Disposable mDisposable;
+
+    protected Disposable mDisposable;
     
     @Override
     public void onSubscribe(Disposable d) {
@@ -43,16 +44,20 @@ public abstract class ApiObserver<T extends MessageLite> implements Observer<T> 
     public void onError(Throwable e) {
         Logs.w("api", e.getClass().getName() + ":" + e.getMessage());
         if (e instanceof SocketTimeoutException) {
-            Toast.makeText(mContext, "请求超时,请稍后重试", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, R.string.toast_net_error_timeout, Toast.LENGTH_SHORT)
+                    .show();
         }
         else if (e instanceof ConnectException) {
-            Toast.makeText(mContext, "请求出错,请稍后重试", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, R.string.toast_net_error_http, Toast.LENGTH_SHORT)
+                    .show();
         }
         else if (e instanceof HttpException) {
-            Toast.makeText(mContext, "请求出错,请稍后重试", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, R.string.toast_net_error_http, Toast.LENGTH_SHORT)
+                    .show();
         }
         else {
-            Toast.makeText(mContext, "请求出错,请稍后重试或者检查网络状态", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, R.string.toast_net_error_default, Toast.LENGTH_SHORT)
+                    .show();
         }
     }
     

@@ -68,6 +68,17 @@ public class DBOperator {
         session.getConversationDao().delete(conversation);
         session.clear();
     }
+
+    public static List<Conversation> getConversations(int count) {
+        DaoMaster master = new DaoMaster(sInstance.mHelper.getReadableDb());
+        DaoSession session = master.newSession();
+        QueryBuilder<Conversation> queryBuilder = session.getConversationDao()
+                .queryBuilder();
+        queryBuilder.orderDesc(ConversationDao.Properties.CreateTime).limit(count);
+        List<Conversation> list = queryBuilder.list();
+        session.clear();
+        return list;
+    }
     
     public static List<Conversation> getConversations() {
         DaoMaster master = new DaoMaster(sInstance.mHelper.getReadableDb());
