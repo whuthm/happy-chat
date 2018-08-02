@@ -2,6 +2,7 @@ package com.whuthm.happychat;
 
 import android.app.Application;
 
+import com.barran.lib.utils.DisplayUtil;
 import com.barran.lib.utils.log.Logs;
 import com.whuthm.happychat.data.DBOperator;
 import com.whuthm.happychat.data.UserAccount;
@@ -28,6 +29,7 @@ public class HappyApp extends Application {
     private void initEnv() {
         Logs.init(this);
         Logs.setDebug(true);
+        DisplayUtil.init(this);
         UserAccount.init(this);
     }
     

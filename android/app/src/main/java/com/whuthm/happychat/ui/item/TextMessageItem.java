@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.whuthm.happychat.R;
+import com.whuthm.happychat.domain.model.Message;
 
 /**
  * 文本消息item
@@ -40,5 +41,12 @@ public class TextMessageItem extends AbsMessageItem {
     
     public void setText(String text) {
         tvContent.setText(text);
+    }
+    
+    @Override
+    public void showMessage(Message message) {
+        super.showMessage(message);
+        
+        tvContent.setText(message.getBody());
     }
 }

@@ -15,7 +15,7 @@ import java.util.Locale;
 public class DateUtil {
     
     public static final String FORMAT_YMD_HMS = "yyyy-MM-dd HH:mm:ss";
-    public static final String FORMAT_YMD_HM = "yyyy-MM-dd日 HH:mm";
+    public static final String FORMAT_YMD_HM = "yyyy-MM-dd HH:mm";
     public static final String FORMAT_YMD = "yyyy-MM-dd";
     public static final String FORMAT_MD_HM = "MM-dd HH:mm";
     public static final String FORMAT_MD = "MM-dd";
@@ -41,7 +41,7 @@ public class DateUtil {
             FORMAT_HM, Locale.CHINA);
     
     public static String formatDate(Date date) {
-        return formatDate(date);
+        return formatDate(date, FORMAT_YMD_HM);
     }
     
     public static String formatDate(long timeMillis) {

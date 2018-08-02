@@ -12,8 +12,8 @@ import java.util.List;
  * Created by tanwei on 2017/10/21.
  */
 
-public abstract class BaseRecyclerAdapter
-        extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class BaseRecyclerAdapter<VH extends RecyclerView.ViewHolder>
+        extends RecyclerView.Adapter<VH> {
     
     protected RecyclerViewItemClickListener itemClickListener;
     
@@ -33,20 +33,18 @@ public abstract class BaseRecyclerAdapter
     }
     
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final RecyclerView.ViewHolder viewHolder = createHolder(parent, viewType);
+    public VH onCreateViewHolder(ViewGroup parent, int viewType) {
+        final VH viewHolder = createHolder(parent, viewType);
         if (itemClickListener != null) {
             viewHolder.itemView.setOnClickListener(mOnClickListener);
         }
         return viewHolder;
     }
     
-    protected abstract RecyclerView.ViewHolder createHolder(ViewGroup parent,
-            int viewType);
+    protected abstract VH createHolder(ViewGroup parent, int viewType);
     
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position,
-            List<Object> payloads) {
+    public void onBindViewHolder(VH holder, int position, List<Object> payloads) {
         super.onBindViewHolder(holder, position, payloads);
         
         holder.itemView.setTag(position);

@@ -27,4 +27,8 @@ public class Constants {
     public static final String KEY_USER_NICK = "user_nick";
     public static final String KEY_USER_TOKEN = "user_token";
     public static final String KEY_KEYSTORE = "keystore";
+
+    public static final String KEY_CONVErSATION_ID = "conversation_id";
+
+    public static final int MESSAGE_PAGE_COUNT = 20;// 消息分页加载量
 }

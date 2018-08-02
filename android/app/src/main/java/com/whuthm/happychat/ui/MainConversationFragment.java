@@ -1,5 +1,6 @@
 package com.whuthm.happychat.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,7 +24,6 @@ import com.whuthm.happychat.data.Constants;
 import com.whuthm.happychat.data.DBOperator;
 import com.whuthm.happychat.domain.model.Conversation;
 
-import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -63,7 +63,8 @@ public class MainConversationFragment extends BaseFragment {
         }
         return super.onOptionsItemSelected(item);
     }
-    
+
+    // test
     private void addConversation() {
         List<Conversation> conversations = DBOperator.getConversations(1);
         String id;
@@ -104,6 +105,15 @@ public class MainConversationFragment extends BaseFragment {
         addConversation = view.findViewById(R.id.frag_conversation_list_add);
         
         mAdapter = new ConversationAdapter();
+        mAdapter.setItemClickListener(new BaseRecyclerAdapter.RecyclerViewItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Intent intent = new Intent(getActivity(), ChatActivity.class);
+                        intent.putExtra(Constants.KEY_CONVErSATION_ID,
+                                conversationList.get(position).getConversionId());
+                startActivity(intent);
+            }
+        });
         
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new VerticalDividerDecoration(getActivity()));
@@ -127,7 +137,7 @@ public class MainConversationFragment extends BaseFragment {
         });
     }
     
-    private class ConversationAdapter extends BaseRecyclerAdapter {
+    private class ConversationAdapter extends BaseRecyclerAdapter<ConversationHolder> {
         
         @Override
         protected ConversationHolder createHolder(ViewGroup parent, int viewType) {
@@ -136,9 +146,8 @@ public class MainConversationFragment extends BaseFragment {
         }
         
         @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder,
-                int position) {
-            ((ConversationHolder) holder).update(conversationList.get(position));
+        public void onBindViewHolder(@NonNull ConversationHolder holder, int position) {
+            holder.update(conversationList.get(position));
         }
         
         @Override

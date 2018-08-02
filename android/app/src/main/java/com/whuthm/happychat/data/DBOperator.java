@@ -122,11 +122,16 @@ public class DBOperator {
     }
     
     public static List<Message> getMessages(String conversationId, int count) {
+        
+        return getMessages(conversationId, count, 0);
+    }
+
+    public static List<Message> getMessages(String conversationId, int count, int start) {
         DaoMaster master = new DaoMaster(sInstance.mHelper.getReadableDb());
         DaoSession session = master.newSession();
         QueryBuilder<Message> queryBuilder = session.getMessageDao().queryBuilder();
         queryBuilder.where(MessageDao.Properties.ToUserId.eq(conversationId)).limit(count)
-                .orderDesc(MessageDao.Properties.SendTime);
+                .orderDesc(MessageDao.Properties.SendTime).offset(start);
         List<Message> list = queryBuilder.list();
         session.clear();
         return list;
