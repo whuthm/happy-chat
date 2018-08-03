@@ -46,7 +46,7 @@
             android:paddingTop="@dimen/dimen_3"
             android:text="@string/text_send"
             android:textColor="@android:color/white"
-            app:bgRoundRadius="true"
+            app:bgRadius="@dimen/dimen_4"
             app:bgSolidColor="@color/primary_blue"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"

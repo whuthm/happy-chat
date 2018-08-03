@@ -2,6 +2,7 @@ package com.whuthm.happychat.ui.item;
 
 import android.content.Context;
 import android.support.constraint.ConstraintLayout;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +12,9 @@ import android.widget.TextView;
 
 import com.barran.lib.utils.DateUtil;
 import com.barran.lib.utils.DisplayUtil;
+import com.whuthm.happychat.BuildConfig;
 import com.whuthm.happychat.R;
+import com.whuthm.happychat.data.UserAccount;
 import com.whuthm.happychat.domain.model.Message;
 
 import java.util.Random;
@@ -46,8 +49,10 @@ public abstract class AbsMessageItem extends ConstraintLayout {
     
     private void installView() {
 
-        // test
-        isSendBySelf = new Random().nextBoolean();
+        // TODO test
+        if (BuildConfig.DEBUG) {
+            isSendBySelf = new Random().nextBoolean();
+        }
 
         LayoutInflater.from(getContext()).inflate(R.layout.layout_base_message_item,
                 this);
@@ -70,8 +75,14 @@ public abstract class AbsMessageItem extends ConstraintLayout {
     protected abstract void inflateContent();
     
     public void showMessage(Message message) {
+
+        if (!BuildConfig.DEBUG) {
+            isSendBySelf = !TextUtils.isEmpty(UserAccount.getUserId())
+                    && UserAccount.getUserId().equals(message.getFromUserId());
+        }
+        
         if (isSendBySelf) {
-            // TODO
+            
             mAvatar.setVisibility(GONE);
             mTvNick.setVisibility(GONE);
             mTvTime.setVisibility(GONE);

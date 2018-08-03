@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import com.barran.lib.utils.log.Logs;
 import com.whuthm.happychat.data.api.RetrofitClient;
+import com.whuthm.happychat.domain.model.Message;
 
 import okhttp3.Request;
 import okhttp3.Response;
@@ -22,13 +23,23 @@ public class ConnectionService {
     private static final String TAG = "socket";
     
     private String url = "ws://echo.websocket.org";// websocket官网测试url
+
+    private WebSocket webSocket;
     
     public void connect() {
         Request request = new Request.Builder().url(url).build();
-        
-        RetrofitClient.okHttp().newWebSocket(request, new SocketListener());
+
+        webSocket = RetrofitClient.okHttp().newWebSocket(request, new SocketListener());
         
         RetrofitClient.okHttp().dispatcher().executorService().shutdown();
+    }
+
+    public void sendMessage(String message) {
+        webSocket.send(message);
+    }
+    
+    public void closeWebSocket() {
+        webSocket.close(500, "close");
     }
     
     private class SocketListener extends WebSocketListener {

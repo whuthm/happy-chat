@@ -24,6 +24,7 @@
 
         <activity android:name=".ui.MainActivity" />
         <activity android:name=".ui.ChatActivity" />
+        <activity android:name=".ui.SplashActivity" />
     </application>
 
 </manifest>
