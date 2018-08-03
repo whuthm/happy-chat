@@ -18,7 +18,7 @@ public class ChatActivity extends BaseActivity {
     
     private String conversationId;
     
-    private MessageListFragment messageFrag;
+    private ChatFragment messageFrag;
     
     private ChatSettingFragment settingFragment;
     
@@ -38,8 +38,8 @@ public class ChatActivity extends BaseActivity {
     }
     
     private void pushMessageFrag() {
-        messageFrag = new MessageListFragment();
-        messageFrag.setFragAction(new MessageListFragment.IFragAction() {
+        messageFrag = new ChatFragment();
+        messageFrag.setFragAction(new ChatFragment.IFragAction() {
             @Override
             public void setting() {
                 pushSettingFrag();

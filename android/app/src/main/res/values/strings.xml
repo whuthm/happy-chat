@@ -2,6 +2,8 @@
     <string name="app_name">嗨起来</string>
 
     <string name="text_login">登 录</string>
+    <string name="text_hint_input_account">请输入账户</string>
+    <string name="text_hint_input_password">请输入密码</string>
 
     <string name="text_main_conversation_list">嗨聊</string>
     <string name="text_main_me">狗子</string>
@@ -11,4 +13,6 @@
     <string name="toast_net_error_timeout">请求超时,请稍后重试</string>
     <string name="toast_net_error_http">请求出错,请稍后重试</string>
     <string name="toast_net_error_default">请求出错,请稍后重试或者检查网络状态</string>
+
+    <string name="text_send">发送</string>
 </resources>

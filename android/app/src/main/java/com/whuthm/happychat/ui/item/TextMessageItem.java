@@ -3,7 +3,6 @@ package com.whuthm.happychat.ui.item;
 import android.content.Context;
 import android.support.annotation.StringRes;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.TextView;
 
 import com.whuthm.happychat.R;
@@ -17,7 +16,7 @@ import com.whuthm.happychat.domain.model.Message;
 
 public class TextMessageItem extends AbsMessageItem {
     
-    private TextView tvContent;
+    private TextView tvContent, tvContentSelf;
     
     public TextMessageItem(Context context) {
         super(context);
@@ -29,24 +28,40 @@ public class TextMessageItem extends AbsMessageItem {
     
     @Override
     protected void inflateContent() {
-        contentStub.setLayoutResource(R.layout.layout_message_content_text);
-        View content = contentStub.inflate();
         
-        tvContent = content.findViewById(R.id.layout_message_content_text);
+        contentStub.setLayoutResource(R.layout.layout_message_content_text);
+        contentView = contentStub.inflate();
+        tvContent = contentView.findViewById(R.id.layout_message_content_text);
+        
+        contentStubSelf.setLayoutResource(R.layout.layout_message_content_text);
+        contentViewSelf = contentStubSelf.inflate();
+        tvContentSelf = contentViewSelf.findViewById(R.id.layout_message_content_text);
+        
     }
     
     public void setText(@StringRes int resId) {
-        tvContent.setText(resId);
+        setText(getResources().getString(resId));
     }
     
     public void setText(String text) {
-        tvContent.setText(text);
+        if (isSendBySelf) {
+            contentView.setVisibility(GONE);
+            contentViewSelf.setVisibility(VISIBLE);
+            
+            tvContentSelf.setText(text);
+        }
+        else {
+            contentView.setVisibility(VISIBLE);
+            contentViewSelf.setVisibility(GONE);
+            
+            tvContent.setText(text);
+        }
     }
     
     @Override
     public void showMessage(Message message) {
         super.showMessage(message);
         
-        tvContent.setText(message.getBody());
+        setText(message.getBody());
     }
 }

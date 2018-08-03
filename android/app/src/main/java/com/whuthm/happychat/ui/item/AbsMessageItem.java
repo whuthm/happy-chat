@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,11 +24,13 @@ import java.util.Random;
 
 public abstract class AbsMessageItem extends ConstraintLayout {
     
-    private ImageView mAvatar;
+    private ImageView mAvatar, mAvatarSelf;
     
     private TextView mTvNick, mTvTime;
     
-    protected ViewStub contentStub;
+    protected ViewStub contentStub, contentStubSelf;
+
+    protected View contentView, contentViewSelf;
     
     protected boolean isSendBySelf;
     
@@ -46,24 +49,21 @@ public abstract class AbsMessageItem extends ConstraintLayout {
         // test
         isSendBySelf = new Random().nextBoolean();
 
-        if (isSendBySelf) {
-            LayoutInflater.from(getContext()).inflate(R.layout.layout_message_item_sent,
-                    this);
-        }
-        else {
-            LayoutInflater.from(getContext())
-                    .inflate(R.layout.layout_message_item_received, this);
-            
-            mTvNick = findViewById(R.id.layout_message_user_nick);
-            mTvTime = findViewById(R.id.layout_message_time);
-        }
+        LayoutInflater.from(getContext()).inflate(R.layout.layout_base_message_item,
+                this);
+
+        mAvatar = findViewById(R.id.layout_message_user_avatar);
+        mTvNick = findViewById(R.id.layout_message_user_nick);
+        mTvTime = findViewById(R.id.layout_message_time);
+        contentStub = findViewById(R.id.layout_message_content);
+
+        mAvatarSelf = findViewById(R.id.layout_message_avatar_self);
+        contentStubSelf = findViewById(R.id.layout_message_content_self);
         
         int padding = DisplayUtil.dp2px(12);
         setPadding(padding, padding / 2, padding, padding / 2);
         
-        mAvatar = findViewById(R.id.layout_message_user_avatar);
-        contentStub = findViewById(R.id.layout_message_content);
-        
+
         inflateContent();
     }
     
@@ -72,8 +72,19 @@ public abstract class AbsMessageItem extends ConstraintLayout {
     public void showMessage(Message message) {
         if (isSendBySelf) {
             // TODO
+            mAvatar.setVisibility(GONE);
+            mTvNick.setVisibility(GONE);
+            mTvTime.setVisibility(GONE);
+
+            mAvatarSelf.setVisibility(VISIBLE);
         }
         else {
+            mAvatar.setVisibility(VISIBLE);
+            mTvNick.setVisibility(VISIBLE);
+            mTvTime.setVisibility(VISIBLE);
+
+            mAvatarSelf.setVisibility(GONE);
+
             mTvNick.setText(message.getFromUserId());
             mTvTime.setText(DateUtil.formatDate(message.getReceiveTime()));
         }

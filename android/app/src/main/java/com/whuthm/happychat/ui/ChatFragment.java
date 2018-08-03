@@ -13,13 +13,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.barran.lib.adapter.BaseRecyclerAdapter;
 import com.barran.lib.app.BaseFragment;
+import com.barran.lib.view.text.ColorfulTextView;
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.data.Constants;
 import com.whuthm.happychat.data.DBOperator;
-import com.whuthm.happychat.domain.model.Conversation;
 import com.whuthm.happychat.domain.model.Message;
 import com.whuthm.happychat.ui.item.TextMessageItem;
 
@@ -32,7 +33,7 @@ import java.util.List;
  * Created by huangming on 18/07/2018.
  */
 
-public class MessageListFragment extends BaseFragment {
+public class ChatFragment extends BaseFragment {
     
     private String conversationId;
     
@@ -41,6 +42,10 @@ public class MessageListFragment extends BaseFragment {
     private RecyclerView recyclerView;
     
     private MessageAdapter mAdapter;
+    
+    private EditText intput;
+    
+    private ColorfulTextView btnSend;
     
     private IFragAction action;
     
@@ -73,6 +78,10 @@ public class MessageListFragment extends BaseFragment {
     
     // test
     private void addMessage() {
+        addMessage(null);
+    }
+    
+    private void addMessage(String text) {
         List<Message> messages = DBOperator.getMessages(conversationId, 1);
         String id;
         if (messages.size() > 0) {
@@ -88,7 +97,12 @@ public class MessageListFragment extends BaseFragment {
         }
         Message message = new Message();
         message.setMessageId(id);
-        message.setBody("狗子起来嗨 " + id);
+        if (text == null) {
+            message.setBody("狗子起来嗨 " + id);
+        }
+        else {
+            message.setBody(text);
+        }
         message.setFromUserId("111");
         message.setSendTime(System.currentTimeMillis());
         message.setReceiveTime(System.currentTimeMillis());
@@ -103,8 +117,7 @@ public class MessageListFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_chat_setting) {
             if (action != null) {
-                 action.setting();
-//                addMessage();
+                action.setting();
             }
             return true;
         }
@@ -115,7 +128,7 @@ public class MessageListFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.frag_message_list, container, false);
+        return inflater.inflate(R.layout.frag_chat, container, false);
     }
     
     @Override
@@ -123,7 +136,7 @@ public class MessageListFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         
         final SwipeRefreshLayout swipeRefreshLayout = view
-                .findViewById(R.id.frag_message_list_swipe_refresh_layout);
+                .findViewById(R.id.frag_chat_swipe_refresh_layout);
         swipeRefreshLayout
                 .setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
@@ -149,6 +162,22 @@ public class MessageListFragment extends BaseFragment {
             }
         });
         recyclerView.setAdapter(mAdapter = new MessageAdapter());
+        
+        intput = view.findViewById(R.id.frag_chat_input);
+        btnSend = view.findViewById(R.id.frag_chat_send);
+        
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String text = intput.getText().toString();
+                if (!TextUtils.isEmpty(text)) {
+                    addMessage(text);
+                    intput.setText("");
+                }else{
+                    addMessage();
+                }
+            }
+        });
     }
     
     private class MessageAdapter extends BaseRecyclerAdapter<TextHolder> {

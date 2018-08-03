@@ -2,11 +2,11 @@ package com.whuthm.happychat.ui.item;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.whuthm.happychat.GlideApp;
 import com.whuthm.happychat.R;
+import com.whuthm.happychat.domain.model.Message;
 
 /**
  * 图片消息item
@@ -16,7 +16,7 @@ import com.whuthm.happychat.R;
 
 public class ImageMessageItem extends AbsMessageItem {
     
-    private ImageView imageView;
+    private ImageView imageView, imageViewSelf;
     
     public ImageMessageItem(Context context) {
         super(context);
@@ -29,11 +29,33 @@ public class ImageMessageItem extends AbsMessageItem {
     @Override
     protected void inflateContent() {
         contentStub.setLayoutResource(R.layout.layout_message_content_image);
-        View content = contentStub.inflate();
+        contentView = contentStub.inflate();
+        imageView = contentView.findViewById(R.id.layout_message_content_image);
+        
+        contentStubSelf.setLayoutResource(R.layout.layout_message_content_image);
+        contentViewSelf = contentStubSelf.inflate();
+        imageViewSelf = contentViewSelf.findViewById(R.id.layout_message_content_image);
     }
     
     public void setImageUrl(String url) {
-        GlideApp.with(getContext()).load(url).centerCrop()
-                .placeholder(R.drawable.ic_launcher).into(imageView);
+        if (isSendBySelf) {
+            contentView.setVisibility(GONE);
+            contentViewSelf.setVisibility(VISIBLE);
+            GlideApp.with(getContext()).load(url).centerCrop()
+                    .placeholder(R.drawable.ic_launcher).into(imageViewSelf);
+        }
+        else {
+            contentView.setVisibility(VISIBLE);
+            contentViewSelf.setVisibility(GONE);
+            GlideApp.with(getContext()).load(url).centerCrop()
+                    .placeholder(R.drawable.ic_launcher).into(imageView);
+        }
+    }
+    
+    @Override
+    public void showMessage(Message message) {
+        super.showMessage(message);
+        
+        setImageUrl(message.getBody());
     }
 }

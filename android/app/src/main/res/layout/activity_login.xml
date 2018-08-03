@@ -31,7 +31,7 @@
                 android:layout_marginBottom="@dimen/dimen_6"
                 android:drawableLeft="@drawable/account"
                 android:drawablePadding="@dimen/dimen_6"
-                android:hint="请输入账户"
+                android:hint="@string/text_hint_input_account"
                 android:maxLength="20" />
 
         </RelativeLayout>
@@ -47,7 +47,7 @@
                 android:layout_marginBottom="@dimen/dimen_8"
                 android:drawableLeft="@drawable/password"
                 android:drawablePadding="@dimen/dimen_6"
-                android:hint="请输入密码"
+                android:hint="@string/text_hint_input_password"
                 android:inputType="textPassword"
                 android:maxLength="20" />
 

@@ -86,8 +86,13 @@ public class MainConversationFragment extends BaseFragment {
         conversation.setConversationType(Constants.ConversationType.SINGLE.ordinal());
         DBOperator.addConversation(conversation);
         
-        conversationList.add(conversation);
+        conversationList.add(0, conversation);
         mAdapter.notifyDataSetChanged();
+
+        if (recyclerView.getVisibility() == View.GONE) {
+            recyclerView.setVisibility(View.VISIBLE);
+            addConversation.setVisibility(View.GONE);
+        }
     }
     
     @Nullable

@@ -15,6 +15,8 @@ public class Message {
 
     @Id
     private String messageId;
+
+    private int type;
     
     private String body;
     
@@ -34,10 +36,11 @@ public class Message {
         
     }
     
-    @Generated(hash = 1698299478)
-    public Message(String messageId, String body, String fromUserId, String toUserId,
-            long sendTime, long receiveTime, boolean read, int status) {
+    @Generated(hash = 132822526)
+    public Message(String messageId, int type, String body, String fromUserId,
+            String toUserId, long sendTime, long receiveTime, boolean read, int status) {
         this.messageId = messageId;
+        this.type = type;
         this.body = body;
         this.fromUserId = fromUserId;
         this.toUserId = toUserId;
@@ -46,7 +49,7 @@ public class Message {
         this.read = read;
         this.status = status;
     }
-    
+
     public String getMessageId() {
         return this.messageId;
     }
@@ -54,7 +57,15 @@ public class Message {
     public void setMessageId(String messageId) {
         this.messageId = messageId;
     }
-    
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     public String getBody() {
         return this.body;
     }
