@@ -1,0 +1,6 @@
+[submodule "android/happy-chat-library"]
+	path = android/happy-chat-library
+	url = https://github.com/whuthm/happy-chat-lib.git
+[submodule "backend/happy-chat-lib"]
+	path = backend/happy-chat-lib
+	url = https://github.com/whuthm/happy-chat-lib.git
