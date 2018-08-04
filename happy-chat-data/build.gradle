@@ -52,6 +52,11 @@ dependencies {
     compile('com.google.protobuf:protobuf-java:3.5.0')
 }
 
+
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
 sourceSets{
     main {
         java {

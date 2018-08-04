@@ -1,4 +1,4 @@
-rootProject.name = 'happy-chat-lib'
+rootProject.name = 'happy-chat'
 
 include 'happy-chat-core',
         'happy-chat-data'
