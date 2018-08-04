@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option java_package = "com.whuthm.happychat.packet";
+option java_outer_classname = "Packet";
+
+message packet {
+    string string = 1;
+    int32 type = 2;
+    bytes data = 3;
+}
