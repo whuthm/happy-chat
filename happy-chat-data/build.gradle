@@ -7,9 +7,6 @@ buildscript {
     }
 }
 
-repositories {
-    mavenCentral()
-}
 
 apply plugin: 'java'
 apply plugin: 'idea'
@@ -38,23 +35,9 @@ protobuf {
     //generatedFilesBaseDir = "$rootProject.buildDir/generated-code/proto"
 }
 
-group 'com.whuthm.happychat'
-version '0.0.1-SNAPSHOT'
-
-sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile('com.google.protobuf:protobuf-java:3.5.0')
-}
-
-
-jar {
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
 sourceSets{

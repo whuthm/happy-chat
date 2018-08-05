@@ -1,41 +1,6 @@
 apply plugin: 'java'
 
-group 'com.whuthm.happychat'
-version '0.0.1-SNAPSHOT'
-
-sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile project(':happy-chat-data')
-}
-
-jar {
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-}
-
-sourceSets{
-    main {
-        java {
-            srcDir 'src/main/java'
-        }
-
-        resources {
-            srcDir 'src/main/resources' //资源目录
-        }
-    }
-
-    test {
-        java {
-            srcDir 'src/test/java'
-        }
-
-        resources {
-            srcDir 'src/test/resources' //资源目录
-        }
-    }
 }

@@ -1,0 +1,105 @@
+static void copyFile(File src, File dest) {
+    if (dest.exists()) {
+        dest.delete()
+    }
+    dest.createNewFile()
+    FileInputStream ins = new FileInputStream(src)
+    FileOutputStream out = new FileOutputStream(dest)
+    byte[] b = new byte[1024]
+    int n
+    while ((n = ins.read(b)) != -1) {
+        out.write(b, 0, n)
+    }
+    ins.close()
+    out.close()
+}
+
+task clean(type: Delete) {
+    println(project.name + ": clean")
+    delete rootProject.buildDir
+}
+
+String[] targetLibsDirs = [
+        "${rootProject.rootDir}/backend/libs_happychat",
+        "${rootProject.rootDir}/android/app/libs_happychat"
+]
+
+task clearJars(dependsOn : [clean]) {
+    println(project.name + ": clearJars")
+    for (String targetLibsDir : targetLibsDirs) {
+        File dir = new File(targetLibsDir)
+        if (dir.exists()) {
+            File[] files = dir.listFiles()
+            for (File file : files) {
+                println("clearJarFile: " + file.getPath())
+                file.delete()
+            }
+        }
+    }
+}
+
+
+subprojects {
+    apply plugin: 'java'
+
+    group 'com.whuthm.happychat'
+    version '0.0.1-SNAPSHOT'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+    }
+
+    jar {
+        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDir 'src/main/java'
+            }
+
+            resources {
+                srcDir 'src/main/resources' //资源目录
+            }
+        }
+
+        test {
+            java {
+                srcDir 'src/test/java'
+            }
+
+            resources {
+                srcDir 'src/test/resources' //资源目录
+            }
+        }
+    }
+
+    task copyJars() {
+        println(project.name + ": copyJars")
+        for (String targetLibsDir : targetLibsDirs) {
+            File targetDir = new File(targetLibsDir)
+            if (!targetDir.exists()) {
+                targetDir.mkdirs()
+            }
+            File[] jarFiles = new File("${project.buildDir}/libs").listFiles(new FilenameFilter() {
+                @Override
+                boolean accept(File dir, String name) {
+                    return name.toLowerCase().endsWith(".jar")
+                }
+            })
+            if (jarFiles != null) {
+                for (File jarFile : jarFiles) {
+                    File targetJarFile = new File(targetDir, jarFile.getName())
+                    copyFile(jarFile, targetJarFile)
+                    println("copyJarFile: " + targetJarFile.getPath())
+                }
+            }
+        }
+    }
+
+    task release(dependsOn: [build])
+
+}
