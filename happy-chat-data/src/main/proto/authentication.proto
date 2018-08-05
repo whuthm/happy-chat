@@ -1,5 +1,6 @@
 syntax = "proto3";
-package com.whuthm.happychat.proto.api;
+option java_package = "com.whuthm.happychat.data";
+option java_outer_classname = "AuthenticationProtos";
 
 import "base.proto";
 

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option java_package = "com.whuthm.happychat.data";
+option java_outer_classname = "IQProtos";
+
+message IQ {
+    Type type = 1;
+    Action action = 2;
+    bytes data = 3;
+
+    enum Type {
+        get = 0;
+        set = 1;
+        result = 2;
+        error = 3;
+    }
+
+    enum Action {
+        authentication= 0;
+    }
+}
+
+message AuthenticationIQResponse {
+    int32 code = 1;
+    string message = 2;
+}

@@ -1,10 +1,16 @@
 syntax = "proto3";
 
-option java_package = "com.whuthm.happychat.packet";
-option java_outer_classname = "Packet";
+option java_package = "com.whuthm.happychat.data";
+option java_outer_classname = "PacketProtos";
 
-message packet {
-    string string = 1;
-    int32 type = 2;
+message Packet {
+    string id = 1;
+    Type type = 2;
     bytes data = 3;
+
+    enum Type {
+        iq = 0;
+        message = 1;
+        push = 2;
+    }
 }
