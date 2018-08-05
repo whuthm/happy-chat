@@ -16,11 +16,10 @@ message IQ {
     }
 
     enum Action {
-        authentication= 0;
+        // 客户端发送ping至服务端，保活Connection
+        ping = 0;
+        // 服务端返回pong
+        pong = 1;
     }
 }
 
-message AuthenticationIQResponse {
-    int32 code = 1;
-    string message = 2;
-}

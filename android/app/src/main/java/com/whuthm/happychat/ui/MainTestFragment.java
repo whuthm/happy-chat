@@ -11,7 +11,6 @@ import com.barran.lib.app.BaseFragment;
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.data.PacketProtos;
 import com.whuthm.happychat.imlib.ChatConnection;
-import com.whuthm.happychat.imlib.Connection;
 import com.whuthm.happychat.util.PacketIdGenerator;
 
 public class MainTestFragment extends BaseFragment {

@@ -91,4 +91,5 @@ public abstract class AbstractConnection implements Connection {
         setConnected(false);
         setAuthenticated(true);
     }
+
 }

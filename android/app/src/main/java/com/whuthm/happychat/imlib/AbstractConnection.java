@@ -16,7 +16,6 @@ import okio.ByteString;
 class AbstractConnection implements Connection {
 
     private boolean connected;
-    private boolean authenticated;
 
     private static final String TAG = ChatConnection.class.getSimpleName();
 
@@ -35,14 +34,6 @@ class AbstractConnection implements Connection {
 
     protected void setConnected(boolean connected) {
         this.connected = connected;
-    }
-
-    public final boolean isAuthenticated() {
-        return this.authenticated;
-    }
-
-    protected void setAuthenticated(boolean authenticated) {
-        this.authenticated = authenticated;
     }
 
     @Override
@@ -127,6 +118,5 @@ class AbstractConnection implements Connection {
 
     private void performDisconnected() {
         setConnected(false);
-        setAuthenticated(false);
     }
 }

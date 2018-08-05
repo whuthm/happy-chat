@@ -11,5 +11,4 @@ public interface Connection {
 
     boolean isConnected();
 
-    boolean isAuthenticated();
 }
