@@ -6,7 +6,7 @@ import android.widget.ImageView;
 
 import com.whuthm.happychat.GlideApp;
 import com.whuthm.happychat.R;
-import com.whuthm.happychat.domain.model.Message;
+import com.whuthm.happychat.imlib.model.Message;
 
 /**
  * 图片消息item

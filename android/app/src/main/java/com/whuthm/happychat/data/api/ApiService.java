@@ -1,8 +1,8 @@
 package com.whuthm.happychat.data.api;
 
-import com.whuthm.happychat.proto.api.Authentication;
-import com.whuthm.happychat.proto.api.Base;
-import com.whuthm.happychat.proto.api.User;
+import com.whuthm.happychat.data.AuthenticationProtos;
+import com.whuthm.happychat.data.BaseProtos;
+import com.whuthm.happychat.data.UserProtos;
 
 import io.reactivex.Observable;
 import retrofit2.http.Body;
@@ -19,13 +19,13 @@ import retrofit2.http.Path;
 public interface ApiService {
     
     @POST("/v1/auth/login")
-    Observable<Authentication.LoginResponse> login(
-            @Body Authentication.LoginRequest request);
+    Observable<AuthenticationProtos.LoginResponse> login(
+            @Body AuthenticationProtos.LoginRequest request);
     
     @GET("/v1/users/{id}")
-    Observable<User.UserResponse> getUserById(@Path("id") String userId);
+    Observable<UserProtos.UserResponse> getUserById(@Path("id") String userId);
     
     @GET("/v1/users")
-    Observable<User.UsersResponse> getUserList(@Body Base.StringListRequest request);
+    Observable<UserProtos.UsersResponse> getUserList(@Body BaseProtos.StringListRequest request);
     
 }

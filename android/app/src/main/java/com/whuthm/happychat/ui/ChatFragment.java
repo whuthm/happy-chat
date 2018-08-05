@@ -21,7 +21,7 @@ import com.barran.lib.view.text.ColorfulTextView;
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.data.Constants;
 import com.whuthm.happychat.data.DBOperator;
-import com.whuthm.happychat.domain.model.Message;
+import com.whuthm.happychat.imlib.model.Message;
 import com.whuthm.happychat.ui.item.TextMessageItem;
 
 import java.util.Collections;

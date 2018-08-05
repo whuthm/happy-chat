@@ -1,4 +1,4 @@
-package com.whuthm.happychat.domain.model;
+package com.whuthm.happychat.imlib.model;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;

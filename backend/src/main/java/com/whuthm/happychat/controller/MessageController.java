@@ -1,4 +1,4 @@
-package com.whuthm.happychat.service.chat;
+package com.whuthm.happychat.controller;
 
 import org.springframework.stereotype.Controller;
 

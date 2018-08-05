@@ -3,7 +3,6 @@ package com.whuthm.happychat.data;
 import android.content.Context;
 
 import com.barran.lib.data.SPWrapper;
-import com.whuthm.happychat.proto.api.Authentication;
 
 /**
  * 用户信息管理
@@ -47,7 +46,7 @@ public class UserAccount {
         key = spWrapper.getString(Constants.KEY_KEYSTORE);
     }
     
-    public static void saveUser(Authentication.LoginResponse response) {
+    public static void saveUser(AuthenticationProtos.LoginResponse response) {
         setToken(response.getToken());
         setUserId(response.getUserId());
         setKey(response.getKeystore());

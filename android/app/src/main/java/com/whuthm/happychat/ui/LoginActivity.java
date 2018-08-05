@@ -16,10 +16,10 @@ import com.barran.lib.utils.log.Logs;
 import com.barran.lib.view.text.LimitEditText;
 import com.barran.lib.view.text.LimitTextWatcher;
 import com.whuthm.happychat.R;
+import com.whuthm.happychat.data.AuthenticationProtos;
 import com.whuthm.happychat.data.UserAccount;
 import com.whuthm.happychat.data.api.ApiObserver;
 import com.whuthm.happychat.data.api.RetrofitClient;
-import com.whuthm.happychat.proto.api.Authentication;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -91,16 +91,16 @@ public class LoginActivity extends BaseActivity {
     private void reqLogin() {
         final String username = mETAccount.getText().toString();
         UserAccount.setUserName(username);
-        
-        Authentication.LoginRequest.Builder builder = Authentication.LoginRequest
+
+        AuthenticationProtos.LoginRequest.Builder builder = AuthenticationProtos.LoginRequest
                 .newBuilder();
         builder.setUsername(username).setPassword(mETPassword.getText().toString())
                 .setPublicKey("");
         RetrofitClient.api().login(builder.build()).subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new ApiObserver<Authentication.LoginResponse>(this) {
+                .subscribe(new ApiObserver<AuthenticationProtos.LoginResponse>(this) {
                     @Override
-                    public void onNext(Authentication.LoginResponse value) {
+                    public void onNext(AuthenticationProtos.LoginResponse value) {
                         Logs.e("login suc: token=" + value.getToken() + ", key= "
                                 + value.getKeystore());
                         Toast.makeText(getApplication(), "success: " + value.getUserId(),

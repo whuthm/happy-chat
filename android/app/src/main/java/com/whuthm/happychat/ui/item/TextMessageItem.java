@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 import com.whuthm.happychat.R;
-import com.whuthm.happychat.domain.model.Message;
+import com.whuthm.happychat.imlib.model.Message;
 
 /**
  * 文本消息item

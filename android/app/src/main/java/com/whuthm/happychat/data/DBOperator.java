@@ -2,12 +2,12 @@ package com.whuthm.happychat.data;
 
 import android.content.Context;
 
-import com.whuthm.happychat.domain.model.Conversation;
-import com.whuthm.happychat.domain.model.ConversationDao;
-import com.whuthm.happychat.domain.model.DaoMaster;
-import com.whuthm.happychat.domain.model.DaoSession;
-import com.whuthm.happychat.domain.model.Message;
-import com.whuthm.happychat.domain.model.MessageDao;
+import com.whuthm.happychat.imlib.model.Conversation;
+import com.whuthm.happychat.imlib.model.ConversationDao;
+import com.whuthm.happychat.imlib.model.DaoMaster;
+import com.whuthm.happychat.imlib.model.DaoSession;
+import com.whuthm.happychat.imlib.model.Message;
+import com.whuthm.happychat.imlib.model.MessageDao;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 

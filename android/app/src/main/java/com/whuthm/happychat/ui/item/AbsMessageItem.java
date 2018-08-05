@@ -15,7 +15,7 @@ import com.barran.lib.utils.DisplayUtil;
 import com.whuthm.happychat.BuildConfig;
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.data.UserAccount;
-import com.whuthm.happychat.domain.model.Message;
+import com.whuthm.happychat.imlib.model.Message;
 
 import java.util.Random;
 

@@ -1,4 +1,4 @@
-package com.whuthm.happychat.domain.model;
+package com.whuthm.happychat.imlib.model;
 
 /**
  * Created by huangming on 18/07/2018.

@@ -1,6 +1,6 @@
 package com.whuthm.happychat.utils;
 
-import com.whuthm.happychat.proto.api.Base;
+import com.whuthm.happychat.data.BaseProtos;
 
 public enum ApiBaseResponses {
 
@@ -16,11 +16,11 @@ public enum ApiBaseResponses {
         this.message = message;
     }
 
-    public Base.BaseResponse getResponse() {
+    public BaseProtos.BaseResponse getResponse() {
         return ApiUtils.getBaseResponse(code, message);
     }
 
-    public Base.BaseResponse getResponse(String hintMessage) {
+    public BaseProtos.BaseResponse getResponse(String hintMessage) {
         return ApiUtils.getBaseResponse(code, message, hintMessage);
     }
 }
