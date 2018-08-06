@@ -1,4 +1,4 @@
-package com.whuthm.happychat.im.connection;
+package com.whuthm.happychat.service.connection;
 
 import com.whuthm.happychat.data.PacketProtos;
 import org.slf4j.Logger;
