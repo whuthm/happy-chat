@@ -10,7 +10,7 @@ public class GroupMember {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     @Column(name = "user_id", nullable = false)
-    private String user_id;
+    private String userId;
     @Column(name = "user_name")
     private String username;
     @Column(name = "user_nick")
@@ -26,12 +26,12 @@ public class GroupMember {
         this.id = id;
     }
 
-    public String getUser_id() {
-        return user_id;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {

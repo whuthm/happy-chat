@@ -3,12 +3,14 @@ package com.whuthm.happychat.service.user;
 import com.whuthm.happychat.domain.model.User;
 import com.whuthm.happychat.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class UserManager implements UserService {
+@Component
+class UserManager implements UserService {
 
     @Autowired
     UserRepository userRepository;
@@ -29,8 +31,13 @@ public class UserManager implements UserService {
     }
 
     @Override
-    public void addUser(User user) {
+    public User getUserByName(String username) {
+        return userRepository.findUserByName(username);
+    }
+
+    public User addUser(User user) {
         User newUser = userRepository.save(user);
-        users.put(user.getId(), user);
+        users.put(user.getId(), newUser);
+        return newUser;
     }
 }

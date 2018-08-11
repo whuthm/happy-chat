@@ -1,4 +1,4 @@
-//package com.whuthm.happychat;
+package com.whuthm.happychat;//package com.whuthm.happychat;
 //
 //import org.junit.Test;
 //import org.junit.runner.RunWith;

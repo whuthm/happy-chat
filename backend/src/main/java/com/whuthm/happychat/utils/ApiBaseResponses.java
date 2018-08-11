@@ -6,6 +6,8 @@ public enum ApiBaseResponses {
 
     SUCCESS(0, "ok"),
     INCORRECT_PARAMETERS(1, "incorrect parameters"),
+    SERVER_ERROR(500, "server error"),
+    UNKNOWN_ERROR(501, "unknown error"),
     NOT_FOUND(404, "not found");
 
     private final int code;

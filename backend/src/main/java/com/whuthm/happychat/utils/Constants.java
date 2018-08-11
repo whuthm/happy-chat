@@ -6,7 +6,7 @@ public class Constants {
     /**
      * token有效期（小时）
      */
-    public static final int TOKEN_EXPIRES_HOUR = 72;
+    public static final int TOKEN_EXPIRES_HOUR = 30 * 24;
 
     public static final String TOKEN = "token";
 

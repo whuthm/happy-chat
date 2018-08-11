@@ -1,4 +1,4 @@
-package com.whuthm.happychat.service.authentication;
+package com.whuthm.happychat.controller.util;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

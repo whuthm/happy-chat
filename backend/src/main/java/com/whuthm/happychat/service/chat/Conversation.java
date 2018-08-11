@@ -1,28 +1,37 @@
 package com.whuthm.happychat.service.chat;
 
+import com.whuthm.happychat.domain.model.ConversationType;
+import com.whuthm.happychat.domain.model.Message;
+
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
-class Conversation {
+abstract class Conversation {
 
-    private final Set<String> users;
+    private final String id;
+    private final ConversationType conversationType;
 
-    public Conversation(Collection<String> users) {
-        this.users = new HashSet<>(users);
+    protected Conversation(@NotNull String id, @NotNull ConversationType conversationType) {
+        this.id = id;
+        this.conversationType = conversationType;
     }
 
-    public Conversation() {
-        this.users = new HashSet<>();
+    final String getId() {
+        return id;
     }
 
-    void join(String userId) {
-        users.add(userId);
+    ConversationType getConversationType() {
+        return conversationType;
     }
 
-    void exit(String userId) {
-        users.remove(userId);
-    }
+    abstract Collection<String> getTargetIds();
 
+    void sendMessage(MessageManager messageManager, Message message) {
+        for (String userId : getTargetIds()) {
+            if (!userId.equals(message.getFrom())) {
+                messageManager.sendMessage(message, userId);
+            }
+        }
+    }
 
 }

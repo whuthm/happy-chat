@@ -12,7 +12,8 @@ message MessageResponse {
 message MentionedInfoBean {
     /** 1: @all; 2: @users*/
     int32 type = 1;
-    repeated string user_ids = 2;
+    /** json array */
+    string user_ids = 2;
     string content = 3;
 }
 
@@ -45,7 +46,7 @@ message MessageBean {
     string type = 3;
     string from = 4;
     string to = 5;
-    /** 类型：Chat, GroupChat, Discussion*/
+    /** 类型：SingleChat, GroupChat, Discussion*/
     string conversation_type = 6;
     /** 通过keystore加密, json*/
     string body = 7;
@@ -53,4 +54,5 @@ message MessageBean {
     MentionedInfoBean mentioned_info = 9;
     /** 扩展，json*/
     string attributes = 10;
+    string extra = 11;
 }

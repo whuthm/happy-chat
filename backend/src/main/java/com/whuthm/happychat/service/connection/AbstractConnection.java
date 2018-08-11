@@ -5,11 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.websocket.*;
+import java.nio.ByteBuffer;
 
 public abstract class AbstractConnection implements Connection {
 
     private boolean connected;
-    private boolean authenticated;
 
     public final boolean isConnected() {
         return this.connected;
@@ -19,40 +19,32 @@ public abstract class AbstractConnection implements Connection {
         this.connected = connected;
     }
 
-    public final boolean isAuthenticated() {
-        return this.authenticated;
-    }
-
-    protected void setAuthenticated(boolean authenticated) {
-        this.authenticated = authenticated;
-    }
-
-    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+    protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     private Session webSocketSession;
 
     @OnOpen
-    public final void onOpen(Session session) {
+    public void onOpen(Session session) {
         // Get session and WebSocket connection
         LOGGER.info("onOpen: " + session.getId());
-        performConnected(session);
+        webSocketSession = session;
     }
 
     @OnMessage
-    public final void onPacket(Session session, PacketProtos.Packet packet) {
+    public void onPacket(Session session, PacketProtos.Packet packet) {
         // Handle new messages
         LOGGER.info("onMessage: " + session.getId() + ", " + packet.getId());
     }
 
     @OnClose
-    public final void onClose(Session session){
+    public  void onClose(Session session){
         // WebSocket connection closes
         LOGGER.info("onClose: " + session.getId());
         performDisconnected();
     }
 
     @OnError
-    public final void onError(Session session, Throwable throwable) {
+    public  void onError(Session session, Throwable throwable) {
         // Do error handling here
         LOGGER.error("onError: " + session.getId(), throwable);
     }
@@ -61,7 +53,8 @@ public abstract class AbstractConnection implements Connection {
     public void disconnect()  throws Exception{
         final Session webSocketSession = getWebSocketSession();
         if (webSocketSession != null) {
-            webSocketSession.close();
+            webSocketSession.close(getCloseReason());
+            performDisconnected();
         }
     }
 
@@ -69,7 +62,7 @@ public abstract class AbstractConnection implements Connection {
     public void sendPacket(PacketProtos.Packet packet)  throws Exception {
         final Session webSocketSession = getWebSocketSession();
         if (webSocketSession != null) {
-            webSocketSession.close();
+            webSocketSession.getAsyncRemote().sendBinary(ByteBuffer.wrap(packet.toByteArray()));
         }
     }
 
@@ -89,7 +82,10 @@ public abstract class AbstractConnection implements Connection {
     protected void performDisconnected() {
         setWebSocketSession(null);
         setConnected(false);
-        setAuthenticated(true);
+    }
+
+    protected CloseReason getCloseReason() {
+        return new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "close");
     }
 
 }

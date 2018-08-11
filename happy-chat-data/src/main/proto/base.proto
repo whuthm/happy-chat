@@ -2,27 +2,27 @@ syntax = "proto3";
 option java_package = "com.whuthm.happychat.data";
 option java_outer_classname = "BaseProtos";
 
-message BoolRequest {
+message BoolBean {
 	bool data = 1;
 }
 
-message IntRequest {
+message IntBean {
 	int32 data = 1;
 }
 
-message StringListRequest{
+message StringListBean{
 	repeated string data = 1;
 }
 
-message LongRequest {
+message LongBean {
 	int64 data = 1;
 }
 
-message DoubleRequest {
+message DoubleBean {
 	double data = 1;
 }
 
-message StringRequest {
+message StringBean {
 	string data = 1;
 }
 

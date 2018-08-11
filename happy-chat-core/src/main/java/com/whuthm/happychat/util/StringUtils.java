@@ -2,6 +2,7 @@ package com.whuthm.happychat.util;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -30,8 +31,7 @@ public class StringUtils {
     public static byte[] toUtf8Bytes(String string) {
         try {
             return string.getBytes(StringUtils.UTF8);
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException("UTF-8 encoding not supported by platform", e);
         }
     }
@@ -44,7 +44,7 @@ public class StringUtils {
     };
 
     private static final char[] numbersAndLetters = ("0123456789abcdefghijklmnopqrstuvwxyz" +
-                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ").toCharArray();
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ").toCharArray();
 
     public static String insecureRandomString(int length) {
         return randomString(length, randGen.get());
@@ -87,10 +87,10 @@ public class StringUtils {
     /**
      * Returns true if CharSequence is not null and is not empty, false otherwise.
      * Examples:
-     *    isNotEmpty(null) - false
-     *    isNotEmpty("") - false
-     *    isNotEmpty(" ") - true
-     *    isNotEmpty("empty") - true
+     * isNotEmpty(null) - false
+     * isNotEmpty("") - false
+     * isNotEmpty(" ") - true
+     * isNotEmpty("empty") - true
      *
      * @param cs checked CharSequence
      * @return true if string is not null and is not empty, false otherwise
@@ -147,6 +147,18 @@ public class StringUtils {
      */
     public static boolean isEmpty(CharSequence cs) {
         return cs.length() == 0;
+    }
+
+    public static String sortToStringValue(String... values) {
+        if (values == null || values.length <= 0) {
+            return null;
+        }
+        Arrays.sort(values);
+        StringBuilder stringBuilder = new StringBuilder(values[0]);
+        for (int i = 1; i < values.length; i++) {
+            stringBuilder.append("|").append(values[i]);
+        }
+        return stringBuilder.toString();
     }
 
 }

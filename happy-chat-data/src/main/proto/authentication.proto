@@ -19,11 +19,11 @@ message LoginResponse {
     string keystore = 4;
 }
 
-enum ConnectionCloseCodes {
-    /** 被踢掉*/
-    kicked = 0;
-    /** token不正确*/
-    token_incorret = 1;
-    /** token过期*/
-    token_expired = 2;
-}
+//enum ConnectionCloseCodes {
+//    /** 被踢掉*/
+//    kicked = 0;
+//    /** token不正确*/
+//    token_incorret = 1;
+//    /** token过期*/
+//    token_expired = 2;
+//}

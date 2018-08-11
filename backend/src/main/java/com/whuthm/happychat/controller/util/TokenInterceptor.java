@@ -1,5 +1,6 @@
-package com.whuthm.happychat.service.authentication;
+package com.whuthm.happychat.controller.util;
 
+import com.whuthm.happychat.service.authentication.AuthenticationService;
 import com.whuthm.happychat.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(TokenInterceptor.class);
 
     @Autowired
-    private TokenManager manager;
+    private AuthenticationService authenticationService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -35,7 +36,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
             //从header中得到token
             String tokenValue = request.getHeader(Constants.TOKEN);
             //验证token
-            if (!manager.checkToken(tokenValue)) {
+            if (!authenticationService.isTokenValid(tokenValue)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return false;
             }
