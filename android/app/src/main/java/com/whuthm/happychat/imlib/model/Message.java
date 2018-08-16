@@ -12,10 +12,10 @@ import org.greenrobot.greendao.annotation.Id;
 
 @Entity
 public class Message {
-
+    
     @Id
     private String messageId;
-
+    
     private int type;
     
     private String body;
@@ -28,6 +28,8 @@ public class Message {
     
     private long receiveTime;
     
+    private String attrs;
+    
     private boolean read;
     
     private int status;
@@ -36,9 +38,10 @@ public class Message {
         
     }
     
-    @Generated(hash = 132822526)
+    @Generated(hash = 1173824308)
     public Message(String messageId, int type, String body, String fromUserId,
-            String toUserId, long sendTime, long receiveTime, boolean read, int status) {
+            String toUserId, long sendTime, long receiveTime, String attrs, boolean read,
+            int status) {
         this.messageId = messageId;
         this.type = type;
         this.body = body;
@@ -46,6 +49,7 @@ public class Message {
         this.toUserId = toUserId;
         this.sendTime = sendTime;
         this.receiveTime = receiveTime;
+        this.attrs = attrs;
         this.read = read;
         this.status = status;
     }
@@ -57,15 +61,15 @@ public class Message {
     public void setMessageId(String messageId) {
         this.messageId = messageId;
     }
-
+    
     public int getType() {
         return type;
     }
-
+    
     public void setType(int type) {
         this.type = type;
     }
-
+    
     public String getBody() {
         return this.body;
     }
@@ -120,5 +124,13 @@ public class Message {
     
     public void setRead(boolean read) {
         this.read = read;
+    }
+
+    public String getAttrs() {
+        return this.attrs;
+    }
+
+    public void setAttrs(String attrs) {
+        this.attrs = attrs;
     }
 }

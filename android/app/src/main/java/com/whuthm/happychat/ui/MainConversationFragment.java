@@ -114,7 +114,7 @@ public class MainConversationFragment extends BaseFragment {
             @Override
             public void onItemClick(int position) {
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
-                        intent.putExtra(Constants.KEY_CONVErSATION_ID,
+                        intent.putExtra(Constants.KEY_CONVERSATION_ID,
                                 conversationList.get(position).getConversionId());
                 startActivity(intent);
             }

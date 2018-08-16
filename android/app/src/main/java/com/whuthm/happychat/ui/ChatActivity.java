@@ -27,7 +27,7 @@ public class ChatActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_full_frag);
         
-        conversationId = getIntent().getStringExtra(Constants.KEY_CONVErSATION_ID);
+        conversationId = getIntent().getStringExtra(Constants.KEY_CONVERSATION_ID);
         if (TextUtils.isEmpty(conversationId)) {
             finish();
             return;

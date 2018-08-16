@@ -54,7 +54,7 @@ public class ChatFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         
-        conversationId = getArguments().getString(Constants.KEY_CONVErSATION_ID);
+        conversationId = getArguments().getString(Constants.KEY_CONVERSATION_ID);
         if (TextUtils.isEmpty(conversationId)) {
             getActivity().finish();
             return;

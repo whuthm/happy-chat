@@ -6,8 +6,11 @@ import com.whuthm.happychat.imlib.model.Conversation;
 import com.whuthm.happychat.imlib.model.ConversationDao;
 import com.whuthm.happychat.imlib.model.DaoMaster;
 import com.whuthm.happychat.imlib.model.DaoSession;
+import com.whuthm.happychat.imlib.model.Group;
 import com.whuthm.happychat.imlib.model.Message;
 import com.whuthm.happychat.imlib.model.MessageDao;
+import com.whuthm.happychat.imlib.model.User;
+import com.whuthm.happychat.imlib.model.UserDao;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
@@ -41,23 +44,7 @@ public class DBOperator {
     public static void addConversation(Conversation conversation) {
         DaoMaster master = new DaoMaster(sInstance.mHelper.getWritableDb());
         DaoSession session = master.newSession();
-        QueryBuilder<Conversation> queryBuilder = session.getConversationDao()
-                .queryBuilder();
-        if (queryBuilder.where(ConversationDao.Properties.ConversionId
-                .eq(conversation.getConversionId())).count() > 0) {
-            updateConversation(conversation);
-        }
-        else {
-            session.getConversationDao().insert(conversation);
-        }
-        
-        session.clear();
-    }
-    
-    public static void updateConversation(Conversation conversation) {
-        DaoMaster master = new DaoMaster(sInstance.mHelper.getWritableDb());
-        DaoSession session = master.newSession();
-        session.getConversationDao().update(conversation);
+        session.getConversationDao().insertOrReplace(conversation);
         
         session.clear();
     }
@@ -68,7 +55,7 @@ public class DBOperator {
         session.getConversationDao().delete(conversation);
         session.clear();
     }
-
+    
     public static List<Conversation> getConversations(int count) {
         DaoMaster master = new DaoMaster(sInstance.mHelper.getReadableDb());
         DaoSession session = master.newSession();
@@ -91,29 +78,6 @@ public class DBOperator {
         return list;
     }
     
-    public static void addMessage(Message message) {
-        DaoMaster master = new DaoMaster(sInstance.mHelper.getWritableDb());
-        DaoSession session = master.newSession();
-        QueryBuilder<Message> queryBuilder = session.getMessageDao().queryBuilder();
-        if (queryBuilder.where(MessageDao.Properties.MessageId.eq(message.getMessageId()))
-                .count() > 0) {
-            session.getMessageDao().update(message);
-        }
-        else {
-            session.getMessageDao().insert(message);
-        }
-        
-        session.clear();
-    }
-    
-    public static void updateMessage(Message message) {
-        DaoMaster master = new DaoMaster(sInstance.mHelper.getWritableDb());
-        DaoSession session = master.newSession();
-        session.getMessageDao().update(message);
-        
-        session.clear();
-    }
-    
     public static void delConversation(Message message) {
         DaoMaster master = new DaoMaster(sInstance.mHelper.getWritableDb());
         DaoSession session = master.newSession();
@@ -121,11 +85,19 @@ public class DBOperator {
         session.clear();
     }
     
+    public static void addMessage(Message message) {
+        DaoMaster master = new DaoMaster(sInstance.mHelper.getWritableDb());
+        DaoSession session = master.newSession();
+        session.getMessageDao().insertOrReplace(message);
+        
+        session.clear();
+    }
+    
     public static List<Message> getMessages(String conversationId, int count) {
         
         return getMessages(conversationId, count, 0);
     }
-
+    
     public static List<Message> getMessages(String conversationId, int count, int start) {
         DaoMaster master = new DaoMaster(sInstance.mHelper.getReadableDb());
         DaoSession session = master.newSession();
@@ -137,4 +109,34 @@ public class DBOperator {
         return list;
     }
     
+    public static void addGroups(List<Group> list) {
+        DaoMaster master = new DaoMaster(sInstance.mHelper.getWritableDb());
+        DaoSession session = master.newSession();
+        session.getGroupDao().insertInTx(list);
+        session.clear();
+    }
+    
+    public static List<Group> getGroups() {
+        DaoMaster master = new DaoMaster(sInstance.mHelper.getReadableDb());
+        DaoSession session = master.newSession();
+        List<Group> list = session.getGroupDao().queryBuilder().list();
+        session.clear();
+        return list;
+    }
+    
+    public static void addUsers(List<User> list) {
+        DaoMaster master = new DaoMaster(sInstance.mHelper.getWritableDb());
+        DaoSession session = master.newSession();
+        session.getUserDao().insertInTx(list);
+        session.clear();
+    }
+    
+    public static List<User> getUsersByIds(List<String> idList) {
+        DaoMaster master = new DaoMaster(sInstance.mHelper.getReadableDb());
+        DaoSession session = master.newSession();
+        List<User> list = session.getUserDao().queryBuilder()
+                .where(UserDao.Properties.Id.in(idList)).list();
+        session.clear();
+        return list;
+    }
 }
