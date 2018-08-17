@@ -14,9 +14,9 @@ import org.greenrobot.greendao.annotation.Id;
 public class Message {
     
     @Id
-    private String messageId;
+    private long messageId;
     
-    private int type;
+    private String type;
     
     private String body;
     
@@ -24,9 +24,7 @@ public class Message {
     
     private String toUserId;
     
-    private long sendTime;
-    
-    private long receiveTime;
+    private long time;
     
     private String attrs;
     
@@ -38,35 +36,33 @@ public class Message {
         
     }
     
-    @Generated(hash = 1173824308)
-    public Message(String messageId, int type, String body, String fromUserId,
-            String toUserId, long sendTime, long receiveTime, String attrs, boolean read,
-            int status) {
+    @Generated(hash = 1186870233)
+    public Message(long messageId, String type, String body, String fromUserId,
+            String toUserId, long time, String attrs, boolean read, int status) {
         this.messageId = messageId;
         this.type = type;
         this.body = body;
         this.fromUserId = fromUserId;
         this.toUserId = toUserId;
-        this.sendTime = sendTime;
-        this.receiveTime = receiveTime;
+        this.time = time;
         this.attrs = attrs;
         this.read = read;
         this.status = status;
     }
 
-    public String getMessageId() {
+    public long getMessageId() {
         return this.messageId;
     }
     
-    public void setMessageId(String messageId) {
+    public void setMessageId(long messageId) {
         this.messageId = messageId;
     }
     
-    public int getType() {
+    public String getType() {
         return type;
     }
     
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
     
@@ -78,12 +74,12 @@ public class Message {
         this.body = body;
     }
     
-    public long getSendTime() {
-        return this.sendTime;
+    public long getTime() {
+        return this.time;
     }
     
-    public void setSendTime(long sendTime) {
-        this.sendTime = sendTime;
+    public void setTime(long time) {
+        this.time = time;
     }
     
     public int getStatus() {
@@ -110,14 +106,6 @@ public class Message {
         this.toUserId = toUserId;
     }
     
-    public long getReceiveTime() {
-        return this.receiveTime;
-    }
-    
-    public void setReceiveTime(long receiveTime) {
-        this.receiveTime = receiveTime;
-    }
-    
     public boolean getRead() {
         return this.read;
     }
@@ -125,11 +113,11 @@ public class Message {
     public void setRead(boolean read) {
         this.read = read;
     }
-
+    
     public String getAttrs() {
         return this.attrs;
     }
-
+    
     public void setAttrs(String attrs) {
         this.attrs = attrs;
     }

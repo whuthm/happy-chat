@@ -83,7 +83,7 @@ public class MainConversationFragment extends BaseFragment {
         conversation.setConversionId(id);
         conversation.setConversionName("狗子起来嗨 " + id);
         conversation.setCreateTime(System.currentTimeMillis());
-        conversation.setConversationType(Constants.ConversationType.SINGLE.ordinal());
+        conversation.setConversationType(Constants.ConversationType.SingleChat.name());
         DBOperator.addConversation(conversation);
         
         conversationList.add(0, conversation);

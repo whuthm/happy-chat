@@ -16,7 +16,7 @@ public class Conversation {
     @Id
     private String conversionId;
     
-    private int conversationType;
+    private String conversationType;
     
     private String conversionName;
     
@@ -30,8 +30,8 @@ public class Conversation {
         
     }
     
-    @Generated(hash = 1272194739)
-    public Conversation(String conversionId, int conversationType,
+    @Generated(hash = 766167222)
+    public Conversation(String conversionId, String conversationType,
             String conversionName, String lastMessageBody, long createTime,
             int status) {
         this.conversionId = conversionId;
@@ -82,11 +82,11 @@ public class Conversation {
         this.status = status;
     }
 
-    public int getConversationType() {
+    public String getConversationType() {
         return this.conversationType;
     }
 
-    public void setConversationType(int conversationType) {
+    public void setConversationType(String conversationType) {
         this.conversationType = conversationType;
     }
 }

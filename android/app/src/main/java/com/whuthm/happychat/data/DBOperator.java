@@ -103,7 +103,7 @@ public class DBOperator {
         DaoSession session = master.newSession();
         QueryBuilder<Message> queryBuilder = session.getMessageDao().queryBuilder();
         queryBuilder.where(MessageDao.Properties.ToUserId.eq(conversationId)).limit(count)
-                .orderDesc(MessageDao.Properties.SendTime).offset(start);
+                .orderDesc(MessageDao.Properties.Time).offset(start);
         List<Message> list = queryBuilder.list();
         session.clear();
         return list;

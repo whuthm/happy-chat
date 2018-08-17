@@ -21,11 +21,15 @@ import com.barran.lib.view.text.ColorfulTextView;
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.data.Constants;
 import com.whuthm.happychat.data.DBOperator;
+import com.whuthm.happychat.imlib.ConversationService;
 import com.whuthm.happychat.imlib.model.Message;
 import com.whuthm.happychat.ui.item.TextMessageItem;
 
 import java.util.Collections;
 import java.util.List;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * 聊天界面
@@ -43,11 +47,13 @@ public class ChatFragment extends BaseFragment {
     
     private MessageAdapter mAdapter;
     
-    private EditText intput;
+    private EditText input;
     
     private ColorfulTextView btnSend;
     
     private IFragAction action;
+    
+    private Disposable mDisposable;
     
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,6 +71,21 @@ public class ChatFragment extends BaseFragment {
         if (messageList.size() > 0) {
             Collections.reverse(messageList);
         }
+
+        // TODO FIX
+//        mDisposable = ConversationService.instance().subscribeMessage(new Consumer<Message>() {
+//            @Override
+//            public void accept(Message message) throws Exception {
+//                messageList.add(message);
+//                mAdapter.notifyDataSetChanged();
+//            }
+//        });
+    }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mDisposable.dispose();
     }
     
     public void setFragAction(IFragAction action) {
@@ -83,17 +104,12 @@ public class ChatFragment extends BaseFragment {
     
     private void addMessage(String text) {
         List<Message> messages = DBOperator.getMessages(conversationId, 1);
-        String id;
+        long id;
         if (messages.size() > 0) {
-            try {
-                int idInt = Integer.parseInt(messages.get(0).getMessageId());
-                id = String.valueOf(idInt + 1);
-            } catch (NumberFormatException e) {
-                id = "0";
-            }
+            id = messages.get(0).getMessageId();
         }
         else {
-            id = String.valueOf(1);
+            id = 1L;
         }
         Message message = new Message();
         message.setMessageId(id);
@@ -104,8 +120,7 @@ public class ChatFragment extends BaseFragment {
             message.setBody(text);
         }
         message.setFromUserId("111");
-        message.setSendTime(System.currentTimeMillis());
-        message.setReceiveTime(System.currentTimeMillis());
+        message.setTime(System.currentTimeMillis());
         message.setToUserId(conversationId);
         DBOperator.addMessage(message);
         
@@ -163,17 +178,18 @@ public class ChatFragment extends BaseFragment {
         });
         recyclerView.setAdapter(mAdapter = new MessageAdapter());
         
-        intput = view.findViewById(R.id.frag_chat_input);
+        input = view.findViewById(R.id.frag_chat_input);
         btnSend = view.findViewById(R.id.frag_chat_send);
         
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String text = intput.getText().toString();
+                String text = input.getText().toString();
                 if (!TextUtils.isEmpty(text)) {
                     addMessage(text);
-                    intput.setText("");
-                }else{
+                    input.setText("");
+                }
+                else {
                     addMessage();
                 }
             }
