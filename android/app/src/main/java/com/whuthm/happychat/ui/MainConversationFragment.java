@@ -22,9 +22,13 @@ import com.barran.lib.view.text.ColorfulTextView;
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.data.Constants;
 import com.whuthm.happychat.data.DBOperator;
+import com.whuthm.happychat.imlib.ConversationService;
 import com.whuthm.happychat.imlib.model.Conversation;
 
 import java.util.List;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * 聊天列表
@@ -42,12 +46,43 @@ public class MainConversationFragment extends BaseFragment {
     
     private List<Conversation> conversationList;
     
+    private Disposable mDisposable;
+    
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         
         conversationList = DBOperator.getConversations();
+        
+        // TODO FIX
+//        mDisposable = ConversationService.instance()
+//                .subscribeConversation(new Consumer<Conversation>() {
+//                    @Override
+//                    public void accept(Conversation conversation) throws Exception {
+//                        int index;
+//                        switch (conversation.getStatus()) {
+//                            case Constants.ACTION_ADD:
+//                                conversationList.add(conversation);
+//                                mAdapter.notifyItemInserted(conversationList.size() - 1);
+//                                break;
+//                            case Constants.ACTION_DELETE:
+//                                index = conversationList.indexOf(conversation);
+//                                if (index >= 0) {
+//                                    conversationList.remove(conversation);
+//                                    mAdapter.notifyItemRemoved(index);
+//                                }
+//                                break;
+//                            case Constants.ACTION_UPDATE:
+//                                index = conversationList.indexOf(conversation);
+//                                if (index >= 0) {
+//                                    conversationList.set(index, conversation);
+//                                    mAdapter.notifyItemChanged(index);
+//                                }
+//                                break;
+//                        }
+//                    }
+//                });
     }
     
     @Override
@@ -63,7 +98,7 @@ public class MainConversationFragment extends BaseFragment {
         }
         return super.onOptionsItemSelected(item);
     }
-
+    
     // test
     private void addConversation() {
         List<Conversation> conversations = DBOperator.getConversations(1);
@@ -88,7 +123,7 @@ public class MainConversationFragment extends BaseFragment {
         
         conversationList.add(0, conversation);
         mAdapter.notifyDataSetChanged();
-
+        
         if (recyclerView.getVisibility() == View.GONE) {
             recyclerView.setVisibility(View.VISIBLE);
             addConversation.setVisibility(View.GONE);
@@ -110,15 +145,16 @@ public class MainConversationFragment extends BaseFragment {
         addConversation = view.findViewById(R.id.frag_conversation_list_add);
         
         mAdapter = new ConversationAdapter();
-        mAdapter.setItemClickListener(new BaseRecyclerAdapter.RecyclerViewItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Intent intent = new Intent(getActivity(), ChatActivity.class);
+        mAdapter.setItemClickListener(
+                new BaseRecyclerAdapter.RecyclerViewItemClickListener() {
+                    @Override
+                    public void onItemClick(int position) {
+                        Intent intent = new Intent(getActivity(), ChatActivity.class);
                         intent.putExtra(Constants.KEY_CONVERSATION_ID,
                                 conversationList.get(position).getConversionId());
-                startActivity(intent);
-            }
-        });
+                        startActivity(intent);
+                    }
+                });
         
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new VerticalDividerDecoration(getActivity()));

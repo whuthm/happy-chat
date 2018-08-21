@@ -73,13 +73,34 @@ public class ChatFragment extends BaseFragment {
         }
 
         // TODO FIX
-//        mDisposable = ConversationService.instance().subscribeMessage(new Consumer<Message>() {
-//            @Override
-//            public void accept(Message message) throws Exception {
-//                messageList.add(message);
-//                mAdapter.notifyDataSetChanged();
-//            }
-//        });
+//        mDisposable = ConversationService.instance()
+//                .subscribeMessage(new Consumer<Message>() {
+//                    @Override
+//                    public void accept(Message message) throws Exception {
+//
+//                        int index;
+//                        switch (message.getStatus()) {
+//                            case Constants.ACTION_ADD:
+//                                messageList.add(message);
+//                                mAdapter.notifyItemInserted(messageList.size() - 1);
+//                                break;
+//                            case Constants.ACTION_DELETE:
+//                                index = messageList.indexOf(message);
+//                                if (index >= 0) {
+//                                    messageList.remove(message);
+//                                    mAdapter.notifyItemRemoved(index);
+//                                }
+//                                break;
+//                            case Constants.ACTION_UPDATE:
+//                                index = messageList.indexOf(message);
+//                                if (index >= 0) {
+//                                    messageList.set(index, message);
+//                                    mAdapter.notifyItemChanged(index);
+//                                }
+//                                break;
+//                        }
+//                    }
+//                });
     }
     
     @Override

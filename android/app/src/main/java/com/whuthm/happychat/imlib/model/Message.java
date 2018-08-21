@@ -121,4 +121,12 @@ public class Message {
     public void setAttrs(String attrs) {
         this.attrs = attrs;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Message) {
+            return messageId == ((Message) obj).getMessageId();
+        }
+        return super.equals(obj);
+    }
 }

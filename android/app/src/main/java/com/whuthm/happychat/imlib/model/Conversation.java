@@ -89,4 +89,12 @@ public class Conversation {
     public void setConversationType(String conversationType) {
         this.conversationType = conversationType;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Conversation) {
+            return conversionId.equals(((Conversation) obj).getConversionId());
+        }
+        return super.equals(obj);
+    }
 }

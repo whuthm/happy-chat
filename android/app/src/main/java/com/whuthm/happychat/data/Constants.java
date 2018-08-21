@@ -37,4 +37,9 @@ public class Constants {
     public static final String KEY_CONVERSATION_ID = "conversation_id";
     
     public static final int MESSAGE_PAGE_COUNT = 20;// 消息分页加载量
+    
+    // 消息和会话的事件定义
+    public static final int ACTION_ADD = 1;
+    public static final int ACTION_UPDATE = 2;
+    public static final int ACTION_DELETE = 3;
 }
