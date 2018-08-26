@@ -1,8 +1,11 @@
 package com.whuthm.happychat.imlib.model;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.ToOne;
+
+import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * 会话实体
@@ -11,90 +14,70 @@ import org.greenrobot.greendao.annotation.Id;
  */
 
 @Entity
-public class Conversation {
+public class Conversation implements Serializable {
 
     @Id
-    private String conversionId;
+    private String id;
     
-    private String conversationType;
+    private String type;
     
-    private String conversionName;
+    private long latestMessageId;
+
+    @ToOne(joinProperty = "latestMessageId")
+    private Message latestMessage;
     
-    private String lastMessageBody;
-    
-    private long createTime;
-    
-    private int status;
-    
+    private long latestMessageTime;
+
     public Conversation() {
         
-    }
-    
-    @Generated(hash = 766167222)
-    public Conversation(String conversionId, String conversationType,
-            String conversionName, String lastMessageBody, long createTime,
-            int status) {
-        this.conversionId = conversionId;
-        this.conversationType = conversationType;
-        this.conversionName = conversionName;
-        this.lastMessageBody = lastMessageBody;
-        this.createTime = createTime;
-        this.status = status;
-    }
-
-    public String getConversionId() {
-        return this.conversionId;
-    }
-    
-    public void setConversionId(String conversionId) {
-        this.conversionId = conversionId;
-    }
-    
-    public String getConversionName() {
-        return this.conversionName;
-    }
-    
-    public void setConversionName(String conversionName) {
-        this.conversionName = conversionName;
-    }
-    
-    public String getLastMessageBody() {
-        return this.lastMessageBody;
-    }
-    
-    public void setLastMessageBody(String lastMessageBody) {
-        this.lastMessageBody = lastMessageBody;
-    }
-    
-    public long getCreateTime() {
-        return this.createTime;
-    }
-    
-    public void setCreateTime(long createTime) {
-        this.createTime = createTime;
-    }
-    
-    public int getStatus() {
-        return this.status;
-    }
-    
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public String getConversationType() {
-        return this.conversationType;
-    }
-
-    public void setConversationType(String conversationType) {
-        this.conversationType = conversationType;
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Conversation) {
-            return conversionId.equals(((Conversation) obj).getConversionId());
+            return id.equals(((Conversation) obj).id);
         }
         return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(new String[]{id});
+    }
+    public String getId() {
+        return this.id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+    public String getType() {
+        return this.type;
+    }
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public long getLatestMessageId() {
+        return latestMessageId;
+    }
+
+    public void setLatestMessageId(long latestMessageId) {
+        this.latestMessageId = latestMessageId;
+    }
+
+    public Message getLatestMessage() {
+        return latestMessage;
+    }
+
+    public void setLatestMessage(Message latestMessage) {
+        this.latestMessage = latestMessage;
+    }
+
+    public long getLatestMessageTime() {
+        return latestMessageTime;
+    }
+
+    public void setLatestMessageTime(long latestMessageTime) {
+        this.latestMessageTime = latestMessageTime;
     }
 }

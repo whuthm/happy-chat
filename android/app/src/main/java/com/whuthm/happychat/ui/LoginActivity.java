@@ -17,6 +17,7 @@ import com.barran.lib.view.text.LimitEditText;
 import com.barran.lib.view.text.LimitTextWatcher;
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.data.AuthenticationProtos;
+import com.whuthm.happychat.data.ClientProtos;
 import com.whuthm.happychat.data.UserAccount;
 import com.whuthm.happychat.data.api.ApiObserver;
 import com.whuthm.happychat.data.api.RetrofitClient;
@@ -94,7 +95,9 @@ public class LoginActivity extends BaseActivity {
 
         AuthenticationProtos.LoginRequest.Builder builder = AuthenticationProtos.LoginRequest
                 .newBuilder();
-        builder.setUsername(username).setPassword(mETPassword.getText().toString())
+        builder.setUsername(username)
+                .setPassword(mETPassword.getText().toString())
+                .setClientResource(ClientProtos.ClientResource.phone)
                 .setPublicKey("");
         RetrofitClient.api().login(builder.build()).subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())

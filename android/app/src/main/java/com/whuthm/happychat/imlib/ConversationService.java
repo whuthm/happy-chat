@@ -61,8 +61,8 @@ public class ConversationService {
                     }
                 });
         
-        mConnection = new ChatConnection();
-        mConnection.setMessageListener(new MessageListener());
+        mConnection = new ChatConnection(messageReceiver);
+        //mConnection.setMessageListener(new MessageListener());
         mConnection.connect();
     }
     
@@ -114,7 +114,7 @@ public class ConversationService {
                         
                         for (Conversation conversation : conversations) {
                             if (message.getTo()
-                                    .equals(conversation.getConversionId())) {
+                                    .equals(conversation.getId())) {
                                 exists = true;
                                 break;
                             }
@@ -135,10 +135,10 @@ public class ConversationService {
     
     private void addConversation(Message message) {
         Conversation conversation = new Conversation();
-        conversation.setConversionId(message.getTo());
-        conversation.setConversionName(message.getFrom());
-        conversation.setCreateTime(message.getSendTime());
-        conversation.setConversationType(message.getType());
+        conversation.setId(message.getTo());
+        //conversation.setConversionName(message.getFrom());
+        //conversation.setCreateTime(message.getSendTime());
+        conversation.setType(message.getConversationType());
         DBOperator.addConversation(conversation);
         
         mConversationEmitter.onNext(conversation);

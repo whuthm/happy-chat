@@ -51,6 +51,7 @@ public class ChatConnection extends AbstractConnection {
                 performConnected(session);
             }
         } catch (Exception ex) {
+            LOGGER.error("onOpen", ex);
             try {
                 disconnect();
             } catch (Exception e) {

@@ -24,7 +24,7 @@ public class MainTestFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final ChatConnection chatConnection = new ChatConnection();
+        final ChatConnection chatConnection = new ChatConnection(messageReceiver);
         view.findViewById(R.id.btn_connect)
                 .setOnClickListener(new View.OnClickListener() {
                     @Override

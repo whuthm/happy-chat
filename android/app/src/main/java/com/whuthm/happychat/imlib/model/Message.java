@@ -1,15 +1,13 @@
 package com.whuthm.happychat.imlib.model;
 
-import android.text.TextUtils;
-
-import com.whuthm.happychat.util.StringUtils;
-
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.Index;
+import org.greenrobot.greendao.annotation.Unique;
 
+import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * 消息实体
@@ -18,11 +16,23 @@ import java.util.Objects;
  */
 
 @Entity
-public class Message {
+public class Message implements Serializable {
 
-    @Id
-    private String id;
+    /**
+     * 客戶端数据库表ID
+     */
+    @Id(autoincrement = true)
+    private long id;
 
+    /**
+     * 客戶端生成uuid传递给服务端，用于校验服务器已送达
+     */
+    @Unique
+    private String uid;
+
+    /**
+     * 服务端生成传递给客户端，客户端可以根据此字段判断消息已读（PC和phone共存时）
+     */
     private long sid;
 
     private String type;
@@ -31,6 +41,10 @@ public class Message {
 
     private String from;
 
+    /**
+     * 建索引，快速查询某一会话的历史消息
+     */
+    @Index
     private String to;
 
 
@@ -52,11 +66,13 @@ public class Message {
     }
 
 
-    @Generated(hash = 1831186955)
-    public Message(String id, long sid, String type, String conversationType,
-            String from, String to, String body, long sendTime, long receiveTime,
-            String attrs, String extra, boolean read, int status) {
+    @Generated(hash = 497362192)
+    public Message(long id, String uid, long sid, String type,
+            String conversationType, String from, String to, String body,
+            long sendTime, long receiveTime, String attrs, String extra,
+            boolean read, int status) {
         this.id = id;
+        this.uid = uid;
         this.sid = sid;
         this.type = type;
         this.conversationType = conversationType;
@@ -72,12 +88,11 @@ public class Message {
     }
 
 
-
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -140,16 +155,15 @@ public class Message {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Message) {
-            return TextUtils.equals(id, ((Message) obj).id);
+            return id ==((Message) obj).id;
         }
-        return super.equals(obj);
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new String[]{id});
+        return Arrays.hashCode(new long[]{id});
     }
-
 
 
     public long getSid() {
@@ -157,11 +171,9 @@ public class Message {
     }
 
 
-
     public void setSid(long sid) {
         this.sid = sid;
     }
-
 
 
     public String getConversationType() {
@@ -169,11 +181,9 @@ public class Message {
     }
 
 
-
     public void setConversationType(String conversationType) {
         this.conversationType = conversationType;
     }
-
 
 
     public long getSendTime() {
@@ -181,11 +191,9 @@ public class Message {
     }
 
 
-
     public void setSendTime(long sendTime) {
         this.sendTime = sendTime;
     }
-
 
 
     public long getReceiveTime() {
@@ -193,11 +201,9 @@ public class Message {
     }
 
 
-
     public void setReceiveTime(long receiveTime) {
         this.receiveTime = receiveTime;
     }
-
 
 
     public String getExtra() {
@@ -205,8 +211,17 @@ public class Message {
     }
 
 
-
     public void setExtra(String extra) {
         this.extra = extra;
+    }
+
+
+    public String getUid() {
+        return this.uid;
+    }
+
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }

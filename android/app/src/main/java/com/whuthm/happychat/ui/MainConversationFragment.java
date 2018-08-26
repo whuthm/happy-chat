@@ -101,33 +101,33 @@ public class MainConversationFragment extends BaseFragment {
     
     // test
     private void addConversation() {
-        List<Conversation> conversations = DBOperator.getConversations(1);
-        String id;
-        if (conversations.size() > 0) {
-            try {
-                int idInt = Integer.parseInt(conversations.get(0).getConversionId());
-                id = String.valueOf(idInt + 1);
-            } catch (NumberFormatException e) {
-                id = "0";
-            }
-        }
-        else {
-            id = String.valueOf(1);
-        }
-        Conversation conversation = new Conversation();
-        conversation.setConversionId(id);
-        conversation.setConversionName("狗子起来嗨 " + id);
-        conversation.setCreateTime(System.currentTimeMillis());
-        conversation.setConversationType(Constants.ConversationType.SingleChat.name());
-        DBOperator.addConversation(conversation);
-        
-        conversationList.add(0, conversation);
-        mAdapter.notifyDataSetChanged();
-        
-        if (recyclerView.getVisibility() == View.GONE) {
-            recyclerView.setVisibility(View.VISIBLE);
-            addConversation.setVisibility(View.GONE);
-        }
+//        List<Conversation> conversations = DBOperator.getConversations(1);
+//        String id;
+//        if (conversations.size() > 0) {
+//            try {
+//                int idInt = Integer.parseInt(conversations.get(0).getConversionId());
+//                id = String.valueOf(idInt + 1);
+//            } catch (NumberFormatException e) {
+//                id = "0";
+//            }
+//        }
+//        else {
+//            id = String.valueOf(1);
+//        }
+//        Conversation conversation = new Conversation();
+//        conversation.setConversionId(id);
+//        conversation.setConversionName("狗子起来嗨 " + id);
+//        conversation.setCreateTime(System.currentTimeMillis());
+//        conversation.setConversationType(Constants.ConversationType.SingleChat.name());
+//        DBOperator.addConversation(conversation);
+//
+//        conversationList.add(0, conversation);
+//        mAdapter.notifyDataSetChanged();
+//
+//        if (recyclerView.getVisibility() == View.GONE) {
+//            recyclerView.setVisibility(View.VISIBLE);
+//            addConversation.setVisibility(View.GONE);
+//        }
     }
     
     @Nullable
@@ -151,7 +151,7 @@ public class MainConversationFragment extends BaseFragment {
                     public void onItemClick(int position) {
                         Intent intent = new Intent(getActivity(), ChatActivity.class);
                         intent.putExtra(Constants.KEY_CONVERSATION_ID,
-                                conversationList.get(position).getConversionId());
+                                conversationList.get(position).getId());
                         startActivity(intent);
                     }
                 });
@@ -214,8 +214,8 @@ public class MainConversationFragment extends BaseFragment {
         }
         
         private void update(Conversation conversation) {
-            name.setText(conversation.getConversionName());
-            lastMessage.setText(conversation.getLastMessageBody());
+//            name.setText(conversation.getConversionName());
+//            lastMessage.setText(conversation.getLastMessageBody());
         }
     }
 }
