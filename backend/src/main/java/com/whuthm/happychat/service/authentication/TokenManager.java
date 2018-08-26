@@ -1,14 +1,10 @@
 package com.whuthm.happychat.service.authentication;
 
-import com.whuthm.happychat.utils.AuthenticationUtils;
-import com.whuthm.happychat.utils.Constants;
+import com.whuthm.happychat.service.vo.Identifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class TokenManager {
@@ -20,37 +16,16 @@ public class TokenManager {
         this.redis = redis;
     }
 
-    String createToken(String userId) {
+    String createToken(Identifier identifier) {
         //使用uuid作为源token
-        String token = userId + "-" + UUID.randomUUID().toString().replace("-", "");
-        redis.boundValueOps(userId).set(token, Constants.TOKEN_EXPIRES_HOUR, TimeUnit.HOURS);
+        String token = UUID.randomUUID().toString();
+        redis.boundValueOps(token).set(identifier.toString());
+        redis.boundValueOps(identifier.toString()).set(token);
         return token;
     }
 
-
-    void deleteToken(String token) {
-        redis.delete(AuthenticationUtils.getUserIdFromToken(token));
+    String getToken(Identifier identifier) {
+        return redis.boundValueOps(identifier.toString()).get();
     }
-
-    boolean checkToken(String token) {
-        if (StringUtils.isEmpty(token)) {
-            return false;
-        }
-        final String userId = getUserIdByToken(token);
-        return !StringUtils.isEmpty(userId) && token.equals(getToken(userId));
-    }
-
-    String getUserIdByToken(String token) {
-        return AuthenticationUtils.getUserIdFromToken(token);
-    }
-
-    boolean checkUser(String userId) {
-        return !StringUtils.isEmpty(userId) && !StringUtils.isEmpty(getToken(userId));
-    }
-
-    private String getToken(String userId) {
-        return redis.boundValueOps(userId).get();
-    }
-
 
 }

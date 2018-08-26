@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option java_package = "com.whuthm.happychat.data";
+option java_outer_classname = "ClientProtos";
+
+enum ClientResource {
+    r_windows = 0;
+    r_mac = 1;
+    r_iphone = 2;
+    r_android = 3;
+    r_web = 4;
+    r_h5 = 5;
+}
+
+enum ClientType {
+    t_pc = 0;
+    t_phone = 1;
+    t_web = 2;
+    t_h5 = 3;
+}
+
+enum ClientDomain {
+    d_chat = 0;
+    d_push = 1;
+}

@@ -124,29 +124,29 @@ public class ChatFragment extends BaseFragment {
     }
     
     private void addMessage(String text) {
-        List<Message> messages = DBOperator.getMessages(conversationId, 1);
-        long id;
-        if (messages.size() > 0) {
-            id = messages.get(0).getMessageId();
-        }
-        else {
-            id = 1L;
-        }
-        Message message = new Message();
-        message.setMessageId(id);
-        if (text == null) {
-            message.setBody("狗子起来嗨 " + id);
-        }
-        else {
-            message.setBody(text);
-        }
-        message.setFromUserId("111");
-        message.setTime(System.currentTimeMillis());
-        message.setToUserId(conversationId);
-        DBOperator.addMessage(message);
-        
-        messageList.add(message);
-        mAdapter.notifyDataSetChanged();
+//        List<Message> messages = DBOperator.getMessages(conversationId, 1);
+//        long id;
+//        if (messages.size() > 0) {
+//            id = messages.get(0).getMessageId();
+//        }
+//        else {
+//            id = 1L;
+//        }
+//        Message message = new Message();
+//        message.setMessageId(id);
+//        if (text == null) {
+//            message.setBody("狗子起来嗨 " + id);
+//        }
+//        else {
+//            message.setBody(text);
+//        }
+//        message.setFromUserId("111");
+//        message.setTime(System.currentTimeMillis());
+//        message.setToUserId(conversationId);
+//        DBOperator.addMessage(message);
+//
+//        messageList.add(message);
+//        mAdapter.notifyDataSetChanged();
     }
     
     @Override

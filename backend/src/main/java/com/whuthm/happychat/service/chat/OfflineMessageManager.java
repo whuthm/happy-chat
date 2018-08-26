@@ -16,6 +16,7 @@ class OfflineMessageManager {
         OfflineMessage offlineMessage = new OfflineMessage();
         offlineMessage.setMessage(message);
         offlineMessage.setTo(to);
+        offlineMessage.setMid(message.getId());
         offlineMessageRepository.save(offlineMessage);
     }
 

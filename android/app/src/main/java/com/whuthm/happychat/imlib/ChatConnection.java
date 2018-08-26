@@ -20,10 +20,19 @@ public class ChatConnection extends AbstractConnection {
     @Override
     protected void onMessageReceived(MessageProtos.MessageBean messageBean) {
         super.onMessageReceived(messageBean);
-        
-        Message message = new Message(messageBean.getUid(), messageBean.getType(),
-                messageBean.getBody(), messageBean.getFrom(), messageBean.getTo(),
-                messageBean.getTime(), messageBean.getAttributes(), false, 0);
+
+        Message message = new Message();
+        message.setId(messageBean.getId());
+        message.setSid(messageBean.getSid());
+        message.setType(messageBean.getType());
+        message.setBody(messageBean.getBody());
+        message.setFrom(messageBean.getFrom());
+        message.setTo(messageBean.getTo());
+        message.setAttrs(messageBean.getAttributes());
+        message.setConversationType(messageBean.getConversationType());
+        message.setReceiveTime(System.currentTimeMillis());
+        message.setSendTime(messageBean.getSendTime());
+        message.setExtra(messageBean.getExtra());
         
         if (mListener != null) {
             mListener.onMessageReceived(message);

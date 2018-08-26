@@ -37,12 +37,13 @@ message MessagesResponse {
 
 message MessageSendResponse {
     BaseResponse response = 1;
-    int64 uid = 2;
-    int64 time = 3;
+    int64 sid = 2;
+    int64 send_time = 3;
 }
 
 message MessageBean {
-    int64 uid = 2;
+    string id = 1;
+    int64 sid = 2;
     string type = 3;
     string from = 4;
     string to = 5;
@@ -50,7 +51,7 @@ message MessageBean {
     string conversation_type = 6;
     /** 通过keystore加密, json*/
     string body = 7;
-    int64 time = 8;
+    int64 send_time = 8;
     MentionedInfoBean mentioned_info = 9;
     /** 扩展，json*/
     string attributes = 10;

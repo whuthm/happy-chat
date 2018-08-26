@@ -1,11 +1,14 @@
 package com.whuthm.happychat.service.authentication;
 
+import com.whuthm.happychat.data.ClientProtos;
 import com.whuthm.happychat.domain.model.User;
 import com.whuthm.happychat.exception.NotFoundException;
 import com.whuthm.happychat.exception.ServerException;
 import com.whuthm.happychat.service.user.UserService;
+import com.whuthm.happychat.service.vo.Identifier;
 import com.whuthm.happychat.util.StringUtils;
 import com.whuthm.happychat.utils.AuthenticationUtils;
+import com.whuthm.happychat.utils.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,27 +22,19 @@ public class AuthenticationManager implements AuthenticationService  {
     UserService userService;
 
     @Override
-    public boolean isAuthenticated(String userId) {
-        return tokenManager.checkUser(userId);
+    public String getToken(String userId, ClientProtos.ClientResource clientResource) {
+        Identifier authIdentifier = Identifier.from(userId, Constants.IDENTIFIER_DOMAIN_AUTH, clientResource.name());
+        return tokenManager.getToken(authIdentifier);
     }
 
     @Override
-    public boolean isTokenValid(String token) {
-        return tokenManager.checkToken(token);
-    }
-
-    @Override
-    public String getUserIdByToken(String token) {
-        return tokenManager.getUserIdByToken(token);
-    }
-
-    @Override
-    public User login(String username, String password) throws Exception {
+    public User login(String username, String password, ClientProtos.ClientResource clientResource) throws Exception {
         User user = userService.getUser(username);
         if (user != null ) {
             if (!StringUtils.isEmpty(user.getPassword())
                     && user.getPassword().equals(AuthenticationUtils.encryptPassword(password, user.getSalt()))) {
-                String token = tokenManager.createToken(user.getId());
+                Identifier authIdentifier = Identifier.from(user.getId(), Constants.IDENTIFIER_DOMAIN_AUTH, clientResource.name());
+                String token = tokenManager.createToken(authIdentifier);
                 if (!StringUtils.isEmpty(token)) {
                     return user;
                 } else {

@@ -22,9 +22,18 @@ public class PacketUtils {
 
     public static IQProtos.IQ getMessageDeliveredIQ(IQProtos.MessageDeliveredIQ messageDeliveredIQ) {
         return IQProtos.IQ.newBuilder()
-                .setType(IQProtos.IQ.Type.result)
+                .setType(IQProtos.IQ.Type.get)
                 .setAction(IQProtos.IQ.Action.messageDelivered)
                 .setData(messageDeliveredIQ.toByteString())
+                .build();
+    }
+
+
+    public static IQProtos.IQ getMessageDeliveredACKIQ(IQProtos.MessageDeliveredACKIQ messageDeliveredACKIQ) {
+        return IQProtos.IQ.newBuilder()
+                .setType(IQProtos.IQ.Type.set)
+                .setAction(IQProtos.IQ.Action.messageDelivered)
+                .setData(messageDeliveredACKIQ.toByteString())
                 .build();
     }
 

@@ -26,6 +26,6 @@ public interface ApiService {
     Observable<UserProtos.UserResponse> getUserById(@Path("id") String userId);
     
     @POST("/v1/users")
-    Observable<UserProtos.UsersResponse> getUserList(@Body BaseProtos.StringListRequest request);
+    Observable<UserProtos.UsersResponse> getUserList(@Body BaseProtos.StringBean request);
     
 }

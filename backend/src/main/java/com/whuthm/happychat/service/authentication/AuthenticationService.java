@@ -1,16 +1,13 @@
 package com.whuthm.happychat.service.authentication;
 
+import com.whuthm.happychat.data.ClientProtos;
 import com.whuthm.happychat.domain.model.User;
 
 public interface AuthenticationService {
 
-    boolean isAuthenticated(String userId);
+    String getToken(String userId, ClientProtos.ClientResource clientResource);
 
-    boolean isTokenValid(String token);
-
-    String getUserIdByToken(String token);
-
-    User login(String username, String password) throws Exception;
+    User login(String username, String password, ClientProtos.ClientResource clientResource) throws Exception;
 
     User register() throws Exception;
 

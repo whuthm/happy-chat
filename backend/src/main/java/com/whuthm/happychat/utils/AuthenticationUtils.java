@@ -4,21 +4,12 @@ import org.springframework.util.StringUtils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.whuthm.happychat.utils.Constants.*;
 
 public class AuthenticationUtils {
-
-    public static String getUserIdFromToken(String token) {
-        return token.split("-")[0];
-    }
-
-    public static String getUid() {
-        return UUID.randomUUID().toString().replace("-", "");
-    }
 
     public static boolean matchEmail(String email){
         return match(email, REGEX_EMAIL);

@@ -14,6 +14,8 @@ import com.whuthm.happychat.validation.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+
 @Component
 class MessageManager implements MessagePacketHandler  {
 
@@ -35,6 +37,8 @@ class MessageManager implements MessagePacketHandler  {
                 ConversationType.from(messageBean.getConversationType()));
         if (conversation != null) {
             Message message = new Message();
+            message.setId(messageBean.getId());
+            message.setSid(nextSortId());
             message.setFrom(messageBean.getFrom());
             message.setTo(messageBean.getTo());
             message.setType(messageBean.getType());
@@ -55,51 +59,70 @@ class MessageManager implements MessagePacketHandler  {
             message.setAttributes(messageBean.getAttributes());
             Message newMessage = messageRepository.save(message);
 
-//            connection.sendPacket(PacketUtils.createPacket(
-//                    PacketProtos.Packet.Type.iq,
-//                    PacketUtils.getMessageDeliveredIQ(IQProtos.MessageDeliveredIQ.newBuilder()
-//                            .build())));
+            connection.sendPacket(PacketUtils.createPacket(
+                    PacketProtos.Packet.Type.iq,
+                    PacketUtils.getMessageDeliveredIQ(IQProtos.MessageDeliveredIQ.newBuilder()
+                            .setConversationId(newMessage.getTo())
+                            .setId(newMessage.getId())
+                            .setSid(newMessage.getSid())
+                            .build())));
 
             conversation.sendMessage(this, newMessage);
         }
     }
 
     void sendMessage(Message message, String to) {
-        final Connection connection = connectionManager.getConnection(to);
-        if (connection != null) {
-            MessageProtos.MentionedInfoBean mentionedInfoBean = null;
-            MentionedInfo mentionedInfo = message.getMentionedInfo();
-            if (mentionedInfo != null) {
-                mentionedInfoBean = MessageProtos.MentionedInfoBean.newBuilder()
-                        .setType(mentionedInfo.getType())
-                        .setContent(mentionedInfo.getContent())
-                        .setUserIds(mentionedInfo.getUserIds())
+        final Collection<Connection> connections = connectionManager.getConnectionsOf(to);
+        if (connections != null && connections.size() > 0) {
+            for (Connection connection : connections) {
+                MessageProtos.MentionedInfoBean mentionedInfoBean = null;
+                MentionedInfo mentionedInfo = message.getMentionedInfo();
+                if (mentionedInfo != null) {
+                    mentionedInfoBean = MessageProtos.MentionedInfoBean.newBuilder()
+                            .setType(mentionedInfo.getType())
+                            .setContent(mentionedInfo.getContent())
+                            .setUserIds(mentionedInfo.getUserIds())
+                            .build();
+                }
+                MessageProtos.MessageBean messageBean = MessageProtos.MessageBean.newBuilder()
+                        .setFrom(message.getFrom())
+                        .setTo(message.getTo())
+                        .setAttributes(message.getAttributes())
+                        .setConversationType(message.getConversationType())
+                        .setType(message.getType())
+                        .setSendTime(message.getCreateTime())
+                        .setBody(message.getBody())
+                        .setExtra(message.getExtra())
+                        .setId(message.getId())
+                        .setSid(message.getSid())
+                        .setMentionedInfo(mentionedInfoBean)
                         .build();
-            }
-            MessageProtos.MessageBean messageBean = MessageProtos.MessageBean.newBuilder()
-                    .setFrom(message.getFrom())
-                    .setTo(message.getTo())
-                    .setAttributes(message.getAttributes())
-                    .setConversationType(message.getConversationType())
-                    .setType(message.getType())
-                    .setTime(message.getCreateTime())
-                    .setBody(message.getBody())
-                    .setExtra(message.getExtra())
-                    .setUid(message.getId())
-                    .setMentionedInfo(mentionedInfoBean)
-                    .build();
-            try {
-                connection.sendPacket(PacketUtils.createPacket(PacketProtos.Packet.Type.message, messageBean));
-            } catch (Exception e) {
-                e.printStackTrace();
-                // 发送失败重试，retry
-                // 重试失败，进入离线队列 enqueue offline
-                offlineMessageManager.enqueue(message, to);
+                try {
+                    connection.sendPacket(PacketUtils.createPacket(PacketProtos.Packet.Type.message, messageBean));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    // 发送失败重试，retry
+                    // 重试失败，进入离线队列 enqueue offline
+                    offlineMessageManager.enqueue(message, to);
+                }
             }
         } else {
             // 发送对象未在线，进入利息那队列
             offlineMessageManager.enqueue(message, to);
         }
+    }
+
+    private void sendMessagePacket(Message message, MessageProtos.MessageBean messageBean, Connection connection) throws Exception {
+        try {
+            connection.sendPacket(PacketUtils.createPacket(PacketProtos.Packet.Type.message, messageBean));
+        } catch (Exception ex) {
+            throw ex;
+        }
+
+    }
+
+    private long nextSortId() {
+        return -1;
     }
 
 }

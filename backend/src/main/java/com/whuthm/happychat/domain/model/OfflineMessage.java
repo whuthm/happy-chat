@@ -7,9 +7,8 @@ import javax.persistence.*;
 public class OfflineMessage {
 
     @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @Column(name = "m_id")
+    private String mid;
 
     @Column(name = "to")
     private String to;
@@ -17,12 +16,12 @@ public class OfflineMessage {
     @OneToOne(fetch = FetchType.EAGER)
     private Message message;
 
-    public long getId() {
-        return id;
+    public String getMid() {
+        return mid;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setMid(String mid) {
+        this.mid = mid;
     }
 
     public String getTo() {

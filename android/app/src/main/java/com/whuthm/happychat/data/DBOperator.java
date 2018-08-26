@@ -102,8 +102,8 @@ public class DBOperator {
         DaoMaster master = new DaoMaster(sInstance.mHelper.getReadableDb());
         DaoSession session = master.newSession();
         QueryBuilder<Message> queryBuilder = session.getMessageDao().queryBuilder();
-        queryBuilder.where(MessageDao.Properties.ToUserId.eq(conversationId)).limit(count)
-                .orderDesc(MessageDao.Properties.Time).offset(start);
+        queryBuilder.where(MessageDao.Properties.To.eq(conversationId)).limit(count)
+                .orderDesc(MessageDao.Properties.SendTime).offset(start);
         List<Message> list = queryBuilder.list();
         session.clear();
         return list;

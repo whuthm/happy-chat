@@ -8,7 +8,12 @@ public class Constants {
      */
     public static final int TOKEN_EXPIRES_HOUR = 30 * 24;
 
-    public static final String TOKEN = "token";
+    public static final String HEADER_TOKEN = "token";
+    public static final String HEADER_USER_ID = "user_id";
+    public static final String HEADER_CLIENT_RESOURCE = "client_resource";
+
+    public static final String IDENTIFIER_DOMAIN_CHAT = "chat";
+    public static final String IDENTIFIER_DOMAIN_AUTH = "auth";
 
     public static final String REGEX_EMAIL = "^\\w+((-\\w+)|(\\.\\w+))*\\@[A-Za-z0-9]+((\\.|-)[A-Za-z0-9]+)*\\.[A-Za-z0-9]+$";
 

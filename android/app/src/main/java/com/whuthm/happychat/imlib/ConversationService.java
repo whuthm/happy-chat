@@ -113,7 +113,7 @@ public class ConversationService {
                         boolean exists = false;
                         
                         for (Conversation conversation : conversations) {
-                            if (message.getToUserId()
+                            if (message.getTo()
                                     .equals(conversation.getConversionId())) {
                                 exists = true;
                                 break;
@@ -135,9 +135,9 @@ public class ConversationService {
     
     private void addConversation(Message message) {
         Conversation conversation = new Conversation();
-        conversation.setConversionId(message.getToUserId());
-        conversation.setConversionName(message.getFromUserId());
-        conversation.setCreateTime(message.getTime());
+        conversation.setConversionId(message.getTo());
+        conversation.setConversionName(message.getFrom());
+        conversation.setCreateTime(message.getSendTime());
         conversation.setConversationType(message.getType());
         DBOperator.addConversation(conversation);
         

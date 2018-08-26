@@ -8,8 +8,9 @@ public class Message {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private String id;
+    @Column(name = "sid")
+    private long sid;
     @Column(name = "type", nullable = false)
     private String type;
     @Column(name = "from_who", nullable = false)
@@ -33,12 +34,20 @@ public class Message {
     @OneToOne(fetch = FetchType.EAGER)
     private MentionedInfo mentionedInfo;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
+    }
+
+    public long getSid() {
+        return sid;
+    }
+
+    public void setSid(long sid) {
+        this.sid = sid;
     }
 
     public String getType() {

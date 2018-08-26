@@ -1,11 +1,13 @@
 package com.whuthm.happychat.controller.util;
 
+import com.whuthm.happychat.data.ClientProtos;
 import com.whuthm.happychat.service.authentication.AuthenticationService;
 import com.whuthm.happychat.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -34,9 +36,12 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
         if (token != null && token.check()) {
             LOGGER.warn(request.getRequestURI() + " need to check token");
             //从header中得到token
-            String tokenValue = request.getHeader(Constants.TOKEN);
+            String tokenValue = request.getHeader(Constants.HEADER_TOKEN);
+            String userId = request.getHeader(Constants.HEADER_USER_ID);
+            String clientResource = request.getHeader(Constants.HEADER_CLIENT_RESOURCE);
             //验证token
-            if (!authenticationService.isTokenValid(tokenValue)) {
+            if (!StringUtils.isEmpty(tokenValue)
+                    && tokenValue.equals(authenticationService.getToken(userId, ClientProtos.ClientResource.valueOf(clientResource)))) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return false;
             }

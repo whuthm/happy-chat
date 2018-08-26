@@ -1,5 +1,6 @@
 package com.whuthm.happychat.service.chat;
 
+import com.whuthm.happychat.data.ClientProtos;
 import com.whuthm.happychat.data.IQProtos;
 import com.whuthm.happychat.data.MessageProtos;
 import com.whuthm.happychat.data.PacketProtos;
@@ -8,7 +9,9 @@ import com.whuthm.happychat.service.connection.AbstractConnection;
 import com.whuthm.happychat.service.connection.ConnectionCloseCodes;
 import com.whuthm.happychat.service.handler.IQPacketHandler;
 import com.whuthm.happychat.service.handler.MessagePacketHandler;
+import com.whuthm.happychat.service.vo.Identifier;
 import com.whuthm.happychat.util.PacketUtils;
+import com.whuthm.happychat.utils.Constants;
 import com.whuthm.happychat.utils.PacketCodec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @ServerEndpoint(
-        value = "/chat",
+        value = "/" + Constants.IDENTIFIER_DOMAIN_CHAT,
         encoders = PacketCodec.class,
         decoders = PacketCodec.class
 )
@@ -37,23 +40,52 @@ public class ChatConnection extends AbstractConnection {
     @Autowired
     IQPacketHandler iqPacketHandler;
 
-    private String token;
-    private String userId;
+    String token;
+
 
     @Override
     public void onOpen(Session session) {
         super.onOpen(session);
-        if (requireAuthenticated()) return;
-        performConnected(session);
+        try {
+            if (authenticateConnectionIdentifier()) {
+                performConnected(session);
+            }
+        } catch (Exception ex) {
+            try {
+                disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private boolean authenticateConnectionIdentifier() throws Exception {
+        Map<String, List<String>> requestParameterMap = getWebSocketSession().getRequestParameterMap();
+        final List<String> tokens = requestParameterMap.get(Constants.HEADER_TOKEN);
+        final List<String> userIds = requestParameterMap.get(Constants.HEADER_USER_ID);
+        final List<String> clientResources = requestParameterMap.get(Constants.HEADER_CLIENT_RESOURCE);
+        final String token = tokens != null && tokens.size() > 0 ? tokens.get(0) : null;
+        final String userId = userIds != null && userIds.size() > 0 ? userIds.get(0) : null;
+        final String clientResourceStringValue = clientResources != null && clientResources.size() > 0 ? clientResources.get(0) : null;
+        ClientProtos.ClientResource clientResource = ClientProtos.ClientResource.valueOf(clientResourceStringValue);
+        setToken(token);
+        final Identifier identifier = Identifier.from(userId, Constants.IDENTIFIER_DOMAIN_AUTH, clientResource.name());
+        setIdentifier(identifier);
+        return isAuthenticated();
+    }
+
+    private String getToken() {
+        return token;
+    }
+
+    private void setToken(String token) {
+        this.token = token;
     }
 
     @Override
     public void onPacket(Session session, PacketProtos.Packet packet) {
         super.onPacket(session, packet);
-        Map<String, List<String>> requestParameterMap = session.getRequestParameterMap();
-        List<String> tokens = requestParameterMap.get("token");
-        this.token = tokens != null && tokens.size() > 0 ? tokens.get(0) : null;
-        this.userId = authenticationService.getUserIdByToken(token);
         if (requireAuthenticated()) return;
         try {
             switch (packet.getType()) {
@@ -84,7 +116,10 @@ public class ChatConnection extends AbstractConnection {
     }
 
     private boolean isAuthenticated() {
-        return authenticationService.isTokenValid(token) && !StringUtils.isEmpty(userId);
+        final String token = getToken();
+        final Identifier identifier = getIdentifier();
+        final ClientProtos.ClientResource resource = ClientProtos.ClientResource.valueOf(identifier.getResource());
+        return !StringUtils.isEmpty(token) && token.equals(authenticationService.getToken(token, resource));
     }
 
     private boolean requireAuthenticated() {
@@ -99,20 +134,16 @@ public class ChatConnection extends AbstractConnection {
         return false;
     }
 
-    private String getUserId() {
-        return userId;
-    }
-
     @Override
     protected void performConnected(Session webSocketSession) {
         super.performConnected(webSocketSession);
-        chatConnectionManager.addConnection(getUserId(), this);
+        chatConnectionManager.addConnection(this);
     }
 
     @Override
     protected void performDisconnected() {
         super.performDisconnected();
-        chatConnectionManager.removeConnection(getUserId());
+        chatConnectionManager.removeConnection(this);
     }
 
     @Override
@@ -122,4 +153,5 @@ public class ChatConnection extends AbstractConnection {
         }
         return super.getCloseReason();
     }
+
 }

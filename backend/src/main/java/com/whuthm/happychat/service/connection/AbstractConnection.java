@@ -1,6 +1,7 @@
 package com.whuthm.happychat.service.connection;
 
 import com.whuthm.happychat.data.PacketProtos;
+import com.whuthm.happychat.service.vo.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +23,7 @@ public abstract class AbstractConnection implements Connection {
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     private Session webSocketSession;
+    private Identifier identifier;
 
     @OnOpen
     public void onOpen(Session session) {
@@ -82,6 +84,15 @@ public abstract class AbstractConnection implements Connection {
     protected void performDisconnected() {
         setWebSocketSession(null);
         setConnected(false);
+    }
+
+    protected void setIdentifier(Identifier identifier) {
+        this.identifier = identifier;
+    }
+
+    @Override
+    public final Identifier getIdentifier() {
+        return identifier;
     }
 
     protected CloseReason getCloseReason() {

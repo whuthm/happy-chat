@@ -78,7 +78,7 @@ public abstract class AbsMessageItem extends ConstraintLayout {
 
         if (!BuildConfig.DEBUG) {
             isSendBySelf = !TextUtils.isEmpty(UserAccount.getUserId())
-                    && UserAccount.getUserId().equals(message.getFromUserId());
+                    && UserAccount.getUserId().equals(message.getFrom());
         }
         
         if (isSendBySelf) {
@@ -96,8 +96,8 @@ public abstract class AbsMessageItem extends ConstraintLayout {
 
             mAvatarSelf.setVisibility(GONE);
 
-            mTvNick.setText(message.getFromUserId());
-            mTvTime.setText(DateUtil.formatDate(message.getTime()));
+            mTvNick.setText(message.getFrom());
+            mTvTime.setText(DateUtil.formatDate(message.getSendTime()));
         }
     }
 }

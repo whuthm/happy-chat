@@ -30,10 +30,17 @@ message IQ {
 
 message MessageDeliveredIQ {
     string conversation_id = 1;
-    int64 message_id = 2;
+    string id = 2;
+    int64 sid = 3;
+    int64 send_time = 4;
+}
+
+message MessageDeliveredACKIQ {
+    string id = 2;
 }
 
 message MessageReadIQ {
     string conversation_id = 1;
-    int64 message_id = 2;
+    string id = 2;
+    int64 sid = 3;
 }
