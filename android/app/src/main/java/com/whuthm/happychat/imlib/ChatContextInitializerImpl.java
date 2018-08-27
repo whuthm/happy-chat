@@ -6,8 +6,8 @@ class ChatContextInitializerImpl implements ChatContext.Initializer {
         MessageManager messageManager = new MessageManager(chatContext);
         ConnectionManager connectionManager = new ConnectionManager(chatContext);
         connectionManager.setMessageReceiver(messageManager);
-        chatContext.registerServiceProvider(MessageService.class, messageManager);
-        chatContext.registerServiceProvider(ConversationServiceV2.class, new ConversationManager(chatContext));
-        chatContext.registerServiceProvider(ConnectionService.class, connectionManager);
+        chatContext.registerService(MessageService.class, messageManager);
+        chatContext.registerService(ConversationServiceV2.class, new ConversationManager(chatContext));
+        chatContext.registerService(ConnectionService.class, connectionManager);
     }
 }

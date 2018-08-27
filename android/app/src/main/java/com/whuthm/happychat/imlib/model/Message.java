@@ -1,13 +1,13 @@
 package com.whuthm.happychat.imlib.model;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.Unique;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * 消息实体
@@ -18,6 +18,7 @@ import java.util.Arrays;
 @Entity
 public class Message implements Serializable {
 
+    private static final long serialVersionUID = 8769663248677565606L;
     /**
      * 客戶端数据库表ID
      */
@@ -61,11 +62,6 @@ public class Message implements Serializable {
 
     private int status;
 
-    public Message() {
-
-    }
-
-
     @Generated(hash = 497362192)
     public Message(long id, String uid, long sid, String type,
             String conversationType, String from, String to, String body,
@@ -87,6 +83,9 @@ public class Message implements Serializable {
         this.status = status;
     }
 
+    @Generated(hash = 637306882)
+    public Message() {
+    }
 
     public long getId() {
         return id;

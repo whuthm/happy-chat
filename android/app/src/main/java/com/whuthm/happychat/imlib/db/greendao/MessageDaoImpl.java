@@ -4,7 +4,10 @@ import com.whuthm.happychat.imlib.db.IMessageDao;
 import com.whuthm.happychat.imlib.model.DaoSession;
 import com.whuthm.happychat.imlib.model.Message;
 import com.whuthm.happychat.imlib.model.MessageDao;
-import com.whuthm.happychat.imlib.vo.LoadDataDirection;
+import com.whuthm.happychat.imlib.vo.HistoryMessagesRequest;
+
+import org.greenrobot.greendao.query.QueryBuilder;
+import org.greenrobot.greendao.query.WhereCondition;
 
 import java.util.List;
 
@@ -15,8 +18,27 @@ class MessageDaoImpl extends AbstractGreenDao implements IMessageDao {
     }
 
     @Override
-    public List<Message> getHistoryMessages(String conversationId, long baseMessageId, LoadDataDirection direction, int count) {
-        return null;
+    public List<Message> getHistoryMessages(HistoryMessagesRequest request) {
+        DaoSession session = getOpenHelper().getReadableDaoMaster().newSession();
+        QueryBuilder<Message> queryBuilder = session.getMessageDao()
+                .queryBuilder()
+                .limit(request.getCount());
+
+        if (request.isBackward()) {
+            queryBuilder.orderDesc(MessageDao.Properties.Id);
+        } else {
+            queryBuilder.orderDesc(MessageDao.Properties.Id);
+        }
+        WhereCondition toCondition = MessageDao.Properties.To.eq(request.getConversationId());
+        WhereCondition idCondition;
+        if (request.isBackward()) {
+            idCondition = MessageDao.Properties.Id.lt(request.getBaseMessageId());
+        } else {
+            idCondition = MessageDao.Properties.Id.gt(request.getBaseMessageId());
+        }
+        List<Message> messages = queryBuilder.where(toCondition, idCondition).build().list();
+        session.clear();
+        return messages;
     }
 
     @Override

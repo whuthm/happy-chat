@@ -2,19 +2,13 @@ package com.whuthm.happychat.imlib;
 
 import android.content.Context;
 
-public interface ChatContext {
+import com.whuthm.happychat.internal.context.ServiceContext;
+
+public interface ChatContext extends ServiceContext {
 
     Context getAndroidContext();
 
     ChatConfiguration getConfiguration();
-
-    <T> T getService(Class<T> clazz);
-
-    <T> void registerServiceProvider(Class<T> clazz, ChatContext.ServiceProvider<T> provider);
-
-    interface ServiceProvider<T> {
-        T provideService(ChatContext chatContext);
-    }
 
     interface Initializer {
         void initialize(ChatContext chatContext);

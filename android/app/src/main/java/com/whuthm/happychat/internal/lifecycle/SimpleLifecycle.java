@@ -1,4 +1,4 @@
-package com.whuthm.happychat.internal;
+package com.whuthm.happychat.internal.lifecycle;
 
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;

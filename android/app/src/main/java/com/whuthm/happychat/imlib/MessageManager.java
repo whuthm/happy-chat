@@ -1,16 +1,24 @@
 package com.whuthm.happychat.imlib;
 
-import com.whuthm.happychat.imlib.vo.LoadDataDirection;
+import android.util.Log;
+
+import com.whuthm.happychat.imlib.db.IMessageDao;
 import com.whuthm.happychat.imlib.model.Message;
+import com.whuthm.happychat.imlib.vo.HistoryMessagesRequest;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 class MessageManager extends AbstractChatContextImplService<MessageService> implements MessageService, MessageReceiver {
 
+    private final static String TAG = MessageManager.class.getSimpleName();
     private final Collection<MessageReceiver> messageReceivers;
 
     MessageManager(ChatContext chatContext) {
@@ -18,9 +26,22 @@ class MessageManager extends AbstractChatContextImplService<MessageService> impl
         messageReceivers = new HashSet<>();
     }
 
+    private IMessageDao getMessageDao() {
+        return getOpenHelper().getMessageDao();
+    }
+
     @Override
-    public Observable<List<Message>> getHistoryMessages(String conversationId, long baseMessageId, LoadDataDirection direction, int count) {
-        return null;
+    public Observable<List<Message>> getHistoryMessages(final HistoryMessagesRequest request) {
+        return Observable
+                .create(new ObservableOnSubscribe<List<Message>>() {
+                    @Override
+                    public void subscribe(ObservableEmitter<List<Message>> e) throws Exception {
+                        e.onNext(getMessageDao().getHistoryMessages(request));
+                        e.onComplete();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override
@@ -30,6 +51,16 @@ class MessageManager extends AbstractChatContextImplService<MessageService> impl
 
     @Override
     public Observable<Message> resendMessage(Message message) {
+        return null;
+    }
+
+    @Override
+    public Observable<Message> markMessagesOfConversationAsRead(String conversationId) {
+        return null;
+    }
+
+    @Override
+    public Observable<Message> markAllMessagesAsRead() {
         return null;
     }
 
@@ -47,6 +78,7 @@ class MessageManager extends AbstractChatContextImplService<MessageService> impl
             if (messageByUid != null) {
                 message.setId(messageByUid.getId());
             } else {
+                Log.e(TAG, "onMessageReceive: " + message, ex);
                 throw ex;
             }
         }

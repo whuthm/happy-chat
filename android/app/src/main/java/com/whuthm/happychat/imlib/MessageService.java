@@ -1,6 +1,6 @@
 package com.whuthm.happychat.imlib;
 
-import com.whuthm.happychat.imlib.vo.LoadDataDirection;
+import com.whuthm.happychat.imlib.vo.HistoryMessagesRequest;
 import com.whuthm.happychat.imlib.model.Message;
 import java.util.List;
 import io.reactivex.Observable;
@@ -11,11 +11,14 @@ import io.reactivex.Observable;
 
 public interface MessageService {
 
-    Observable<List<Message>> getHistoryMessages(String conversationId, long baseMessageId, LoadDataDirection direction, int count);
+    Observable<List<Message>> getHistoryMessages(HistoryMessagesRequest request);
 
     Observable<Message> sendMessage(Message message);
 
     Observable<Message> resendMessage(Message message);
 
+    Observable<Message> markMessagesOfConversationAsRead(String conversationId);
+
+    Observable<Message> markAllMessagesAsRead();
 
 }

@@ -2,7 +2,7 @@ package com.whuthm.happychat.imlib;
 
 import com.whuthm.happychat.imlib.db.IOpenHelper;
 
-class AbstractChatContextImplService<T> extends AbstractChatContextService<T> {
+class AbstractChatContextImplService<T> extends AbstractChatService<T> {
 
      AbstractChatContextImplService(ChatContext chatContext) {
          super(chatContext);

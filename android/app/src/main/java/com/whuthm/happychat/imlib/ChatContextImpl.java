@@ -8,17 +8,13 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.whuthm.happychat.imlib.db.IOpenHelper;
+import com.whuthm.happychat.internal.context.AbstractServiceContext;
 
-import java.util.HashMap;
-import java.util.Map;
-
-final class ChatContextImpl implements ChatContext, LifecycleOwner {
+final class ChatContextImpl extends AbstractServiceContext implements ChatContext, LifecycleOwner {
 
     private final ChatConfiguration configuration;
 
     private final LifecycleRegistry lifecycleRegistry;
-
-    private final Map<Class<?>, Object> services;
 
     private final Context androidContext;
 
@@ -28,7 +24,6 @@ final class ChatContextImpl implements ChatContext, LifecycleOwner {
         this.androidContext  = androidContext;
         this.configuration = configuration;
         this.lifecycleRegistry = new LifecycleRegistry(this);
-        this.services = new HashMap<>();
     }
 
     @Override
@@ -42,17 +37,11 @@ final class ChatContextImpl implements ChatContext, LifecycleOwner {
     }
 
     @Override
-    public <T> T getService(Class<T> clazz) {
-        return null;
-    }
-
-    @Override
-    public <T> void registerServiceProvider(Class<T> clazz, ChatContext.ServiceProvider<T> provider) {
-        T service = provider.provideService(this);
+    protected <T> void onRegisterService(Class<T> clazz, T service) {
+        super.onRegisterService(clazz, service);
         if (service instanceof LifecycleObserver) {
             lifecycleRegistry.addObserver((LifecycleObserver) service);
         }
-        services.put(clazz, service);
     }
 
     void create() {
