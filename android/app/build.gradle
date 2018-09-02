@@ -88,14 +88,14 @@ dependencies {
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:$lifecycle_version"
     // alternatively - just ViewModel
-    implementation "android.arch.lifecycle:viewmodel:$lifecycle_version" // use -ktx for Kotlin
+    //implementation "android.arch.lifecycle:viewmodel:$lifecycle_version" // use -ktx for Kotlin
     // alternatively - just LiveData
     implementation "android.arch.lifecycle:livedata:$lifecycle_version"
     // alternatively - Lifecycles only (no ViewModel or LiveData).
     //     Support library depends on this lightweight import
     implementation "android.arch.lifecycle:runtime:$lifecycle_version"
 
-    annotationProcessor "android.arch.lifecycle:compiler:$lifecycle_version" // use kapt for Kotlin
+    //annotationProcessor "android.arch.lifecycle:compiler:$lifecycle_version" // use kapt for Kotlin
     // alternately - if using Java8, use the following instead of compiler
     implementation "android.arch.lifecycle:common-java8:$lifecycle_version"
 

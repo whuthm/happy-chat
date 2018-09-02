@@ -1,13 +1,13 @@
 package com.whuthm.happychat.ui;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 
-import com.barran.lib.app.BaseActivity;
 import com.barran.lib.app.FragmentStack;
 import com.whuthm.happychat.R;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends ChatContextActivity {
 
     private static final int TAB_CONVERSATION = 0;
     private static final int TAB_ME = 1;
@@ -15,14 +15,15 @@ public class MainActivity extends BaseActivity {
 
     private TabLayout mTabLayout;
 
-    private MainConversationFragment conversationFragment;
+    private MainConversationListFragment conversationFragment;
 
     private MainMeFragment meFragment;
 
     private MainTestFragment testFragment;
 
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -35,7 +36,7 @@ public class MainActivity extends BaseActivity {
 
     private void init() {
 
-        conversationFragment = new MainConversationFragment();
+        conversationFragment = new MainConversationListFragment();
         meFragment = new MainMeFragment();
         testFragment = new MainTestFragment();
 

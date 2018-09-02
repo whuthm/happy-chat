@@ -2,6 +2,7 @@ package com.whuthm.happychat.imlib;
 
 import android.support.annotation.Nullable;
 
+import com.barran.lib.utils.log.Logs;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.whuthm.happychat.data.IQProtos;
 import com.whuthm.happychat.data.MessageProtos;
@@ -10,17 +11,35 @@ import com.whuthm.happychat.imlib.model.ConnectionStatus;
 import com.whuthm.happychat.imlib.model.Message;
 import com.whuthm.happychat.util.PacketUtils;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.internal.schedulers.RxThreadFactory;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.Response;
 
-class ConnectionManager extends AbstractChatContextImplService<ConnectionService> implements ConnectionService {
+class ConnectionManager extends AbstractChatContextImplService implements ConnectionService , PacketSender {
+
+    private static final String TAG = ConnectionManager.class.getSimpleName();
 
     private ConnectionStatus connectionStatus;
     private ChatConnection chatConnection;
 
     private MessageReceiver messageReceiver;
 
+    private final Scheduler connectionScheduler;
+
     ConnectionManager(ChatContext chatContext) {
         super(chatContext);
+        this.connectionScheduler = Schedulers.from(Executors.newSingleThreadExecutor(new RxThreadFactory("rx-connection")));
+        this.connectionStatus = ConnectionStatus.DISCONNECTED;
+    }
+
+    public Scheduler getConnectionScheduler() {
+        return connectionScheduler;
     }
 
     @Override
@@ -35,17 +54,59 @@ class ConnectionManager extends AbstractChatContextImplService<ConnectionService
     @Override
     protected void onCreate() {
         super.onCreate();
+        connect();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        disconnect();
     }
 
     /**
      * 可能对外提供接口，暂时private
      */
-    private synchronized void connect() {
+    private void connect() {
+        runOnConnectionThread(new Runnable() {
+            @Override
+            public void run() {
+                connectInternal();
+            }
+        });
+    }
+
+    private  void runOnConnectionThread(final Runnable runnable) {
+
+        Observable
+                .fromCallable(new Callable<Object>() {
+                    @Override
+                    public Object call() throws Exception {
+                        runnable.run();
+                        return ConnectionManager.this;
+                    }
+                })
+                .subscribeOn(getConnectionScheduler())
+                .observeOn(getConnectionScheduler())
+                .subscribe(new DisposableObserver<Object>() {
+                    @Override
+                    public void onNext(Object value) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private synchronized void connectInternal() {
+        Logs.v(TAG, "connectInternal: " + isConnectable());
         if (isConnectable()) {
             ChatConnection chatConnection = new ChatConnection(this);
             setChatConnection(chatConnection);
@@ -54,11 +115,34 @@ class ConnectionManager extends AbstractChatContextImplService<ConnectionService
         }
     }
 
+    private ChatConnection getChatConnection() {
+        return chatConnection;
+    }
+
     private void setChatConnection(ChatConnection chatConnection) {
         this.chatConnection = chatConnection;
     }
 
-    private synchronized void disconnect() {
+    private void disconnect() {
+        runOnConnectionThread(new Runnable() {
+            @Override
+            public void run() {
+                disconnectInternal();
+            }
+        });
+    }
+
+    private synchronized void disconnectInternal() {
+        final ChatConnection chatConnection = getChatConnection();
+        if (chatConnection != null) {
+            try {
+                chatConnection.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            setChatConnection(null);
+        }
+        performChangeConnectionStatus(ConnectionStatus.DISCONNECTED);
     }
 
     private void setConnectionStatus(ConnectionStatus connectionStatus) {
@@ -77,6 +161,7 @@ class ConnectionManager extends AbstractChatContextImplService<ConnectionService
 
     private void performChangeConnectionStatus(ConnectionStatus connectionStatus) {
         if (connectionStatus != getConnectionStatus()) {
+            Logs.v("performChangeConnectionStatus:" + connectionStatus);
             setConnectionStatus(connectionStatus);
             // TODO: notify connection status changed
         }
@@ -88,14 +173,17 @@ class ConnectionManager extends AbstractChatContextImplService<ConnectionService
      */
     private boolean isConnectable() {
         final ConnectionStatus connectionStatus = getConnectionStatus();
-        return connectionStatus == ConnectionStatus.DISCONNECTED;
+        return connectionStatus == ConnectionStatus.DISCONNECTED && isActive();
     }
 
     boolean isConnected() {
         return getConnectionStatus() == ConnectionStatus.CONNECTED;
     }
 
-    void handlePacket(ChatConnection chatConnection, PacketProtos.Packet packet) {
+    synchronized void handlePacket(ChatConnection chatConnection, PacketProtos.Packet packet) {
+        if (this.chatConnection != chatConnection) {
+            return;
+        }
         switch (packet.getType()) {
             case message:
                 try {
@@ -143,18 +231,46 @@ class ConnectionManager extends AbstractChatContextImplService<ConnectionService
     }
 
     synchronized void handleConnectionClosed(ChatConnection chatConnection, int code, String reason) {
-        // TODO: 定义code， token未认证
-        performChangeConnectionStatus(ConnectionStatus.DISCONNECTED);
-        setChatConnection(null);
+        // TODO: 定义code， 如token未认证等
+        Logs.v(TAG, "handleConnectionClosed: code=" + code + ", reason=" + reason);
+        if (chatConnection == getChatConnection()) {
+            setChatConnection(null);
+            performChangeConnectionStatus(ConnectionStatus.DISCONNECTED);
+        }
+    }
+
+    synchronized void handleConnectionClosing(ChatConnection chatConnection, int code, String reason) {
+        // TODO: 定义code， 如token未认证等
+        Logs.v(TAG, "handleConnectionClosing: code=" + code + ", reason=" + reason);
+        if (chatConnection == getChatConnection()) {
+            setChatConnection(null);
+            performChangeConnectionStatus(ConnectionStatus.DISCONNECTED);
+        }
     }
 
     synchronized void handleConnectionOpened(ChatConnection chatConnection) {
-        performChangeConnectionStatus(ConnectionStatus.CONNECTED);
+        Logs.v(TAG, "handleConnectionOpened");
+        if (chatConnection == getChatConnection()) {
+            performChangeConnectionStatus(ConnectionStatus.CONNECTED);
+        }
     }
 
     synchronized void handleConnectionFailed(ChatConnection chatConnection, Throwable t,
-                                @Nullable Response response) {
-        performChangeConnectionStatus(ConnectionStatus.DISCONNECTED);
+                                             @Nullable Response response) {
+        Logs.v(TAG, "handleConnectionFailed");
+        if (chatConnection == getChatConnection()) {
+            setChatConnection(null);
+            performChangeConnectionStatus(ConnectionStatus.DISCONNECTED);
+        }
+    }
 
+    @Override
+    public void sendPacket(PacketProtos.Packet packet) throws Exception {
+        final ChatConnection chatConnection = getChatConnection();
+        final ConnectionStatus connectionStatus = getConnectionStatus();
+        if (connectionStatus != ConnectionStatus.CONNECTED || chatConnection == null) {
+            throw new Exception("Chat is not connected");
+        }
+        chatConnection.sendPacket(packet);
     }
 }

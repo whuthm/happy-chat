@@ -21,6 +21,12 @@ message LoginResponse {
     string keystore = 4;
 }
 
+message RegisterRequest {
+    string username = 1;
+    string password = 2;
+    string nick = 3;
+}
+
 //enum ConnectionCloseCodes {
 //    /** 被踢掉*/
 //    kicked = 0;

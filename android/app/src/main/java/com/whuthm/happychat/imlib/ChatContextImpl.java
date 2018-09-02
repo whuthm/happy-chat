@@ -6,11 +6,13 @@ import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LifecycleRegistry;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
-import com.whuthm.happychat.imlib.db.IOpenHelper;
-import com.whuthm.happychat.internal.context.AbstractServiceContext;
+import com.whuthm.happychat.imlib.dao.IMDaoFactory;
+import com.whuthm.happychat.common.context.AbstractServiceContext;
 
 final class ChatContextImpl extends AbstractServiceContext implements ChatContext, LifecycleOwner {
+    private static final String TAG = ChatContextImpl.class.getSimpleName();
 
     private final ChatConfiguration configuration;
 
@@ -18,7 +20,7 @@ final class ChatContextImpl extends AbstractServiceContext implements ChatContex
 
     private final Context androidContext;
 
-    private IOpenHelper openHelper;
+    private IMDaoFactory daoFactory;
 
     ChatContextImpl(Context androidContext, ChatConfiguration configuration) {
         this.androidContext  = androidContext;
@@ -28,7 +30,7 @@ final class ChatContextImpl extends AbstractServiceContext implements ChatContex
 
     @Override
     public Context getAndroidContext() {
-        return null;
+        return androidContext;
     }
 
     @Override
@@ -46,12 +48,14 @@ final class ChatContextImpl extends AbstractServiceContext implements ChatContex
 
     void create() {
         if (lifecycleRegistry.getCurrentState() == Lifecycle.State.INITIALIZED) {
+            Log.i(TAG, "context created");
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE);
         }
     }
 
     void destroy() {
         if (lifecycleRegistry.getCurrentState().isAtLeast(Lifecycle.State.CREATED)) {
+            Log.i(TAG, "context destroyed");
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY);
         }
     }
@@ -62,11 +66,11 @@ final class ChatContextImpl extends AbstractServiceContext implements ChatContex
         return lifecycleRegistry;
     }
 
-    IOpenHelper getOpenHelper() {
-        return openHelper;
+    IMDaoFactory getDaoFactory() {
+        return daoFactory;
     }
 
-    void setOpenHelper(IOpenHelper openHelper) {
-        this.openHelper = openHelper;
+    void setDaoFactory(IMDaoFactory daoFactory) {
+        this.daoFactory = daoFactory;
     }
 }

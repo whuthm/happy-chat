@@ -2,6 +2,8 @@ package com.whuthm.happychat.utils;
 
 import org.springframework.util.StringUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
@@ -32,11 +34,11 @@ public class AuthenticationUtils {
         return m.matches();
     }
 
-    public static String encryptPassword(String password, String salt) throws NoSuchAlgorithmException {
+    public static String encryptPassword(String password, String salt) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         if (!StringUtils.isEmpty(salt)) {
-            return new String(MessageDigest.getInstance("MD5").digest((salt + password).getBytes()));
+            return new String(MessageDigest.getInstance("MD5").digest((salt + password).getBytes("utf-8")), "utf-8");
         } else {
-            return new String(MessageDigest.getInstance("MD5").digest(password.getBytes()));
+            return new String(MessageDigest.getInstance("MD5").digest(password.getBytes("utf-8")), "utf-8");
         }
     }
 

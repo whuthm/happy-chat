@@ -14,7 +14,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
-class ConversationManager extends AbstractChatContextImplService<ConversationServiceV2> implements ConversationServiceV2, MessageReceiver {
+class ConversationManager extends AbstractChatContextImplService implements ConversationService, MessageReceiver {
 
     private final static String TAG = ConnectionManager.class.getSimpleName();
     private final Map<String, Conversation> allConversations;

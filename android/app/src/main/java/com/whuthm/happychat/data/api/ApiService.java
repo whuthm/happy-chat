@@ -21,6 +21,10 @@ public interface ApiService {
     @POST("/v1/auth/login")
     Observable<AuthenticationProtos.LoginResponse> login(
             @Body AuthenticationProtos.LoginRequest request);
+
+    @POST("/v1/auth/register")
+    Observable<BaseProtos.BaseResponse> register(
+            @Body AuthenticationProtos.RegisterRequest request);
     
     @GET("/v1/users/{id}")
     Observable<UserProtos.UserResponse> getUserById(@Path("id") String userId);

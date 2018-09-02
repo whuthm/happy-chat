@@ -2,7 +2,7 @@ package com.whuthm.happychat.imlib;
 
 import android.content.Context;
 
-import com.whuthm.happychat.internal.context.ServiceContext;
+import com.whuthm.happychat.common.context.ServiceContext;
 
 public interface ChatContext extends ServiceContext {
 

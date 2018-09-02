@@ -14,7 +14,7 @@ import com.barran.lib.utils.DateUtil;
 import com.barran.lib.utils.DisplayUtil;
 import com.whuthm.happychat.BuildConfig;
 import com.whuthm.happychat.R;
-import com.whuthm.happychat.data.UserAccount;
+import com.whuthm.happychat.app.model.AuthenticationUser;
 import com.whuthm.happychat.imlib.model.Message;
 
 import java.util.Random;
@@ -76,10 +76,10 @@ public abstract class AbsMessageItem extends ConstraintLayout {
     
     public void showMessage(Message message) {
 
-        if (!BuildConfig.DEBUG) {
-            isSendBySelf = !TextUtils.isEmpty(UserAccount.getUserId())
-                    && UserAccount.getUserId().equals(message.getFrom());
-        }
+//        if (!BuildConfig.DEBUG) {
+//            isSendBySelf = !TextUtils.isEmpty(AuthenticationUser.getUserId())
+//                    && AuthenticationUser.getUserId().equals(message.getFrom());
+//        }
         
         if (isSendBySelf) {
             

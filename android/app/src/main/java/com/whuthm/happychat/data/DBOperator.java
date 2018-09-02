@@ -61,7 +61,7 @@ public class DBOperator {
         DaoSession session = master.newSession();
         QueryBuilder<Conversation> queryBuilder = session.getConversationDao()
                 .queryBuilder();
-        queryBuilder.orderDesc(ConversationDao.Properties.CreateTime).limit(count);
+        queryBuilder.orderDesc(ConversationDao.Properties.LatestMessageTime).limit(count);
         List<Conversation> list = queryBuilder.list();
         session.clear();
         return list;
@@ -72,7 +72,7 @@ public class DBOperator {
         DaoSession session = master.newSession();
         QueryBuilder<Conversation> queryBuilder = session.getConversationDao()
                 .queryBuilder();
-        queryBuilder.orderDesc(ConversationDao.Properties.CreateTime);
+        queryBuilder.orderDesc(ConversationDao.Properties.LatestMessageTime);
         List<Conversation> list = queryBuilder.list();
         session.clear();
         return list;

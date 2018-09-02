@@ -2,7 +2,8 @@ package com.whuthm.happychat.imlib;
 
 import android.util.Log;
 
-import com.whuthm.happychat.imlib.db.IMessageDao;
+import com.barran.lib.utils.log.Logs;
+import com.whuthm.happychat.imlib.dao.IMessageDao;
 import com.whuthm.happychat.imlib.model.Message;
 import com.whuthm.happychat.imlib.vo.HistoryMessagesRequest;
 
@@ -16,14 +17,16 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-class MessageManager extends AbstractChatContextImplService<MessageService> implements MessageService, MessageReceiver {
+class MessageManager extends AbstractChatContextImplService implements MessageService, MessageReceiver {
 
     private final static String TAG = MessageManager.class.getSimpleName();
     private final Collection<MessageReceiver> messageReceivers;
+    private final MessageSender messageSender;
 
-    MessageManager(ChatContext chatContext) {
+    MessageManager(ChatContext chatContext, PacketSender packetSender) {
         super(chatContext);
         messageReceivers = new HashSet<>();
+        this.messageSender = new MessageSender(packetSender);
     }
 
     private IMessageDao getMessageDao() {
@@ -45,13 +48,35 @@ class MessageManager extends AbstractChatContextImplService<MessageService> impl
     }
 
     @Override
-    public Observable<Message> sendMessage(Message message) {
-        return null;
+    public Observable<Message> sendMessage(final Message message) {
+        return Observable
+                .create(new ObservableOnSubscribe<Message>() {
+                    @Override
+                    public void subscribe(ObservableEmitter<Message> e) throws Exception {
+                        try {
+                            Message messageInDb = getMessageDao().getMessageByUid(message.getUid());
+                            if (messageInDb != null) {
+                                getMessageDao().updateMessage(message);
+                            } else {
+                                getMessageDao().insertMessage(message);
+                            }
+                            Log.i(TAG, "sendMessage insertOrUpdate : " + message);
+                            messageSender.sendMessage(message);
+                            e.onNext(message);
+                            e.onComplete();
+                        } catch (Exception ex) {
+                            e.onError(ex);
+                            Log.e(TAG, "sendMessage:" + message, ex);
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override
     public Observable<Message> resendMessage(Message message) {
-        return null;
+        return sendMessage(message);
     }
 
     @Override

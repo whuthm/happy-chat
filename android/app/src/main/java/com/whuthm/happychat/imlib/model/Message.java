@@ -23,7 +23,7 @@ public class Message implements Serializable {
      * 客戶端数据库表ID
      */
     @Id(autoincrement = true)
-    private long id;
+    private Long id;
 
     /**
      * 客戶端生成uuid传递给服务端，用于校验服务器已送达
@@ -62,8 +62,8 @@ public class Message implements Serializable {
 
     private int status;
 
-    @Generated(hash = 497362192)
-    public Message(long id, String uid, long sid, String type,
+    @Generated(hash = 1751850340)
+    public Message(Long id, String uid, long sid, String type,
             String conversationType, String from, String to, String body,
             long sendTime, long receiveTime, String attrs, String extra,
             boolean read, int status) {
@@ -87,11 +87,11 @@ public class Message implements Serializable {
     public Message() {
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -157,6 +157,11 @@ public class Message implements Serializable {
             return id ==((Message) obj).id;
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Message(" + id + ")";
     }
 
     @Override

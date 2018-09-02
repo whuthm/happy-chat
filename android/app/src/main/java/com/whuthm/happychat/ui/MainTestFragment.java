@@ -9,11 +9,17 @@ import android.view.ViewGroup;
 
 import com.barran.lib.app.BaseFragment;
 import com.whuthm.happychat.R;
-import com.whuthm.happychat.data.PacketProtos;
-import com.whuthm.happychat.imlib.ChatConnection;
-import com.whuthm.happychat.util.PacketIdGenerator;
+import com.whuthm.happychat.app.AuthenticationService;
+import com.whuthm.happychat.imlib.MessageService;
+import com.whuthm.happychat.imlib.model.Conversation;
+import com.whuthm.happychat.imlib.model.Message;
 
-public class MainTestFragment extends BaseFragment {
+import java.util.UUID;
+
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+
+public class MainTestFragment extends ChatContextFragment {
 
     @Nullable
     @Override
@@ -24,16 +30,13 @@ public class MainTestFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final ChatConnection chatConnection = new ChatConnection(messageReceiver);
+        final MessageService messageService = chatContext.getService(MessageService.class);
+        final AuthenticationService authenticationService = applicationServiceContext.getService(AuthenticationService.class);
         view.findViewById(R.id.btn_connect)
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        try {
-                            chatConnection.connect();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        ConversationActivity.startConversation(getActivity(), "vs", "GroupChat");
                     }
                 });
 
@@ -41,28 +44,43 @@ public class MainTestFragment extends BaseFragment {
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        try {
-                            chatConnection.disconnect();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
                     }
                 });
 
+        final String to = UUID.randomUUID().toString();
         view.findViewById(R.id.btn_send_packet)
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        try {
-                            PacketProtos.Packet packet = PacketProtos.Packet
-                                    .newBuilder()
-                                    .setId(PacketIdGenerator.nextId())
-                                    .setType(PacketProtos.Packet.Type.message)
-                                    .build();
-                            chatConnection.sendPacket(packet);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        Message message = new Message();
+                        message.setFrom(authenticationService.getAuthenticationUser().getUserId());
+                        message.setTo(to);
+                        message.setBody("{\"text\":\"test\"}");
+                        message.setConversationType("SingleChat");
+                        message.setType("txt");
+                        message.setUid(UUID.randomUUID().toString());
+                        messageService.sendMessage(message).subscribe(new Observer<Message>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(Message value) {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
+
                     }
                 });
     }

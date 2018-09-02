@@ -1,8 +1,8 @@
 package com.whuthm.happychat.imlib;
 
-import com.whuthm.happychat.imlib.db.IOpenHelper;
+import com.whuthm.happychat.imlib.dao.IMDaoFactory;
 
-class AbstractChatContextImplService<T> extends AbstractChatService<T> {
+class AbstractChatContextImplService extends AbstractChatService {
 
      AbstractChatContextImplService(ChatContext chatContext) {
          super(chatContext);
@@ -13,7 +13,7 @@ class AbstractChatContextImplService<T> extends AbstractChatService<T> {
          return (ChatContextImpl) super.getChatContext();
      }
 
-     protected IOpenHelper getOpenHelper() {
-         return getChatContext().getOpenHelper();
+     protected IMDaoFactory getOpenHelper() {
+         return getChatContext().getDaoFactory();
      }
  }

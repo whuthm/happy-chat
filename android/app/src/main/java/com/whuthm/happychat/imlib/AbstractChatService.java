@@ -2,9 +2,10 @@ package com.whuthm.happychat.imlib;
 
 import android.arch.lifecycle.LifecycleObserver;
 
-import com.whuthm.happychat.internal.lifecycle.SimpleLifecycle;
+import com.barran.lib.utils.log.Logs;
+import com.whuthm.happychat.common.lifecycle.SimpleLifecycle;
 
-public class AbstractChatService<T>  extends SimpleLifecycle implements LifecycleObserver {
+public class AbstractChatService  extends SimpleLifecycle implements LifecycleObserver {
 
     private final ChatContext chatContext;
 
@@ -16,4 +17,15 @@ public class AbstractChatService<T>  extends SimpleLifecycle implements Lifecycl
         return chatContext;
     }
 
+    @Override
+    protected void onCreate() {
+        super.onCreate();
+        Logs.i("AbstractChatService", getClass().getSimpleName() + " create");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Logs.i("AbstractChatService", getClass().getSimpleName() + " destroy");
+    }
 }

@@ -1,6 +1,8 @@
 package com.whuthm.happychat.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.whuthm.happychat.data.AuthenticationProtos;
+import com.whuthm.happychat.data.BaseProtos;
 import com.whuthm.happychat.data.ClientProtos;
 import com.whuthm.happychat.domain.model.User;
 import com.whuthm.happychat.exception.ServerException;
@@ -27,12 +29,10 @@ public class AuthenticationController {
     @RequestMapping(value = "/v1/auth/login", method = {RequestMethod.POST})
     AuthenticationProtos.LoginResponse login(@RequestBody AuthenticationProtos.LoginRequest request) {
 
+        LOGGER.info("login");
         try {
             final ClientProtos.ClientResource resource = request.getClientResource();
-            User user = authenticationService.login(
-                    request.getUsername(),
-                    request.getPassword(),
-                    resource);
+            User user = authenticationService.login(request);
             String token = authenticationService.getToken(user.getId(), resource);
             if (!StringUtils.isEmpty(token)) {
                 return AuthenticationProtos.LoginResponse
@@ -49,6 +49,24 @@ public class AuthenticationController {
                     .newBuilder()
                     .setResponse(ApiUtils.getErrorResponse(ex))
                     .build();
+        }
+
+    }
+
+    @Token(check = false)
+    @RequestMapping(value = "/v1/auth/register", method = {RequestMethod.POST})
+    BaseProtos.BaseResponse register(@RequestBody AuthenticationProtos.RegisterRequest request) {
+        LOGGER.info("register");
+        try {
+            User user = authenticationService.register(request);
+            LOGGER.info("register result:" + JSON.toJSONString(user));
+            if (user != null && !StringUtils.isEmpty(user.getId())) {
+                return ApiBaseResponses.SUCCESS.getResponse();
+            } else {
+                throw new ServerException();
+            }
+        } catch (Exception ex) {
+            return ApiUtils.getErrorResponse(ex);
         }
 
     }

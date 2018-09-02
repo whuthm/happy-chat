@@ -8,9 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.barran.lib.app.BaseFragment;
 import com.whuthm.happychat.R;
-import com.whuthm.happychat.data.UserAccount;
+import com.whuthm.happychat.app.AuthenticationService;
 
 /**
  * 个人信息界面
@@ -18,7 +17,7 @@ import com.whuthm.happychat.data.UserAccount;
  * Created by huangming on 18/07/2018.
  */
 
-public class MainMeFragment extends BaseFragment {
+public class MainMeFragment extends ChatContextFragment {
     
     private EditText editNick;
     
@@ -31,7 +30,7 @@ public class MainMeFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.frag_me, container, false);
+        return inflater.inflate(R.layout.frag_main_me, container, false);
     }
     
     @Override
@@ -39,7 +38,7 @@ public class MainMeFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         
         editNick = view.findViewById(R.id.frag_me_input_nick);
-        editNick.setText(UserAccount.getUserNick());
+        editNick.setText(applicationServiceContext.getService(AuthenticationService.class).getAuthenticationUser().getUserNick());
         
         view.findViewById(R.id.frag_me_btn_save)
                 .setOnClickListener(new View.OnClickListener() {
@@ -47,7 +46,7 @@ public class MainMeFragment extends BaseFragment {
                     public void onClick(View view) {
                         String userNick = editNick.getText().toString().trim();
                         if (!TextUtils.isEmpty(userNick)) {
-                            UserAccount.setUserNick(userNick);
+                            //AuthenticationUser.setUserNick(userNick);
                         }
                     }
                 });

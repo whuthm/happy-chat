@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,14 +18,13 @@ import com.barran.lib.utils.log.Logs;
 import com.barran.lib.view.text.LimitEditText;
 import com.barran.lib.view.text.LimitTextWatcher;
 import com.whuthm.happychat.R;
+import com.whuthm.happychat.app.AuthenticationService;
+import com.whuthm.happychat.common.context.ApplicationServiceContext;
 import com.whuthm.happychat.data.AuthenticationProtos;
 import com.whuthm.happychat.data.ClientProtos;
-import com.whuthm.happychat.data.UserAccount;
-import com.whuthm.happychat.data.api.ApiObserver;
-import com.whuthm.happychat.data.api.RetrofitClient;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+import com.whuthm.happychat.app.model.AuthenticationUser;
+import com.whuthm.happychat.data.api.ApiResponseObserver;
+import com.whuthm.happychat.ui.api.FailureHandlers;
 
 /**
  * 登录界面
@@ -39,11 +40,15 @@ public class LoginActivity extends BaseActivity {
     private ImageView mIvPasswordHidden;
     
     private boolean isPasswordHidden = true;
+
+    private AuthenticationService authenticationService;
     
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        authenticationService = ApplicationServiceContext.of(this).getService(AuthenticationService.class);
         
         mETAccount = findViewById(R.id.activity_login_edit_account);
         mETAccount.addTextChangedListener(new LimitTextWatcher() {
@@ -66,19 +71,26 @@ public class LoginActivity extends BaseActivity {
         
         mTVSubmit = findViewById(R.id.fragment_pwd_login_tv_submit);
         mTVSubmit.setOnClickListener(listener);
-        
-        checkLogin();
+
+        mETAccount.setText(authenticationService.getAuthenticationUser().getUsername());
     }
-    
-    private void checkLogin() {
-        if (!TextUtils.isEmpty(UserAccount.getToken())) {
-            toMainActivity();
-        }
-        else if (!TextUtils.isEmpty(UserAccount.getUserName())) {
-            mETAccount.setText(UserAccount.getUserName());
-        }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_login, menu);
+        return super.onCreateOptionsMenu(menu);
     }
-    
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_register) {
+            startActivity(new Intent(this, RegisterActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void checkSubmitButton() {
         if (!TextUtils.isEmpty(mETAccount.getText().toString())
                 && !TextUtils.isEmpty(mETPassword.getText().toString())) {
@@ -91,7 +103,6 @@ public class LoginActivity extends BaseActivity {
     
     private void reqLogin() {
         final String username = mETAccount.getText().toString();
-        UserAccount.setUserName(username);
 
         AuthenticationProtos.LoginRequest.Builder builder = AuthenticationProtos.LoginRequest
                 .newBuilder();
@@ -99,27 +110,26 @@ public class LoginActivity extends BaseActivity {
                 .setPassword(mETPassword.getText().toString())
                 .setClientResource(ClientProtos.ClientResource.phone)
                 .setPublicKey("");
-        RetrofitClient.api().login(builder.build()).subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new ApiObserver<AuthenticationProtos.LoginResponse>(this) {
+        authenticationService.login(builder.build())
+                .subscribe(new ApiResponseObserver<AuthenticationUser>(FailureHandlers.getDefault(this)) {
+
                     @Override
-                    public void onNext(AuthenticationProtos.LoginResponse value) {
-                        Logs.e("login suc: token=" + value.getToken() + ", key= "
-                                + value.getKeystore());
-                        Toast.makeText(getApplication(), "success: " + value.getUserId(),
-                                Toast.LENGTH_LONG).show();
-                        
-                        UserAccount.saveUser(value);
-                        
+                    public void onSuccess(AuthenticationUser response) {
                         toMainActivity();
+                    }
+
+                    @Override
+                    public boolean onFailure(Throwable error) {
+                        return false;
                     }
                 });
         
     }
     
     private void toMainActivity() {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
     
     private class ClickListener implements View.OnClickListener {

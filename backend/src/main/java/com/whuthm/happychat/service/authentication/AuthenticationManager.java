@@ -1,5 +1,6 @@
 package com.whuthm.happychat.service.authentication;
 
+import com.whuthm.happychat.data.AuthenticationProtos;
 import com.whuthm.happychat.data.ClientProtos;
 import com.whuthm.happychat.domain.model.User;
 import com.whuthm.happychat.exception.NotFoundException;
@@ -11,6 +12,8 @@ import com.whuthm.happychat.utils.AuthenticationUtils;
 import com.whuthm.happychat.utils.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class AuthenticationManager implements AuthenticationService  {
@@ -28,11 +31,12 @@ public class AuthenticationManager implements AuthenticationService  {
     }
 
     @Override
-    public User login(String username, String password, ClientProtos.ClientResource clientResource) throws Exception {
-        User user = userService.getUser(username);
+    public User login(AuthenticationProtos.LoginRequest loginRequest) throws Exception {
+        ClientProtos.ClientResource clientResource = loginRequest.getClientResource();
+        User user = userService.getUserByName(loginRequest.getUsername());
         if (user != null ) {
             if (!StringUtils.isEmpty(user.getPassword())
-                    && user.getPassword().equals(AuthenticationUtils.encryptPassword(password, user.getSalt()))) {
+                    && user.getPassword().equals(loginRequest.getPassword())) {
                 Identifier authIdentifier = Identifier.from(user.getId(), Constants.IDENTIFIER_DOMAIN_AUTH, clientResource.name());
                 String token = tokenManager.createToken(authIdentifier);
                 if (!StringUtils.isEmpty(token)) {
@@ -49,8 +53,18 @@ public class AuthenticationManager implements AuthenticationService  {
     }
 
     @Override
-    public User register() throws Exception {
-        return null;
+    public User register(AuthenticationProtos.RegisterRequest registerRequest) throws Exception {
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setName(registerRequest.getUsername());
+        user.setNick(registerRequest.getNick());
+        user.setAvatar("http://pic3.40017.cn/nongjiale/2015/02/10/10/ZmLXp4.jpg");
+        user.setGender(1);
+        user.setPassword(registerRequest.getPassword());
+        user.setRole(User.Role.Normal.getValue());
+        user.setSalt("gouzi");
+        User newUser = userService.addUser(user);
+        return newUser;
     }
 
 }

@@ -49,6 +49,8 @@ public class ChatConnection extends AbstractConnection {
         try {
             if (authenticateConnectionIdentifier()) {
                 performConnected(session);
+            } else {
+                disconnect();
             }
         } catch (Exception ex) {
             LOGGER.error("onOpen", ex);
@@ -138,13 +140,17 @@ public class ChatConnection extends AbstractConnection {
     @Override
     protected void performConnected(Session webSocketSession) {
         super.performConnected(webSocketSession);
+        LOGGER.error("performConnected:" + getIdentifier());
         chatConnectionManager.addConnection(this);
     }
 
     @Override
     protected void performDisconnected() {
         super.performDisconnected();
-        chatConnectionManager.removeConnection(this);
+        LOGGER.error("performDisconnected:" + getIdentifier());
+        if (chatConnectionManager != null) {
+            chatConnectionManager.removeConnection(this);
+        }
     }
 
     @Override

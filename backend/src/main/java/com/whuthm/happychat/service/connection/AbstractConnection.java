@@ -28,20 +28,20 @@ public abstract class AbstractConnection implements Connection {
     @OnOpen
     public void onOpen(Session session) {
         // Get session and WebSocket connection
-        LOGGER.info("onOpen: " + session.getId());
+        LOGGER.error("onOpen: " + session.getId());
         webSocketSession = session;
     }
 
     @OnMessage
     public void onPacket(Session session, PacketProtos.Packet packet) {
         // Handle new messages
-        LOGGER.info("onMessage: " + session.getId() + ", " + packet.getId());
+        LOGGER.error("onMessage: " + session.getId() + ", " + packet.getId());
     }
 
     @OnClose
     public  void onClose(Session session){
         // WebSocket connection closes
-        LOGGER.info("onClose: " + session.getId());
+        LOGGER.error("onClose: " + session.getId());
         performDisconnected();
     }
 

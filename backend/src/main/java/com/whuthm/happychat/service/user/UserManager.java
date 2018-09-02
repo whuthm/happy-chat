@@ -35,6 +35,7 @@ class UserManager implements UserService {
         return userRepository.findUserByName(username);
     }
 
+    @Override
     public User addUser(User user) {
         User newUser = userRepository.save(user);
         users.put(user.getId(), newUser);

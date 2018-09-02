@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.annotation.MainThread;
 import android.util.Log;
 
+import com.whuthm.happychat.imlib.dao.greendao.GreenDaoOpenHelper;
+
 /**
  * 获取ChatContext
  */
@@ -33,16 +35,19 @@ public class ChatManager {
     public static void init(Context androidContext, ChatContext.Initializer initializer) {
         if (sInstance == null) {
             sInstance = new ChatManager(androidContext.getApplicationContext(), initializer);
-            sInstance.login(NO_CONFIGURATION);
+            sInstance.connect(NO_CONFIGURATION);
         }
     }
 
+    public static ChatManager getInstance() {
+        return sInstance;
+    }
 
-    public synchronized void login(ChatConfiguration configuration) {
+    public synchronized void connect(ChatConfiguration configuration) {
         performChangeContext(configuration);
     }
 
-    public synchronized void logout() {
+    public synchronized void disconnect() {
         performChangeContext(NO_CONFIGURATION);
     }
 
@@ -51,14 +56,21 @@ public class ChatManager {
         final ChatConfiguration previousConfiguration = previousContext != null ? previousContext.getConfiguration() : null;
         if (previousConfiguration == null || !previousConfiguration.equals(configuration)) {
             if (previousConfiguration != null && previousConfiguration.isValid()) {
+                Log.i(TAG, "destroy context:" + previousContext);
                 previousContext.destroy();
             }
 
             final ChatContextImpl currentChatContext = new ChatContextImpl(androidContext, configuration);
-            if (configuration.isValid()) {
-                currentChatContext.create();
+            currentChatContext.setDaoFactory(new GreenDaoOpenHelper(androidContext, configuration.getUserId()));
+            internalInitializer.initialize(currentChatContext);
+            if (initializer != null) {
+                initializer.initialize(currentChatContext);
             }
             this.chatContext = currentChatContext;
+            if (configuration.isValid()) {
+                Log.i(TAG, "create context:" + currentChatContext);
+                currentChatContext.create();
+            }
         } else {
             Log.d(TAG, configuration + " duplicate");
         }

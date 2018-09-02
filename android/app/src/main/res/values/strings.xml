@@ -23,4 +23,9 @@
     <string name="text_nick">昵称</string>
     <string name="text_save">保存</string>
     <string name="text_message_notify">消息通知</string>
+
+    <string name="text_register">注册</string>
+    <string name="text_hint_input_nick">请输入昵称</string>
+
+    <string name="text_settings">设置</string>
 </resources>
