@@ -5,7 +5,7 @@ import com.whuthm.happychat.data.IQProtos;
 import com.whuthm.happychat.data.MessageProtos;
 import com.whuthm.happychat.data.PacketProtos;
 import com.whuthm.happychat.service.authentication.AuthenticationService;
-import com.whuthm.happychat.service.connection.AbstractConnection;
+import com.whuthm.happychat.service.connection.Connection;
 import com.whuthm.happychat.service.connection.ConnectionCloseCodes;
 import com.whuthm.happychat.service.handler.IQPacketHandler;
 import com.whuthm.happychat.service.handler.MessagePacketHandler;
@@ -13,23 +13,26 @@ import com.whuthm.happychat.service.vo.Identifier;
 import com.whuthm.happychat.util.PacketUtils;
 import com.whuthm.happychat.utils.Constants;
 import com.whuthm.happychat.utils.PacketCodec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestHeader;
 
-import javax.websocket.CloseReason;
-import javax.websocket.Session;
+import javax.websocket.*;
+import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
-import java.util.List;
-import java.util.Map;
+import java.nio.ByteBuffer;
 
 @ServerEndpoint(
-        value = "/" + Constants.IDENTIFIER_DOMAIN_CHAT,
+        value = "/" + Constants.IDENTIFIER_DOMAIN_CHAT + "/{user_id}/{client_resource}",
         encoders = PacketCodec.class,
-        decoders = PacketCodec.class
+        decoders = PacketCodec.class,
+        configurator = ChatConnectionConfigurator.class
 )
 @Component
-public class ChatConnection extends AbstractConnection {
+public class ChatConnection implements Connection {
 
     @Autowired
     ChatConnectionManager chatConnectionManager;
@@ -40,14 +43,28 @@ public class ChatConnection extends AbstractConnection {
     @Autowired
     IQPacketHandler iqPacketHandler;
 
-    String token;
 
+    private boolean connected;
 
-    @Override
-    public void onOpen(Session session) {
-        super.onOpen(session);
+    protected void setConnected(boolean connected) {
+        this.connected = connected;
+    }
+
+    protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
+
+    private Session webSocketSession;
+    private Identifier identifier;
+
+    @OnOpen
+    public void onOpen(Session session, @PathParam("user_id") String userId, @PathParam("client_resource") String clientResourceStringValue) {
+        // Get session and WebSocket connection
+        LOGGER.error("onOpen: " + session.getId());
+        webSocketSession = session;
         try {
-            if (authenticateConnectionIdentifier()) {
+            ClientProtos.ClientResource clientResource = ClientProtos.ClientResource.valueOf(clientResourceStringValue);
+            final Identifier identifier = Identifier.from(userId, Constants.IDENTIFIER_DOMAIN_AUTH, clientResource.name());
+            setIdentifier(identifier);
+            if (isAuthenticated()) {
                 performConnected(session);
             } else {
                 disconnect();
@@ -60,35 +77,12 @@ public class ChatConnection extends AbstractConnection {
                 e.printStackTrace();
             }
         }
-
     }
 
-    private boolean authenticateConnectionIdentifier() throws Exception {
-        Map<String, List<String>> requestParameterMap = getWebSocketSession().getRequestParameterMap();
-        final List<String> tokens = requestParameterMap.get(Constants.HEADER_TOKEN);
-        final List<String> userIds = requestParameterMap.get(Constants.HEADER_USER_ID);
-        final List<String> clientResources = requestParameterMap.get(Constants.HEADER_CLIENT_RESOURCE);
-        final String token = tokens != null && tokens.size() > 0 ? tokens.get(0) : null;
-        final String userId = userIds != null && userIds.size() > 0 ? userIds.get(0) : null;
-        final String clientResourceStringValue = clientResources != null && clientResources.size() > 0 ? clientResources.get(0) : null;
-        ClientProtos.ClientResource clientResource = ClientProtos.ClientResource.valueOf(clientResourceStringValue);
-        setToken(token);
-        final Identifier identifier = Identifier.from(userId, Constants.IDENTIFIER_DOMAIN_AUTH, clientResource.name());
-        setIdentifier(identifier);
-        return isAuthenticated();
-    }
-
-    private String getToken() {
-        return token;
-    }
-
-    private void setToken(String token) {
-        this.token = token;
-    }
-
-    @Override
+    @OnMessage
     public void onPacket(Session session, PacketProtos.Packet packet) {
-        super.onPacket(session, packet);
+        // Handle new messages
+        LOGGER.error("onMessage: " + session.getId() + ", " + packet.getId());
         if (requireAuthenticated()) return;
         try {
             switch (packet.getType()) {
@@ -103,6 +97,74 @@ public class ChatConnection extends AbstractConnection {
         } catch (Exception e) {
             LOGGER.warn("onPacket", e);
         }
+    }
+
+    @OnClose
+    public void onClose(Session session) {
+        // WebSocket connection closes
+        LOGGER.error("onClose: " + session.getId());
+        performDisconnected();
+    }
+
+    @OnError
+    public void onError(Session session, Throwable throwable) {
+        // Do error handling here
+        LOGGER.error("onError: " + session.getId(), throwable);
+    }
+
+    @Override
+    public synchronized void disconnect() throws Exception {
+        final Session webSocketSession = getWebSocketSession();
+        if (webSocketSession != null) {
+            webSocketSession.close(getCloseReason());
+            performDisconnected();
+        }
+    }
+
+    @Override
+    public void sendPacket(PacketProtos.Packet packet) throws Exception {
+        final Session webSocketSession = getWebSocketSession();
+        if (webSocketSession != null) {
+            webSocketSession.getAsyncRemote().sendBinary(ByteBuffer.wrap(packet.toByteArray()));
+        }
+    }
+
+    @Override
+    public boolean isConnected() {
+        return connected;
+    }
+
+    @Override
+    public Identifier getIdentifier() {
+        return identifier;
+    }
+
+    protected Session getWebSocketSession() {
+        return webSocketSession;
+    }
+
+    private void setWebSocketSession(Session webSocketSession) {
+        this.webSocketSession = webSocketSession;
+    }
+
+    protected synchronized void performConnected(Session webSocketSession) {
+        setWebSocketSession(webSocketSession);
+        setConnected(true);
+        LOGGER.error("performConnected:" + getIdentifier());
+        chatConnectionManager.addConnection(this);
+    }
+
+    protected synchronized void performDisconnected() {
+        setWebSocketSession(null);
+        setConnected(false);
+        LOGGER.error("performDisconnected:" + getIdentifier());
+        if (chatConnectionManager != null) {
+            chatConnectionManager.removeConnection(this);
+        }
+    }
+
+    protected void setIdentifier(Identifier identifier) {
+        this.identifier = identifier;
     }
 
     private void handleReceivedIQ(PacketProtos.Packet packet, IQProtos.IQ iq) throws Exception {
@@ -137,28 +199,12 @@ public class ChatConnection extends AbstractConnection {
         return false;
     }
 
-    @Override
-    protected void performConnected(Session webSocketSession) {
-        super.performConnected(webSocketSession);
-        LOGGER.error("performConnected:" + getIdentifier());
-        chatConnectionManager.addConnection(this);
-    }
 
-    @Override
-    protected void performDisconnected() {
-        super.performDisconnected();
-        LOGGER.error("performDisconnected:" + getIdentifier());
-        if (chatConnectionManager != null) {
-            chatConnectionManager.removeConnection(this);
-        }
-    }
-
-    @Override
     protected CloseReason getCloseReason() {
         if (!isAuthenticated()) {
             return ConnectionCloseCodes.token_incorrect.getCloseReason();
         }
-        return super.getCloseReason();
+        return new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "close");
     }
 
 }

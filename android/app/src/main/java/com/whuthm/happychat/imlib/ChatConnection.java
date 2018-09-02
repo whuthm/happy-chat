@@ -9,6 +9,7 @@ import com.whuthm.happychat.data.ClientProtos;
 import com.whuthm.happychat.data.PacketProtos;
 import com.whuthm.happychat.data.api.RetrofitClient;
 
+import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -38,13 +39,14 @@ class ChatConnection implements Connection {
     @Override
     public void connect() {
         Logs.v(TAG, "connect");
+
+        String finalUrl = url + "/" + connectionManager.getChatContext().getConfiguration().getUserId() + "/" + ClientProtos.ClientResource.phone.name();
         Request request = new Request.Builder()
-                .header("user_id", connectionManager.getChatContext().getConfiguration().getUserId())
                 .header("token", connectionManager.getChatContext().getConfiguration().getToken())
-                .header("client_resource", ClientProtos.ClientResource.phone.name())
-                .url(url)
+                .url(finalUrl)
                 .build();
         webSocket = RetrofitClient.okHttp().newWebSocket(request, new SocketListener());
+
     }
 
     private WebSocket getWebSocket() {

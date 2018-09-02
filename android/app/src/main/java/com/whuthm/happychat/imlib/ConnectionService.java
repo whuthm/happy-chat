@@ -6,6 +6,10 @@ public interface ConnectionService {
 
     ConnectionStatus getConnectionStatus();
 
+    void connect();
+
+    void disconnect();
+
     void addConnectionStatusListener(ConnectionStatusListener listener);
 
     void removeConnectionStatusListener(ConnectionStatusListener listener);

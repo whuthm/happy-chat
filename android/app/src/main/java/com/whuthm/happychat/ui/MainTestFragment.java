@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import com.barran.lib.app.BaseFragment;
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.app.AuthenticationService;
+import com.whuthm.happychat.imlib.ConnectionService;
 import com.whuthm.happychat.imlib.MessageService;
 import com.whuthm.happychat.imlib.model.Conversation;
 import com.whuthm.happychat.imlib.model.Message;
@@ -32,11 +33,13 @@ public class MainTestFragment extends ChatContextFragment {
         super.onViewCreated(view, savedInstanceState);
         final MessageService messageService = chatContext.getService(MessageService.class);
         final AuthenticationService authenticationService = applicationServiceContext.getService(AuthenticationService.class);
+        final ConnectionService connectionService = chatContext.getService(ConnectionService.class);
         view.findViewById(R.id.btn_connect)
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ConversationActivity.startConversation(getActivity(), "vs", "GroupChat");
+                        connectionService.connect();
+                        //ConversationActivity.startConversation(getActivity(), "vs", "GroupChat");
                     }
                 });
 
@@ -44,6 +47,7 @@ public class MainTestFragment extends ChatContextFragment {
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        connectionService.disconnect();
                     }
                 });
 

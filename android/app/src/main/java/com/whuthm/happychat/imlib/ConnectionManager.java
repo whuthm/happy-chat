@@ -66,7 +66,8 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
     /**
      * 可能对外提供接口，暂时private
      */
-    private void connect() {
+    @Override
+    public void connect() {
         runOnConnectionThread(new Runnable() {
             @Override
             public void run() {
@@ -123,7 +124,8 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
         this.chatConnection = chatConnection;
     }
 
-    private void disconnect() {
+    @Override
+    public void disconnect() {
         runOnConnectionThread(new Runnable() {
             @Override
             public void run() {
