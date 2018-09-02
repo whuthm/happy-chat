@@ -1,5 +1,6 @@
 package com.whuthm.happychat.service.chat;
 
+import com.whuthm.happychat.controller.util.Token;
 import com.whuthm.happychat.data.ClientProtos;
 import com.whuthm.happychat.data.IQProtos;
 import com.whuthm.happychat.data.MessageProtos;
@@ -54,6 +55,8 @@ public class ChatConnection implements Connection {
 
     private Session webSocketSession;
     private Identifier identifier;
+
+    private String token;
 
     @OnOpen
     public void onOpen(Session session, @PathParam("user_id") String userId, @PathParam("client_resource") String clientResourceStringValue) {
@@ -163,7 +166,7 @@ public class ChatConnection implements Connection {
         }
     }
 
-    protected void setIdentifier(Identifier identifier) {
+    void setIdentifier(Identifier identifier) {
         this.identifier = identifier;
     }
 
@@ -179,6 +182,15 @@ public class ChatConnection implements Connection {
         iqPacketHandler.handlerIQPacket(this, packet, iq);
 
     }
+
+    private String getToken() {
+        return token;
+    }
+
+    void setToken(String token) {
+        this.token = token;
+    }
+
 
     private boolean isAuthenticated() {
         final String token = getToken();
