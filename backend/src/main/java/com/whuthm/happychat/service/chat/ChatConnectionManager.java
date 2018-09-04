@@ -4,12 +4,13 @@ import com.whuthm.happychat.data.ClientProtos;
 import com.whuthm.happychat.service.connection.Connection;
 import com.whuthm.happychat.service.vo.Identifier;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
+@Service
 class ChatConnectionManager {
 
     private Map<String, Map<ClientProtos.ClientResource, Connection>> connections = new ConcurrentHashMap<>();

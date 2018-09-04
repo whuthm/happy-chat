@@ -1,6 +1,5 @@
 package com.whuthm.happychat.service.chat;
 
-import com.whuthm.happychat.controller.util.Token;
 import com.whuthm.happychat.data.ClientProtos;
 import com.whuthm.happychat.data.IQProtos;
 import com.whuthm.happychat.data.MessageProtos;
@@ -16,10 +15,8 @@ import com.whuthm.happychat.utils.Constants;
 import com.whuthm.happychat.utils.PacketCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
@@ -35,17 +32,28 @@ import java.nio.ByteBuffer;
 @Component
 public class ChatConnection implements Connection {
 
-    @Autowired
     ChatConnectionManager chatConnectionManager;
-    @Autowired
     AuthenticationService authenticationService;
-    @Autowired
     MessagePacketHandler messagePacketHandler;
-    @Autowired
     IQPacketHandler iqPacketHandler;
 
-
     private boolean connected;
+
+    public void setAuthenticationService(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
+
+    public void setChatConnectionManager(ChatConnectionManager chatConnectionManager) {
+        this.chatConnectionManager = chatConnectionManager;
+    }
+
+    public void setIqPacketHandler(IQPacketHandler iqPacketHandler) {
+        this.iqPacketHandler = iqPacketHandler;
+    }
+
+    public void setMessagePacketHandler(MessagePacketHandler messagePacketHandler) {
+        this.messagePacketHandler = messagePacketHandler;
+    }
 
     protected void setConnected(boolean connected) {
         this.connected = connected;
@@ -153,16 +161,18 @@ public class ChatConnection implements Connection {
     protected synchronized void performConnected(Session webSocketSession) {
         setWebSocketSession(webSocketSession);
         setConnected(true);
-        LOGGER.error("performConnected:" + getIdentifier());
+        LOGGER.info("performConnected:" + getIdentifier());
         chatConnectionManager.addConnection(this);
     }
 
     protected synchronized void performDisconnected() {
         setWebSocketSession(null);
-        setConnected(false);
-        LOGGER.error("performDisconnected:" + getIdentifier());
-        if (chatConnectionManager != null) {
-            chatConnectionManager.removeConnection(this);
+        if (isConnected()) {
+            setConnected(false);
+            LOGGER.info("performDisconnected:" + getIdentifier());
+            if (chatConnectionManager != null) {
+                chatConnectionManager.removeConnection(this);
+            }
         }
     }
 
@@ -196,7 +206,7 @@ public class ChatConnection implements Connection {
         final String token = getToken();
         final Identifier identifier = getIdentifier();
         final ClientProtos.ClientResource resource = ClientProtos.ClientResource.valueOf(identifier.getResource());
-        return !StringUtils.isEmpty(token) && token.equals(authenticationService.getToken(token, resource));
+        return !StringUtils.isEmpty(token) && token.equals(authenticationService.getToken(identifier.getNode(), resource));
     }
 
     private boolean requireAuthenticated() {

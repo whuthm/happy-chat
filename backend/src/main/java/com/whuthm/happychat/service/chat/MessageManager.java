@@ -30,7 +30,7 @@ class MessageManager implements MessagePacketHandler  {
 
     @Override
     public void handleMessagePacket(Connection connection, PacketProtos.Packet packet, MessageProtos.MessageBean messageBean) throws Exception {
-        Validation.of(MessageProtos.MessageBean.class).requireValid(messageBean);
+        //Validation.of(MessageProtos.MessageBean.class).requireValid(messageBean);
         final Conversation conversation = conversationManager.getConversation(
                 messageBean.getFrom(),
                 messageBean.getTo(),

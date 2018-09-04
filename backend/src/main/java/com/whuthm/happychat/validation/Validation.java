@@ -22,9 +22,11 @@ public interface Validation<T> {
     static <T> Validation<T> of(Class<T> clazz) {
         Validation<?> validation = VALIDATIONS.get(clazz);
         if (validation == null) {
+            VALIDATIONS.put(clazz, validation);
+
             try {
                 validation = (Validation<?>) clazz.newInstance();
-                VALIDATIONS.put(clazz, validation);
+
             } catch (IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
             }

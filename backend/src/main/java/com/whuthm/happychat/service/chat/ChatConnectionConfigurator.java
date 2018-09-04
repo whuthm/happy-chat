@@ -1,10 +1,14 @@
 package com.whuthm.happychat.service.chat;
 
+import com.whuthm.happychat.SpringUtils;
 import com.whuthm.happychat.data.ClientProtos;
 import com.whuthm.happychat.service.authentication.AuthenticationService;
+import com.whuthm.happychat.service.handler.IQPacketHandler;
+import com.whuthm.happychat.service.handler.MessagePacketHandler;
 import com.whuthm.happychat.service.vo.Identifier;
 import com.whuthm.happychat.utils.Constants;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.websocket.HandshakeResponse;
 import javax.websocket.server.HandshakeRequest;
@@ -15,6 +19,8 @@ public class ChatConnectionConfigurator extends ServerEndpointConfig.Configurato
 
     private String token;
     private Identifier identifier;
+
+    protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     @Override
     public void modifyHandshake(ServerEndpointConfig sec, HandshakeRequest request, HandshakeResponse response) {
@@ -36,6 +42,13 @@ public class ChatConnectionConfigurator extends ServerEndpointConfig.Configurato
         ChatConnection chatConnection = (ChatConnection) super.getEndpointInstance(clazz);
         chatConnection.setToken(token);
         chatConnection.setIdentifier(identifier);
+        chatConnection.setAuthenticationService(SpringUtils.getBean(AuthenticationService.class));
+        chatConnection.setChatConnectionManager(SpringUtils.getBean(ChatConnectionManager.class));
+        chatConnection.setIqPacketHandler(SpringUtils.getBean(IQPacketHandler.class));
+        chatConnection.setMessagePacketHandler(SpringUtils.getBean(MessagePacketHandler.class));
+
+        LOGGER.info(chatConnection.toString());
+        LOGGER.info(chatConnection.chatConnectionManager.toString());
         return (T) chatConnection;
     }
 }
