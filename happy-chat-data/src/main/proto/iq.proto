@@ -36,7 +36,11 @@ message MessageDeliveredIQ {
 }
 
 message MessageDeliveredACKIQ {
-    string id = 2;
+    string id = 1;
+}
+
+message MessageReceivedIQ {
+    string id = 1;
 }
 
 message MessageReadIQ {

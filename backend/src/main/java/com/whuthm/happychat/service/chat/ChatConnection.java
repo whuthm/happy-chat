@@ -99,8 +99,10 @@ public class ChatConnection implements Connection {
             switch (packet.getType()) {
                 case iq:
                     handleReceivedIQ(packet, IQProtos.IQ.newBuilder().mergeFrom(packet.getData()).build());
+                    break;
                 case message:
                     messagePacketHandler.handleMessagePacket(this, packet, MessageProtos.MessageBean.newBuilder().mergeFrom(packet.getData()).build());
+                    break;
                 case push:
                 default:
                     throw new Exception("Unknown packet type : " + packet.getType());

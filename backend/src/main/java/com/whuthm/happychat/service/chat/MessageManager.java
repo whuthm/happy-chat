@@ -12,9 +12,15 @@ import com.whuthm.happychat.service.handler.MessagePacketHandler;
 import com.whuthm.happychat.util.PacketUtils;
 import com.whuthm.happychat.validation.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 class MessageManager implements MessagePacketHandler  {
@@ -28,6 +34,8 @@ class MessageManager implements MessagePacketHandler  {
     @Autowired
     ChatConnectionManager connectionManager;
 
+    private volatile AtomicLong sortId;
+
     @Override
     public void handleMessagePacket(Connection connection, PacketProtos.Packet packet, MessageProtos.MessageBean messageBean) throws Exception {
         //Validation.of(MessageProtos.MessageBean.class).requireValid(messageBean);
@@ -36,38 +44,43 @@ class MessageManager implements MessagePacketHandler  {
                 messageBean.getTo(),
                 ConversationType.from(messageBean.getConversationType()));
         if (conversation != null) {
-            Message message = new Message();
-            message.setId(messageBean.getId());
-            message.setSid(nextSortId());
-            message.setFrom(messageBean.getFrom());
-            message.setTo(messageBean.getTo());
-            message.setType(messageBean.getType());
-            message.setConversationType(messageBean.getConversationType());
-            message.setBody(messageBean.getBody());
-            long time = System.currentTimeMillis();
-            message.setCreateTime(time);
-            message.setUpdateTime(time);
-            if (messageBean.getMentionedInfo() != null) {
-                MessageProtos.MentionedInfoBean mentionedInfoBean = messageBean.getMentionedInfo();
-                MentionedInfo mentionedInfo = new MentionedInfo();
-                mentionedInfo.setType(mentionedInfoBean.getType());
-                mentionedInfo.setContent(mentionedInfoBean.getContent());
-                mentionedInfo.setUserIds(mentionedInfoBean.getUserIds());
-                message.setMentionedInfo(mentionedInfo);
-            }
-            message.setExtra(messageBean.getExtra());
-            message.setAttributes(messageBean.getAttributes());
-            Message newMessage = messageRepository.save(message);
+            Optional<Message> messageOptional = messageRepository.findById(messageBean.getId());
+            Message persistedMessage = messageOptional.orElse(null);
+            if (persistedMessage == null) {
+                Message message = new Message();
+                message.setId(messageBean.getId());
+                message.setSid(nextSortId());
+                message.setFrom(messageBean.getFrom());
+                message.setTo(messageBean.getTo());
+                message.setType(messageBean.getType());
+                message.setConversationType(messageBean.getConversationType());
+                message.setBody(messageBean.getBody());
+                long time = System.currentTimeMillis();
+                message.setCreateTime(time);
+                message.setUpdateTime(time);
+                if (messageBean.getMentionedInfo() != null) {
+                    MessageProtos.MentionedInfoBean mentionedInfoBean = messageBean.getMentionedInfo();
+                    MentionedInfo mentionedInfo = new MentionedInfo();
+                    mentionedInfo.setType(mentionedInfoBean.getType());
+                    mentionedInfo.setContent(mentionedInfoBean.getContent());
+                    mentionedInfo.setUserIds(mentionedInfoBean.getUserIds());
+                    message.setMentionedInfo(mentionedInfo);
+                }
+                message.setExtra(messageBean.getExtra());
+                message.setAttributes(messageBean.getAttributes());
+                persistedMessage = messageRepository.save(message);
 
+                conversation.sendMessage(this, persistedMessage);
+            }
+
+            // 向客户端发送已送达IQ
             connection.sendPacket(PacketUtils.createPacket(
                     PacketProtos.Packet.Type.iq,
                     PacketUtils.getMessageDeliveredIQ(IQProtos.MessageDeliveredIQ.newBuilder()
-                            .setConversationId(newMessage.getTo())
-                            .setId(newMessage.getId())
-                            .setSid(newMessage.getSid())
+                            .setConversationId(persistedMessage.getTo())
+                            .setId(persistedMessage.getId())
+                            .setSid(persistedMessage.getSid())
                             .build())));
-
-            conversation.sendMessage(this, newMessage);
         }
     }
 
@@ -122,7 +135,23 @@ class MessageManager implements MessagePacketHandler  {
     }
 
     private long nextSortId() {
-        return -1;
+        if (sortId == null) {
+            synchronized (MessageManager.class) {
+                if (sortId == null) {
+                    Page<Message> page = messageRepository.findAll(PageRequest.of(0, 1, Sort.by(Sort.Order.desc("sid"))));
+                    List<Message> messages = page.getContent();
+
+                    final long maxSortId;
+                    if (!messages.isEmpty()) {
+                        maxSortId = messages.get(0).getSid();
+                    } else {
+                        maxSortId = -1;
+                    }
+                    sortId = new AtomicLong(maxSortId);
+                }
+            }
+        }
+        return sortId.incrementAndGet();
     }
 
 }

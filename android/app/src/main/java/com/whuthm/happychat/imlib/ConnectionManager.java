@@ -76,8 +76,18 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
         });
     }
 
-    private  void runOnConnectionThread(final Runnable runnable) {
+    private void sendHeartbeatPacketWhenConnected() {
+        ChatConnection chatConnection = getChatConnection();
+        if (getConnectionStatus() == ConnectionStatus.CONNECTED && chatConnection != null) {
+            try {
+                chatConnection.sendPacket(PacketUtils.createPacket(PacketProtos.Packet.Type.iq, PacketUtils.getPingIQ()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
+    private  void runOnConnectionThread(final Runnable runnable) {
         Observable
                 .fromCallable(new Callable<Object>() {
                     @Override
@@ -108,6 +118,7 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
 
     private synchronized void connectInternal() {
         Logs.v(TAG, "connectInternal: " + isConnectable());
+        sendHeartbeatPacketWhenConnected();
         if (isConnectable()) {
             ChatConnection chatConnection = new ChatConnection(this);
             setChatConnection(chatConnection);
@@ -207,25 +218,7 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
     }
 
     private void handleMessageBean(ChatConnection chatConnection, MessageProtos.MessageBean messageBean) {
-        Message message = new Message();
-        message.setSid(messageBean.getSid());
-        message.setType(messageBean.getType());
-        message.setBody(messageBean.getBody());
-        message.setFrom(messageBean.getFrom());
-        message.setTo(messageBean.getTo());
-        message.setAttrs(messageBean.getAttributes());
-        message.setConversationType(messageBean.getConversationType());
-        message.setReceiveTime(System.currentTimeMillis());
-        message.setSendTime(messageBean.getSendTime());
-        message.setExtra(messageBean.getExtra());
-        messageReceiver.onMessageReceive(message);
-        // 需要发送已接收回执
-        try {
-            chatConnection.sendPacket(PacketUtils.createPacket(PacketProtos.Packet.Type.iq,
-                    PacketUtils.getMessageDeliveredACKIQ(IQProtos.MessageDeliveredACKIQ.newBuilder().setId(message.getUid()).build())));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
     }
 
     private void handleIQ(ChatConnection chatConnection, IQProtos.IQ iq) {

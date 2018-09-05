@@ -9,7 +9,7 @@ public class Message {
     @Id
     @Column(name = "id")
     private String id;
-    @Column(name = "sid")
+    @Column(name = "sid", unique = true)
     private long sid;
     @Column(name = "type", nullable = false)
     private String type;
@@ -31,7 +31,7 @@ public class Message {
     @Column(name = "update_time", nullable = false)
     private long updateTime;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private MentionedInfo mentionedInfo;
 
     public String getId() {

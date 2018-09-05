@@ -3,9 +3,13 @@ package com.whuthm.happychat.imlib;
 import android.util.Log;
 
 import com.barran.lib.utils.log.Logs;
+import com.whuthm.happychat.data.IQProtos;
+import com.whuthm.happychat.data.MessageProtos;
+import com.whuthm.happychat.data.PacketProtos;
 import com.whuthm.happychat.imlib.dao.IMessageDao;
 import com.whuthm.happychat.imlib.model.Message;
 import com.whuthm.happychat.imlib.vo.HistoryMessagesRequest;
+import com.whuthm.happychat.util.PacketUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,7 +21,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-class MessageManager extends AbstractChatContextImplService implements MessageService, MessageReceiver {
+class MessageManager extends AbstractChatContextImplService implements MessageService, MessagePacketHandler {
 
     private final static String TAG = MessageManager.class.getSimpleName();
     private final Collection<MessageReceiver> messageReceivers;
@@ -89,8 +93,24 @@ class MessageManager extends AbstractChatContextImplService implements MessageSe
         return null;
     }
 
+    void addMessageReceiver(MessageReceiver messageReceiver) {
+        messageReceivers.add(messageReceiver);
+    }
+
     @Override
-    public void onMessageReceive(Message message) {
+    public void handleMessagePacket(PacketSender packetSender, PacketProtos.Packet packet, MessageProtos.MessageBean messageBean) throws Exception {
+        Message message = new Message();
+        message.setSid(messageBean.getSid());
+        message.setType(messageBean.getType());
+        message.setBody(messageBean.getBody());
+        message.setFrom(messageBean.getFrom());
+        message.setTo(messageBean.getTo());
+        message.setAttrs(messageBean.getAttributes());
+        message.setConversationType(messageBean.getConversationType());
+        message.setReceiveTime(System.currentTimeMillis());
+        message.setSendTime(messageBean.getSendTime());
+        message.setExtra(messageBean.getExtra());
+
         try {
             long messageId = getOpenHelper().getMessageDao().insertMessage(message);
             message.setId(messageId);
@@ -100,6 +120,7 @@ class MessageManager extends AbstractChatContextImplService implements MessageSe
             }
         } catch (Exception ex) {
             Message messageByUid = getOpenHelper().getMessageDao().getMessageByUid(message.getUid());
+            // 消息在本地已存在
             if (messageByUid != null) {
                 message.setId(messageByUid.getId());
             } else {
@@ -107,9 +128,9 @@ class MessageManager extends AbstractChatContextImplService implements MessageSe
                 throw ex;
             }
         }
-    }
+        // 需要发送已接收回执
+        packetSender.sendPacket(PacketUtils.createPacket(PacketProtos.Packet.Type.iq,
+                PacketUtils.getMessageDeliveredACKIQ(IQProtos.MessageDeliveredACKIQ.newBuilder().setId(message.getUid()).build())));
 
-    void addMessageReceiver(MessageReceiver messageReceiver) {
-        messageReceivers.add(messageReceiver);
     }
 }

@@ -87,5 +87,14 @@ public class MainTestFragment extends ChatContextFragment {
 
                     }
                 });
+
+
+        view.findViewById(R.id.btn_ping)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        connectionService.connect();
+                    }
+                });
     }
 }

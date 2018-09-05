@@ -7,21 +7,22 @@ import javax.persistence.*;
 public class OfflineMessage {
 
     @Id
-    @Column(name = "m_id")
-    private String mid;
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-    @Column(name = "to")
+    @Column(name = "to_who")
     private String to;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     private Message message;
 
-    public String getMid() {
-        return mid;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setMid(String mid) {
-        this.mid = mid;
+    public Long getId() {
+        return id;
     }
 
     public String getTo() {
