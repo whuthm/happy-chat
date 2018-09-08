@@ -16,4 +16,9 @@ class AbstractChatContextImplService extends AbstractChatService {
      protected IMDaoFactory getOpenHelper() {
          return getChatContext().getDaoFactory();
      }
+
+     protected EventPoster getEventPoster() {
+         return getChatContext().getEventPoster();
+     }
+
  }

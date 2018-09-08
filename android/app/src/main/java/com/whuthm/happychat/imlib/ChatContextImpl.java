@@ -21,11 +21,13 @@ final class ChatContextImpl extends AbstractServiceContext implements ChatContex
     private final Context androidContext;
 
     private IMDaoFactory daoFactory;
+    private EventPoster eventPoster;
 
     ChatContextImpl(Context androidContext, ChatConfiguration configuration) {
         this.androidContext  = androidContext;
         this.configuration = configuration;
         this.lifecycleRegistry = new LifecycleRegistry(this);
+        this.eventPoster = new EventPoster();
     }
 
     @Override
@@ -68,6 +70,10 @@ final class ChatContextImpl extends AbstractServiceContext implements ChatContex
 
     IMDaoFactory getDaoFactory() {
         return daoFactory;
+    }
+
+    EventPoster getEventPoster() {
+        return eventPoster;
     }
 
     void setDaoFactory(IMDaoFactory daoFactory) {

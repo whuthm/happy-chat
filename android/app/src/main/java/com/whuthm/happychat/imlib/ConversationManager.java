@@ -1,27 +1,31 @@
 package com.whuthm.happychat.imlib;
 
+import com.whuthm.happychat.imlib.dao.IConversationDao;
+import com.whuthm.happychat.imlib.event.MessageEvent;
+import com.whuthm.happychat.imlib.exception.NotFoundException;
 import com.whuthm.happychat.imlib.model.Conversation;
 import com.whuthm.happychat.imlib.model.Message;
 
-import java.util.ArrayList;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.observers.DisposableObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-class ConversationManager extends AbstractChatContextImplService implements ConversationService, MessageReceiver {
+class ConversationManager extends AbstractChatContextImplService implements ConversationService {
 
     private final static String TAG = ConnectionManager.class.getSimpleName();
-    private final Map<String, Conversation> allConversations;
 
     ConversationManager(ChatContext chatContext) {
         super(chatContext);
-        this.allConversations = new ConcurrentHashMap<>();
+    }
+
+    private IConversationDao getDao() {
+        return getOpenHelper().getConversationDao();
     }
 
     @Override
@@ -29,56 +33,59 @@ class ConversationManager extends AbstractChatContextImplService implements Conv
         super.onCreate();
     }
 
-    private void loadAllConversationsFronLocal() {
-        Observable
+    @Override
+    public Observable<Conversation> getConversation(final String conversationId) {
+        return Observable
+                .create(new ObservableOnSubscribe<Conversation>() {
+                    @Override
+                    public void subscribe(ObservableEmitter<Conversation> e) throws Exception {
+                        Conversation conversation = getConversationInternal(conversationId);
+                        if (conversation != null) {
+                            e.onNext(conversation);
+                            e.onComplete();
+                        } else {
+                            e.onError(new NotFoundException("Conversation(" + conversationId + ") is not found!"));
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private Conversation getConversationInternal(String conversationId) {
+        return getDao().getConversation(conversationId);
+    }
+
+    @Override
+    public Observable<List<Conversation>> getAllConversations() {
+        return Observable
                 .create(new ObservableOnSubscribe<List<Conversation>>() {
                     @Override
                     public void subscribe(ObservableEmitter<List<Conversation>> e) throws Exception {
-                        e.onNext(getOpenHelper().getConversationDao().getAllConversations());
+                        e.onNext(getDao().getAllConversations());
                         e.onComplete();
                     }
                 })
                 .subscribeOn(Schedulers.io())
-                .subscribe(new DisposableObserver<List<Conversation>>() {
-                    @Override
-                    public void onNext(List<Conversation> conversations) {
-                        for (Conversation conversation : conversations) {
-                            allConversations.put(conversation.getId(), conversation);
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
-    @Override
-    public Conversation getConversation(String conversationId) {
-        return allConversations.get(conversationId);
+
+    @Subscribe
+    public void onMessageAddedEvent(MessageEvent.AddedEvent event) {
+        updateConversationBy(event.getMessage());
     }
 
-    @Override
-    public List<Conversation> getAllConversations() {
-        return new ArrayList<>(allConversations.values());
+    @Subscribe
+    public void onMessageUpdatedEvent(MessageEvent.UpdatedEvent event) {
+        updateConversationBy(event.getMessage());
     }
 
-    private Conversation getConversationInternal(String conversationId) {
-        Conversation conversation = getConversation(conversationId);
-        if (conversation == null) {
-            conversation= getOpenHelper().getConversationDao().getConveration(conversationId);
-        }
-        return conversation;
+    @Subscribe
+    public void onMessageRemovedEvent(MessageEvent.RemovedEvent event) {
     }
 
-    @Override
-    public void onMessageReceive(Message message) {
+    private void updateConversationBy(Message message) {
         Conversation conversation = getConversationInternal(message.getTo());
         if (conversation == null) {
             conversation = new Conversation();
@@ -91,6 +98,6 @@ class ConversationManager extends AbstractChatContextImplService implements Conv
             conversation.setLatestMessageId(message.getId());
             conversation.setLatestMessageTime(message.getSendTime());
         }
-
+        getDao().insertOrUpdateConversation(conversation);
     }
 }

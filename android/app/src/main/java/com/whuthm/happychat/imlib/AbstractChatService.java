@@ -28,4 +28,8 @@ public class AbstractChatService  extends SimpleLifecycle implements LifecycleOb
         super.onDestroy();
         Logs.i("AbstractChatService", getClass().getSimpleName() + " destroy");
     }
+
+    protected String getCurrentUserId() {
+        return getChatContext().getConfiguration().getUserId();
+    }
 }

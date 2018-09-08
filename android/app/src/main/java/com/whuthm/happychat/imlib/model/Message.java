@@ -1,13 +1,18 @@
 package com.whuthm.happychat.imlib.model;
 
+import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
+import org.greenrobot.greendao.annotation.NotNull;
+import org.greenrobot.greendao.annotation.Transient;
 import org.greenrobot.greendao.annotation.Unique;
 
 import java.io.Serializable;
 import java.util.Arrays;
+
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.converter.PropertyConverter;
 
 /**
  * 消息实体
@@ -31,15 +36,21 @@ public class Message implements Serializable {
     @Unique
     private String uid;
 
+    @Convert(columnType = String.class, converter = DirectionConverter.class)
+    private Direction direction;
+
     /**
      * 服务端生成传递给客户端，客户端可以根据此字段判断消息已读（PC和phone共存时）
      */
-    private long sid;
+    private Long sid;
 
+    @NotNull
     private String type;
 
+    @NotNull
     private String conversationType;
 
+    @NotNull
     private String from;
 
     /**
@@ -51,6 +62,9 @@ public class Message implements Serializable {
 
     private String body;
 
+    @Transient
+    private MessageBody bodyObject;
+
     private long sendTime;
     private long receiveTime;
 
@@ -58,17 +72,20 @@ public class Message implements Serializable {
 
     private String extra;
 
-    private boolean read;
+    @Convert(columnType = String.class, converter = SentStatusConverter.class)
+    private SentStatus sentStatus;
 
-    private int status;
+    @Convert(columnType = Integer.class, converter = ReceivedStatusConverter.class)
+    private ReceivedStatus receivedStatus;
 
-    @Generated(hash = 1751850340)
-    public Message(Long id, String uid, long sid, String type,
-            String conversationType, String from, String to, String body,
-            long sendTime, long receiveTime, String attrs, String extra,
-            boolean read, int status) {
+    @Generated(hash = 1676727750)
+    public Message(Long id, String uid, Direction direction, Long sid, @NotNull String type,
+            @NotNull String conversationType, @NotNull String from, String to, String body,
+            long sendTime, long receiveTime, String attrs, String extra, SentStatus sentStatus,
+            ReceivedStatus receivedStatus) {
         this.id = id;
         this.uid = uid;
+        this.direction = direction;
         this.sid = sid;
         this.type = type;
         this.conversationType = conversationType;
@@ -79,8 +96,8 @@ public class Message implements Serializable {
         this.receiveTime = receiveTime;
         this.attrs = attrs;
         this.extra = extra;
-        this.read = read;
-        this.status = status;
+        this.sentStatus = sentStatus;
+        this.receivedStatus = receivedStatus;
     }
 
     @Generated(hash = 637306882)
@@ -109,14 +126,7 @@ public class Message implements Serializable {
 
     public void setBody(String body) {
         this.body = body;
-    }
-
-    public int getStatus() {
-        return this.status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
+        this.bodyObject = MessageBody.decode(this);
     }
 
     public String getFrom() {
@@ -135,14 +145,6 @@ public class Message implements Serializable {
         this.to = to;
     }
 
-    public boolean getRead() {
-        return this.read;
-    }
-
-    public void setRead(boolean read) {
-        this.read = read;
-    }
-
     public String getAttrs() {
         return this.attrs;
     }
@@ -151,31 +153,37 @@ public class Message implements Serializable {
         this.attrs = attrs;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Message) {
-            return id ==((Message) obj).id;
-        }
-        return false;
+    public SentStatus getSentStatus() {
+        return sentStatus;
     }
 
-    @Override
-    public String toString() {
-        return "Message(" + id + ")";
+    public void setSentStatus(SentStatus sentStatus) {
+        this.sentStatus = sentStatus;
     }
 
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(new long[]{id});
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
+    public ReceivedStatus getReceivedStatus() {
+        return receivedStatus;
+    }
+
+    public void setReceivedStatus(ReceivedStatus receivedStatus) {
+        this.receivedStatus = receivedStatus;
     }
 
 
-    public long getSid() {
+    public Long getSid() {
         return this.sid;
     }
 
 
-    public void setSid(long sid) {
+    public void setSid(Long sid) {
         this.sid = sid;
     }
 
@@ -228,4 +236,130 @@ public class Message implements Serializable {
     public void setUid(String uid) {
         this.uid = uid;
     }
+
+    public MessageBody getBodyObject() {
+        if (bodyObject == null) {
+            bodyObject = MessageBody.decode(this);
+        }
+        return bodyObject;
+    }
+
+    public void setBodyObject(MessageBody bodyObject) {
+        this.bodyObject = bodyObject;
+        this.body = MessageBody.encode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Message) {
+            Message o = (Message) obj;
+            return id == o.id || (id != null && id.equals(o.id));
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Message(" + id + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(new long[]{id});
+    }
+
+    public enum SentStatus {
+        SENDING,
+        FAILED,
+        SENT,
+    }
+
+    public static class SentStatusConverter implements PropertyConverter<SentStatus, String> {
+
+        @Override
+        public SentStatus convertToEntityProperty(String databaseValue) {
+            try {
+                return SentStatus.valueOf(databaseValue);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        @Override
+        public String convertToDatabaseValue(SentStatus entityProperty) {
+            return entityProperty.name();
+        }
+    }
+
+    public enum Direction {
+        SEND,
+        RECEIVE,
+    }
+
+    public static class DirectionConverter implements PropertyConverter<Direction, String> {
+
+        @Override
+        public Direction convertToEntityProperty(String databaseValue) {
+            try {
+                return Direction.valueOf(databaseValue);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        @Override
+        public String convertToDatabaseValue(Direction entityProperty) {
+            return entityProperty.name();
+        }
+    }
+
+    public static class ReceivedStatus {
+
+        private int flag;
+
+        public static final int FLAG_READ = 1;
+        public static final int FLAG_LISTENED = 2;
+        //public static final int FLAG_DOWNLOADED = 4;
+
+        private ReceivedStatus(int flag) {
+            this.flag = flag;
+        }
+
+
+        public int getFlag() {
+            return flag;
+        }
+
+        public void markAsRead() {
+            this.flag = this.flag | FLAG_READ;
+        }
+
+        public boolean isRead() {
+            return (flag & FLAG_READ) > 0;
+        }
+
+        public boolean isListened() {
+            return (flag & FLAG_LISTENED) > 0;
+        }
+
+        public void markAsListened() {
+            this.flag = this.flag | FLAG_LISTENED;
+        }
+
+    }
+
+
+    public static class ReceivedStatusConverter implements PropertyConverter<ReceivedStatus, Integer> {
+
+        @Override
+        public ReceivedStatus convertToEntityProperty(Integer databaseValue) {
+            return new ReceivedStatus(databaseValue != null ? databaseValue : 0);
+        }
+
+        @Override
+        public Integer convertToDatabaseValue(ReceivedStatus entityProperty) {
+            return entityProperty.flag;
+        }
+    }
+
 }

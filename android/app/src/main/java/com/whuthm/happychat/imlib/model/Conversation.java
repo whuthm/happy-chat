@@ -2,7 +2,9 @@ package com.whuthm.happychat.imlib.model;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.Keep;
+import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToOne;
 
 import java.io.Serializable;
@@ -23,7 +25,9 @@ public class Conversation  implements Serializable {
     private static final long serialVersionUID = 6636927818298424517L;
     @Id
     private String id;
-    
+
+    @Index
+    @NotNull
     private String type;
     
     private long latestMessageId;
@@ -48,8 +52,8 @@ public class Conversation  implements Serializable {
         
     }
 
-    @Generated(hash = 1370097037)
-    public Conversation(String id, String type, long latestMessageId,
+    @Generated(hash = 1142294719)
+    public Conversation(String id, @NotNull String type, long latestMessageId,
             long latestMessageTime) {
         this.id = id;
         this.type = type;

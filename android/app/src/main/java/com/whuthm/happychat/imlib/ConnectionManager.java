@@ -21,14 +21,16 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.Response;
 
-class ConnectionManager extends AbstractChatContextImplService implements ConnectionService , PacketSender {
+class ConnectionManager extends AbstractChatContextImplService implements ConnectionService, PacketSender {
 
     private static final String TAG = ConnectionManager.class.getSimpleName();
 
     private ConnectionStatus connectionStatus;
     private ChatConnection chatConnection;
 
-    private MessageReceiver messageReceiver;
+
+    private IQPacketHandler iqPacketHandler;
+    private MessagePacketHandler messagePacketHandler;
 
     private final Scheduler connectionScheduler;
 
@@ -47,8 +49,12 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
         return connectionStatus;
     }
 
-    void setMessageReceiver(MessageReceiver messageReceiver) {
-        this.messageReceiver = messageReceiver;
+    public void setIqPacketHandler(IQPacketHandler iqPacketHandler) {
+        this.iqPacketHandler = iqPacketHandler;
+    }
+
+    public void setMessagePacketHandler(MessagePacketHandler messagePacketHandler) {
+        this.messagePacketHandler = messagePacketHandler;
     }
 
     @Override
@@ -87,7 +93,7 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
         }
     }
 
-    private  void runOnConnectionThread(final Runnable runnable) {
+    private void runOnConnectionThread(final Runnable runnable) {
         Observable
                 .fromCallable(new Callable<Object>() {
                     @Override
@@ -182,6 +188,7 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
 
     /**
      * 是否可执行连接动作
+     *
      * @return
      */
     private boolean isConnectable() {
@@ -201,28 +208,40 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
             case message:
                 try {
                     MessageProtos.MessageBean messageBean = MessageProtos.MessageBean.newBuilder().mergeFrom(packet.getData()).build();
-                    handleMessageBean(chatConnection, messageBean);
-                } catch (InvalidProtocolBufferException e) {
+                    handleMessagePacket(chatConnection, packet, messageBean);
+                } catch (Exception e) {
                     e.printStackTrace();
+                    Logs.w(TAG, "handleMessageBean:" + e.getMessage());
                 }
                 break;
             case iq:
                 try {
                     IQProtos.IQ iq = IQProtos.IQ.newBuilder().mergeFrom(packet.getData()).build();
-                    handleIQ(chatConnection, iq);
-                } catch (InvalidProtocolBufferException e) {
-                    e.printStackTrace();
+                    handleIQPacket(chatConnection, packet, iq);
+                } catch (Exception e) {
+                    Logs.w(TAG, "handleIQ:" + e.getMessage());
                 }
                 break;
         }
     }
 
-    private void handleMessageBean(ChatConnection chatConnection, MessageProtos.MessageBean messageBean) {
-
+    private void handleMessagePacket(ChatConnection chatConnection, PacketProtos.Packet packet, MessageProtos.MessageBean messageBean) throws Exception {
+        if (messagePacketHandler != null) {
+            messagePacketHandler.handleMessagePacket(this, packet, messageBean);
+        }
     }
 
-    private void handleIQ(ChatConnection chatConnection, IQProtos.IQ iq) {
-
+    private void handleIQPacket(ChatConnection chatConnection, PacketProtos.Packet packet, IQProtos.IQ iq) throws Exception {
+        switch (iq.getAction()) {
+            case pong:
+                //心跳应答
+                break;
+            default:
+                if (iqPacketHandler != null) {
+                    iqPacketHandler.handlerIQPacket(this, packet, iq);
+                }
+                break;
+        }
     }
 
     synchronized void handleConnectionClosed(ChatConnection chatConnection, int code, String reason) {

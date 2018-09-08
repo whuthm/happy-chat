@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface IConversationDao {
 
-    Conversation getConveration(String conversationId);
+    Conversation getConversation(String conversationId);
 
     List<Conversation> getAllConversations();
 

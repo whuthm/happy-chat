@@ -4,10 +4,12 @@ import com.whuthm.happychat.imlib.model.Conversation;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+
 public interface ConversationService {
 
-    Conversation getConversation(String conversationId);
+    Observable<Conversation> getConversation(String conversationId);
 
-    List<Conversation> getAllConversations();
+    Observable<List<Conversation>> getAllConversations();
 
 }

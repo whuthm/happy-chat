@@ -62,6 +62,7 @@ public class MainTestFragment extends ChatContextFragment {
                         message.setBody("{\"text\":\"test\"}");
                         message.setConversationType("SingleChat");
                         message.setType("txt");
+                        message.setDirection(Message.Direction.SEND);
                         message.setUid(UUID.randomUUID().toString());
                         messageService.sendMessage(message).subscribe(new Observer<Message>() {
                             @Override

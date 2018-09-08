@@ -19,26 +19,37 @@ class MessageSender {
         this.sendingMessages = new ConcurrentHashMap<>();
     }
 
-    public void sendMessage(Message message) throws Exception {
+    void sendMessage(Message message) throws Exception {
         try {
-            MessageProtos.MessageBean messageBean = MessageProtos.MessageBean.newBuilder()
-                    .setId(message.getUid())
-                    .setBody(message.getBody())
-                    .setConversationType(message.getConversationType())
-                    .setFrom(message.getFrom())
-                    .setTo(message.getTo())
-                    .setSendTime(message.getSendTime())
-                    .build();
+            MessageProtos.MessageBean messageBean = MessageUtils.getMessagePacketFrom(message);
             this.sendingMessages.put(message.getUid(), message);
             packetSender.sendPacket(PacketUtils.createPacket(PacketProtos.Packet.Type.message, messageBean));
-            if (this.sendingMessages.containsKey(message.getUid())) {
-                synchronized (message) {
-                    wait(6 * 1000);
+            synchronized (message) {
+                if (this.sendingMessages.containsKey(message.getUid())) {
+                    message.wait(8 * 1000);
+                }
+                if (message.getSid() != null) {
+                    message.setSentStatus(Message.SentStatus.SENT);
+                } else {
+                    throw new Exception("Message sent Failed(" + message.getUid() + ")");
                 }
             }
         } catch (Exception e){
-            this.sendingMessages.remove(message.getUid());
+            message.setSentStatus(Message.SentStatus.FAILED);
             throw  e;
+        } finally {
+            this.sendingMessages.remove(message.getUid());
         }
     }
+
+    void performMessageDelivered(String uid, long sid) {
+        final Message message = sendingMessages.get(uid);
+        if (message != null) {
+            synchronized (message) {
+                message.setSid(sid);
+                message.notifyAll();
+            }
+        }
+    }
+
 }
