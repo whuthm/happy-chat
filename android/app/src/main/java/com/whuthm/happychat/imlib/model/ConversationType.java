@@ -5,10 +5,6 @@ package com.whuthm.happychat.imlib.model;
  */
 
 public enum  ConversationType {
-    PRIVATE,
-    DISCUSSION,
-    CHATROOM,
-    GROUP,
-    SYSTEM,
-    PUSH_SYSTEM
+    SingleChat,
+    GroupChat
 }

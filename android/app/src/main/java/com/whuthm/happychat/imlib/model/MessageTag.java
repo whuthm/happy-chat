@@ -20,6 +20,9 @@ public @interface MessageTag {
     // 保存在本地并计算未读数
     int FLAG_COUNTED = 3;
 
+    String TYPE_TXT = "txt";
+    String TYPE_IMG = "img";
+
     String type();
 
     int flag() default FLAG_NONE;

@@ -125,15 +125,6 @@ class MessageManager implements MessagePacketHandler  {
         }
     }
 
-    private void sendMessagePacket(Message message, MessageProtos.MessageBean messageBean, Connection connection) throws Exception {
-        try {
-            connection.sendPacket(PacketUtils.createPacket(PacketProtos.Packet.Type.message, messageBean));
-        } catch (Exception ex) {
-            throw ex;
-        }
-
-    }
-
     private long nextSortId() {
         if (sortId == null) {
             synchronized (MessageManager.class) {

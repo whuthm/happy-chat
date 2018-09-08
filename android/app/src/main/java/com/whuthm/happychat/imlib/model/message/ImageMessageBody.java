@@ -3,7 +3,7 @@ package com.whuthm.happychat.imlib.model.message;
 import com.whuthm.happychat.imlib.model.MessageTag;
 import com.whuthm.happychat.imlib.model.MessageBody;
 
-@MessageTag(type = "img", flag = MessageTag.FLAG_COUNTED)
+@MessageTag(type = MessageTag.TYPE_IMG, flag = MessageTag.FLAG_COUNTED)
 public class ImageMessageBody extends MessageBody {
 
     private static final long serialVersionUID = 8872463275375934585L;

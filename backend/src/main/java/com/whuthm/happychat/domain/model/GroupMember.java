@@ -16,7 +16,7 @@ public class GroupMember {
     @Column(name = "user_nick")
     private String userNick;
     @Column(name = "role")
-    private int role;
+    private Integer role;
 
     public long getId() {
         return id;
@@ -50,11 +50,11 @@ public class GroupMember {
         this.userNick = userNick;
     }
 
-    public int getRole() {
+    public Integer getRole() {
         return role;
     }
 
-    public void setRole(int role) {
+    public void setRole(Integer role) {
         this.role = role;
     }
 }

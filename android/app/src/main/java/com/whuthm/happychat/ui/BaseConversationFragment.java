@@ -17,4 +17,12 @@ public class BaseConversationFragment extends ChatContextFragment {
         conversationId = getArguments().getString(KEY_CONVERSATION_ID);
         conversationType = getArguments().getString(KEY_CONVERSATION_TYPE);
     }
+
+    public String getConversationId() {
+        return conversationId;
+    }
+
+    public String getConversationType() {
+        return conversationType;
+    }
 }

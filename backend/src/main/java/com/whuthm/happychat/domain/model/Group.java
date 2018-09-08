@@ -19,7 +19,7 @@ public class Group {
     @Column(name = "creator")
     private String creator;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<GroupMember> members;
 
     public String getId() {

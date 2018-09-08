@@ -206,8 +206,7 @@ public class ChatConnection implements Connection {
 
     private boolean isAuthenticated() {
         final String token = getToken();
-        final Identifier identifier = getIdentifier();
-        final ClientProtos.ClientResource resource = ClientProtos.ClientResource.valueOf(identifier.getResource());
+        final Identifier identifier = getIdentifier();final ClientProtos.ClientResource resource = ClientProtos.ClientResource.valueOf(identifier.getResource());
         return !StringUtils.isEmpty(token) && token.equals(authenticationService.getToken(identifier.getNode(), resource));
     }
 

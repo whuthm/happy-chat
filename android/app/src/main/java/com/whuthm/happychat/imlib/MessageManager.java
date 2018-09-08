@@ -1,5 +1,6 @@
 package com.whuthm.happychat.imlib;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.whuthm.happychat.data.IQProtos;
@@ -11,6 +12,7 @@ import com.whuthm.happychat.imlib.vo.HistoryMessagesRequest;
 import com.whuthm.happychat.util.PacketUtils;
 
 import java.util.List;
+import java.util.UUID;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -56,6 +58,16 @@ class MessageManager extends AbstractChatContextImplService implements MessageSe
                     public void subscribe(ObservableEmitter<Message> e) throws Exception {
                         try {
                             Log.i(TAG, "sendMessage sending");
+                            if (TextUtils.isEmpty(message.getUid())) {
+                                message.setUid(UUID.randomUUID().toString());
+                            }
+                            if (TextUtils.isEmpty(message.getFrom())) {
+                                message.setFrom(getCurrentUserId());
+                            }
+                            message.setDirection(Message.Direction.SEND);
+                            if (message.getSendTime() <= 0) {
+                                message.setSendTime(System.currentTimeMillis());
+                            }
                             message.setSentStatus(Message.SentStatus.SENDING);
                             saveMessageInternal(message);
                             messageSender.sendMessage(message);

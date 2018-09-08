@@ -19,10 +19,10 @@ class ConversationManager {
     public Conversation getConversation(String from, String to, ConversationType conversationType) {
         String conversationId;
         switch (conversationType) {
-            case GroupChat:
+            case SingleChat:
                 conversationId = StringUtils.sortToStringValue(from, to);
                 break;
-            case SingleChat:
+            case GroupChat:
                 conversationId = to;
                 break;
             default:

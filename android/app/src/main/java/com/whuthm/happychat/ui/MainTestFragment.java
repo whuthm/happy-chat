@@ -13,6 +13,7 @@ import com.whuthm.happychat.app.AuthenticationService;
 import com.whuthm.happychat.imlib.ConnectionService;
 import com.whuthm.happychat.imlib.MessageService;
 import com.whuthm.happychat.imlib.model.Conversation;
+import com.whuthm.happychat.imlib.model.ConversationType;
 import com.whuthm.happychat.imlib.model.Message;
 
 import java.util.UUID;
@@ -60,7 +61,7 @@ public class MainTestFragment extends ChatContextFragment {
                         message.setFrom(authenticationService.getAuthenticationUser().getUserId());
                         message.setTo(to);
                         message.setBody("{\"text\":\"test\"}");
-                        message.setConversationType("SingleChat");
+                        message.setConversationType(ConversationType.SingleChat.name());
                         message.setType("txt");
                         message.setDirection(Message.Direction.SEND);
                         message.setUid(UUID.randomUUID().toString());
@@ -95,6 +96,15 @@ public class MainTestFragment extends ChatContextFragment {
                     @Override
                     public void onClick(View v) {
                         connectionService.connect();
+                    }
+                });
+
+        final String groupId = "1";
+        view.findViewById(R.id.btn_start_conversation)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ConversationActivity.startConversation(getActivity(), groupId, ConversationType.GroupChat.name());
                     }
                 });
     }
