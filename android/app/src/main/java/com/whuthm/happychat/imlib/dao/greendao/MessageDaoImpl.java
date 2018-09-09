@@ -29,14 +29,14 @@ class MessageDaoImpl extends AbstractGreenDao implements IMessageDao {
         } else {
             queryBuilder.orderDesc(MessageDao.Properties.Id);
         }
-        WhereCondition toCondition = MessageDao.Properties.To.eq(request.getConversationId());
+        WhereCondition conversationIdCondition = MessageDao.Properties.ConversationId.eq(request.getConversationId());
         WhereCondition idCondition;
         if (request.isBackward()) {
             idCondition = MessageDao.Properties.Id.lt(request.getBaseMessageId());
         } else {
             idCondition = MessageDao.Properties.Id.gt(request.getBaseMessageId());
         }
-        List<Message> messages = queryBuilder.where(toCondition, idCondition).build().list();
+        List<Message> messages = queryBuilder.where(conversationIdCondition, idCondition).build().list();
         session.clear();
         return messages;
     }

@@ -49,7 +49,7 @@ public class MessageListFragment extends BaseConversationFragment {
         supportedSpec = new Spec<Message>() {
             @Override
             public boolean isSatisfiedBy(Message product) {
-                return !TextUtils.isEmpty(product.getConversationType()) && product.getConversationType().equals(getConversationType());
+                return getConversationId().equals(product.getConversationId());
             }
         };
         messageList = new ArrayList<>();

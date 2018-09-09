@@ -7,12 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.barran.lib.app.BaseFragment;
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.app.AuthenticationService;
 import com.whuthm.happychat.imlib.ConnectionService;
 import com.whuthm.happychat.imlib.MessageService;
-import com.whuthm.happychat.imlib.model.Conversation;
 import com.whuthm.happychat.imlib.model.ConversationType;
 import com.whuthm.happychat.imlib.model.Message;
 
@@ -58,10 +56,9 @@ public class MainTestFragment extends ChatContextFragment {
                     @Override
                     public void onClick(View v) {
                         Message message = new Message();
-                        message.setFrom(authenticationService.getAuthenticationUser().getUserId());
-                        message.setTo(to);
+                        message.setConversationId(to);
                         message.setBody("{\"text\":\"test\"}");
-                        message.setConversationType(ConversationType.SingleChat.name());
+                        message.setConversationType(ConversationType.PRIVATE);
                         message.setType("txt");
                         message.setDirection(Message.Direction.SEND);
                         message.setUid(UUID.randomUUID().toString());
@@ -104,7 +101,7 @@ public class MainTestFragment extends ChatContextFragment {
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ConversationActivity.startConversation(getActivity(), groupId, ConversationType.GroupChat.name());
+                        ConversationActivity.startConversation(getActivity(), groupId, ConversationType.GROUP);
                     }
                 });
     }

@@ -48,12 +48,12 @@ public class MessageInputFragment extends BaseConversationFragment {
                 final String text = input.getText().toString();
 
                 Message message = new Message();
-                message.setTo(getConversationId());
+                message.setConversationId(getConversationId());
+                message.setConversationType(getConversationType());
                 TextMessageBody textMessageBody = new TextMessageBody();
                 textMessageBody.setText(text);
                 message.setBodyObject(textMessageBody);
                 message.setType(MessageTag.TYPE_TXT);
-                message.setConversationType(getConversationType());
                 if (!TextUtils.isEmpty(text)) {
                     messageService.sendMessage(message).subscribe(new DisposableObserver<Message>() {
                         @Override

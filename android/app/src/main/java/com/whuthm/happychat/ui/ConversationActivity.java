@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import com.barran.lib.app.BaseActivity;
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.data.Constants;
+import com.whuthm.happychat.imlib.model.ConversationType;
 
 /**
  * 聊天界面
@@ -31,8 +32,8 @@ public class ConversationActivity extends BaseConversationActivity {
         super.onArgumentsInitialized();
         conversationFragment = new ConversationFragment();
         Bundle args = new Bundle();
-        args.putString(KEY_CONVERSATION_ID, conversationId);
-        args.putString(KEY_CONVERSATION_TYPE, conversationType);
+        args.putString(KEY_CONVERSATION_ID, getConversationId());
+        args.putSerializable(KEY_CONVERSATION_TYPE, getConversationType());
         conversationFragment.setArguments(args);
         getSupportFragmentManager()
                 .beginTransaction()
@@ -40,7 +41,7 @@ public class ConversationActivity extends BaseConversationActivity {
                 .commitAllowingStateLoss();
     }
 
-    public static void startConversation(Context context, String conversationId, String conversationType) {
+    public static void startConversation(Context context, String conversationId, ConversationType conversationType) {
         Intent intent = new Intent(context, ConversationActivity.class);
         intent.putExtra(KEY_CONVERSATION_ID, conversationId);
         intent.putExtra(KEY_CONVERSATION_TYPE, conversationType);

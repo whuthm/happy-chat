@@ -61,9 +61,7 @@ class MessageManager extends AbstractChatContextImplService implements MessageSe
                             if (TextUtils.isEmpty(message.getUid())) {
                                 message.setUid(UUID.randomUUID().toString());
                             }
-                            if (TextUtils.isEmpty(message.getFrom())) {
-                                message.setFrom(getCurrentUserId());
-                            }
+                            message.setSenderUserId(getCurrentUserId());
                             message.setDirection(Message.Direction.SEND);
                             if (message.getSendTime() <= 0) {
                                 message.setSendTime(System.currentTimeMillis());

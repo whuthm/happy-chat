@@ -86,10 +86,10 @@ class ConversationManager extends AbstractChatContextImplService implements Conv
     }
 
     private void updateConversationBy(Message message) {
-        Conversation conversation = getConversationInternal(message.getTo());
+        Conversation conversation = getConversationInternal(message.getConversationId());
         if (conversation == null) {
             conversation = new Conversation();
-            conversation.setId(message.getTo());
+            conversation.setId(message.getConversationId());
             conversation.setType(message.getConversationType());
         }
 

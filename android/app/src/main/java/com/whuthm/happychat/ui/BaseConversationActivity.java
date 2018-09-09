@@ -6,13 +6,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.whuthm.happychat.imlib.model.ConversationType;
+
 public abstract class BaseConversationActivity extends ChatContextActivity  {
 
     public static final String KEY_CONVERSATION_ID = "conversation_id";
     public static final String KEY_CONVERSATION_TYPE = "conversation_type";
 
     protected String conversationId;
-    protected String conversationType;
+    protected ConversationType conversationType;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,7 +30,7 @@ public abstract class BaseConversationActivity extends ChatContextActivity  {
 
     protected final void initializeArguments(@NonNull Intent intent) {
         conversationId = intent.getStringExtra(KEY_CONVERSATION_ID);
-        conversationType = intent.getStringExtra(KEY_CONVERSATION_TYPE);
+        conversationType = (ConversationType) intent.getSerializableExtra(KEY_CONVERSATION_TYPE);
         if (checkArguments()) {
             onArgumentsInitialized();
         } else  {
@@ -44,7 +46,14 @@ public abstract class BaseConversationActivity extends ChatContextActivity  {
     }
 
     private boolean checkArguments() {
-        return  !TextUtils.isEmpty(conversationId) && !TextUtils.isEmpty(conversationType);
+        return  !TextUtils.isEmpty(conversationId) && conversationType != null;
     }
 
+    public String getConversationId() {
+        return conversationId;
+    }
+
+    public ConversationType getConversationType() {
+        return conversationType;
+    }
 }

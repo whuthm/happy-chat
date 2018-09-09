@@ -1,5 +1,6 @@
 package com.whuthm.happychat.imlib.model;
 
+import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
@@ -28,7 +29,8 @@ public class Conversation  implements Serializable {
 
     @Index
     @NotNull
-    private String type;
+    @Convert(columnType = String.class, converter = ConversationType.Converter.class)
+    private ConversationType type;
     
     private long latestMessageId;
 
@@ -36,24 +38,22 @@ public class Conversation  implements Serializable {
     private Message latestMessage;
     
     private long latestMessageTime;
-
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
-
     /** Used for active entity operations. */
     @Generated(hash = 151466175)
     private transient ConversationDao myDao;
-
     @Generated(hash = 1231441308)
     private transient Long latestMessage__resolvedKey;
+
 
     public Conversation() {
         
     }
 
-    @Generated(hash = 1142294719)
-    public Conversation(String id, @NotNull String type, long latestMessageId,
+    @Generated(hash = 266679905)
+    public Conversation(String id, @NotNull ConversationType type, long latestMessageId,
             long latestMessageTime) {
         this.id = id;
         this.type = type;
@@ -79,10 +79,10 @@ public class Conversation  implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
-    public String getType() {
+    public ConversationType getType() {
         return this.type;
     }
-    public void setType(String type) {
+    public void setType(ConversationType type) {
         this.type = type;
     }
 
@@ -154,4 +154,6 @@ public class Conversation  implements Serializable {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getConversationDao() : null;
     }
+
+
 }

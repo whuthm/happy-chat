@@ -21,7 +21,7 @@ class MessageSender {
 
     void sendMessage(Message message) throws Exception {
         try {
-            MessageProtos.MessageBean messageBean = MessageUtils.getMessagePacketFrom(message);
+            MessageProtos.MessageBean messageBean = MessageUtils.getSendMessagePacketFrom(message);
             this.sendingMessages.put(message.getUid(), message);
             packetSender.sendPacket(PacketUtils.createPacket(PacketProtos.Packet.Type.message, messageBean));
             synchronized (message) {

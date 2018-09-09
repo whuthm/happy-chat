@@ -96,7 +96,7 @@ public abstract class AbsMessageItem extends ConstraintLayout {
 
             mAvatarSelf.setVisibility(GONE);
 
-            mTvNick.setText(message.getFrom());
+            mTvNick.setText(message.getConversationId());
             mTvTime.setText(DateUtil.formatDate(message.getSendTime()));
         }
     }

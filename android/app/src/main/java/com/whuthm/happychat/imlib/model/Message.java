@@ -1,5 +1,7 @@
 package com.whuthm.happychat.imlib.model;
 
+import android.support.annotation.NonNull;
+
 import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
@@ -48,16 +50,18 @@ public class Message implements Serializable {
     private String type;
 
     @NotNull
-    private String conversationType;
-
-    @NotNull
-    private String from;
+    @Convert(columnType = String.class, converter = ConversationType.Converter.class)
+    private ConversationType conversationType;
 
     /**
      * 建索引，快速查询某一会话的历史消息
      */
     @Index
-    private String to;
+    @NonNull
+    private String conversationId;
+
+    @NonNull
+    private String senderUserId;
 
 
     private String body;
@@ -78,19 +82,24 @@ public class Message implements Serializable {
     @Convert(columnType = Integer.class, converter = ReceivedStatusConverter.class)
     private ReceivedStatus receivedStatus;
 
-    @Generated(hash = 1676727750)
+
+    @Generated(hash = 637306882)
+    public Message() {
+    }
+
+    @Generated(hash = 621950465)
     public Message(Long id, String uid, Direction direction, Long sid, @NotNull String type,
-            @NotNull String conversationType, @NotNull String from, String to, String body,
-            long sendTime, long receiveTime, String attrs, String extra, SentStatus sentStatus,
-            ReceivedStatus receivedStatus) {
+            @NotNull ConversationType conversationType, @NotNull String conversationId,
+            @NotNull String senderUserId, String body, long sendTime, long receiveTime, String attrs,
+            String extra, SentStatus sentStatus, ReceivedStatus receivedStatus) {
         this.id = id;
         this.uid = uid;
         this.direction = direction;
         this.sid = sid;
         this.type = type;
         this.conversationType = conversationType;
-        this.from = from;
-        this.to = to;
+        this.conversationId = conversationId;
+        this.senderUserId = senderUserId;
         this.body = body;
         this.sendTime = sendTime;
         this.receiveTime = receiveTime;
@@ -98,10 +107,6 @@ public class Message implements Serializable {
         this.extra = extra;
         this.sentStatus = sentStatus;
         this.receivedStatus = receivedStatus;
-    }
-
-    @Generated(hash = 637306882)
-    public Message() {
     }
 
     public Long getId() {
@@ -127,22 +132,6 @@ public class Message implements Serializable {
     public void setBody(String body) {
         this.body = body;
         this.bodyObject = MessageBody.decode(this);
-    }
-
-    public String getFrom() {
-        return from;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
     }
 
     public String getAttrs() {
@@ -187,13 +176,29 @@ public class Message implements Serializable {
         this.sid = sid;
     }
 
+    public String getConversationId() {
+        return conversationId;
+    }
 
-    public String getConversationType() {
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
+    }
+
+    @NonNull
+    public String getSenderUserId() {
+        return senderUserId;
+    }
+
+    public void setSenderUserId(@NonNull String senderUserId) {
+        this.senderUserId = senderUserId;
+    }
+
+    public ConversationType getConversationType() {
         return this.conversationType;
     }
 
 
-    public void setConversationType(String conversationType) {
+    public void setConversationType(ConversationType conversationType) {
         this.conversationType = conversationType;
     }
 
