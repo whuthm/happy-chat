@@ -5,6 +5,7 @@ import com.whuthm.happychat.domain.repository.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +29,31 @@ class GroupManager implements GroupService {
             }
         }
         return group;
+    }
+
+    @Override
+    public Group inviteIntoGroup(String groupId, String invitor, List<String> memberIds) throws Exception {
+        return null;
+    }
+
+    @Override
+    public Group quitGroup(String groupId, String who) throws Exception {
+        return null;
+    }
+
+    @Override
+    public Group applyIntoGroup(String groupId, String applicant) throws Exception {
+        return null;
+    }
+
+    @Override
+    public Group modifyGroupName(String groupId, String who, String groupName) {
+        return null;
+    }
+
+    @Override
+    public Group createGroup(String groupName, String groupType, String creator, List<String> memberIds) {
+        return null;
     }
 
 }

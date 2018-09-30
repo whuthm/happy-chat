@@ -21,6 +21,7 @@ import com.barran.lib.view.text.ColorfulTextView;
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.common.utils.EventBusUtils;
 import com.whuthm.happychat.data.Constants;
+import com.whuthm.happychat.data.api.RetrofitClient;
 import com.whuthm.happychat.imlib.ConversationService;
 import com.whuthm.happychat.imlib.event.ConversationEvent;
 import com.whuthm.happychat.imlib.model.Conversation;
@@ -128,7 +129,7 @@ public class MainConversationListFragment extends ChatContextFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_add) {
             // TODO 创建群聊
-            
+            RetrofitClient.api().createGroup();
             return true;
         }
         return super.onOptionsItemSelected(item);
