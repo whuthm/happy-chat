@@ -18,7 +18,6 @@ import com.whuthm.happychat.imlib.event.MessageEvent;
 import com.whuthm.happychat.imlib.model.Message;
 import com.whuthm.happychat.ui.item.TextMessageItem;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -27,21 +26,22 @@ import java.util.Collections;
 import java.util.List;
 
 public class MessageListFragment extends BaseConversationFragment {
-
+    
     private List<Message> messageList;
-
+    
     private RecyclerView recyclerView;
-
+    
     private MessageAdapter mAdapter;
-
+    
     private Spec<Message> supportedSpec;
-
+    
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.frag_message_list, container, false);
     }
-
+    
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -63,7 +63,7 @@ public class MessageListFragment extends BaseConversationFragment {
         });
         recyclerView.setAdapter(mAdapter = new MessageAdapter());
     }
-
+    
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageAddedEvent(MessageEvent.AddedEvent event) {
         if (supportedSpec.isSatisfiedBy(event.getMessage())) {
@@ -72,48 +72,48 @@ public class MessageListFragment extends BaseConversationFragment {
             mAdapter.notifyItemInserted(messageList.indexOf(event.getMessage()));
         }
     }
-
+    
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageUpdatedEvent(MessageEvent.UpdatedEvent event) {
-    }
-
+    public void onMessageUpdatedEvent(MessageEvent.UpdatedEvent event) {}
+    
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageRemovedEvent(MessageEvent.RemovedEvent event) {
-    }
-
+    public void onMessageRemovedEvent(MessageEvent.RemovedEvent event) {}
+    
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         EventBusUtils.safeUnregister(this);
     }
-
+    
     private class MessageAdapter extends BaseRecyclerAdapter<TextHolder> {
-
+        
         @Override
         protected TextHolder createHolder(ViewGroup parent, int viewType) {
             return new TextHolder(new TextMessageItem(getContext()));
         }
-
+        
         @Override
         public void onBindViewHolder(@NonNull TextHolder holder, int position) {
             holder.update(messageList.get(position));
         }
-
+        
         @Override
         public int getItemCount() {
             return messageList != null ? messageList.size() : 0;
         }
     }
-
+    
     private class TextHolder extends RecyclerView.ViewHolder {
-
+        
         public TextHolder(View itemView) {
             super(itemView);
         }
-
+        
         public void update(Message message) {
-            ((TextMessageItem) itemView).showMessage(message);
+            boolean isSendBySelf = !TextUtils.isEmpty(userId)
+                    && userId.equals(message.getSenderUserId());
+            ((TextMessageItem) itemView).showMessage(message, isSendBySelf);
         }
     }
-
+    
 }

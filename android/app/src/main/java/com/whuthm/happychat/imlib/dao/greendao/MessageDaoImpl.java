@@ -27,7 +27,7 @@ class MessageDaoImpl extends AbstractGreenDao implements IMessageDao {
         if (request.isBackward()) {
             queryBuilder.orderDesc(MessageDao.Properties.Id);
         } else {
-            queryBuilder.orderDesc(MessageDao.Properties.Id);
+            queryBuilder.orderAsc(MessageDao.Properties.Id);
         }
         WhereCondition conversationIdCondition = MessageDao.Properties.ConversationId.eq(request.getConversationId());
         WhereCondition idCondition;

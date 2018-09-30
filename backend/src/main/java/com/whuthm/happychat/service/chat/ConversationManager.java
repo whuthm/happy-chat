@@ -17,6 +17,11 @@ class ConversationManager {
     private Map<String, Conversation> conversations = new ConcurrentHashMap<>();
 
     public Conversation getConversation(String from, String to, ConversationType conversationType) {
+
+        if(conversationType == null){
+            return null;
+        }
+
         String conversationId;
         switch (conversationType) {
             case SingleChat:

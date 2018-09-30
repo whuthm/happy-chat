@@ -8,7 +8,7 @@ import org.greenrobot.greendao.converter.PropertyConverter;
 
 public enum ConversationType {
     PRIVATE("private"),
-    GROUP("group", true),
+    GROUP("GroupChat", true),
     CHAT_ROOM("chat_room", true),
     DISCUSSION("discussion", true),
     SYSTEM("system", false),

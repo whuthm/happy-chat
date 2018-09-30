@@ -59,8 +59,8 @@ public class TextMessageItem extends AbsMessageItem {
     }
     
     @Override
-    public void showMessage(Message message) {
-        super.showMessage(message);
+    public void showMessage(Message message, boolean isSendBySelf) {
+        super.showMessage(message, isSendBySelf);
         
         setText(message.getBody());
     }

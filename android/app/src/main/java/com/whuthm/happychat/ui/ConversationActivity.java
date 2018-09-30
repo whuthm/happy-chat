@@ -3,12 +3,8 @@ package com.whuthm.happychat.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
-import com.barran.lib.app.BaseActivity;
 import com.whuthm.happychat.R;
-import com.whuthm.happychat.data.Constants;
 import com.whuthm.happychat.imlib.model.ConversationType;
 
 /**

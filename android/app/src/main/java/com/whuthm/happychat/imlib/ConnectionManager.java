@@ -3,12 +3,10 @@ package com.whuthm.happychat.imlib;
 import android.support.annotation.Nullable;
 
 import com.barran.lib.utils.log.Logs;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.whuthm.happychat.data.IQProtos;
 import com.whuthm.happychat.data.MessageProtos;
 import com.whuthm.happychat.data.PacketProtos;
 import com.whuthm.happychat.imlib.model.ConnectionStatus;
-import com.whuthm.happychat.imlib.model.Message;
 import com.whuthm.happychat.util.PacketUtils;
 
 import java.util.concurrent.Callable;

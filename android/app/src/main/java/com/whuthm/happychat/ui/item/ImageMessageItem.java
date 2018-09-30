@@ -53,8 +53,8 @@ public class ImageMessageItem extends AbsMessageItem {
     }
     
     @Override
-    public void showMessage(Message message) {
-        super.showMessage(message);
+    public void showMessage(Message message, boolean isSendBySelf) {
+        super.showMessage(message, isSendBySelf);
         
         setImageUrl(message.getBody());
     }

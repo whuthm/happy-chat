@@ -51,7 +51,7 @@ public class App extends Application implements ApplicationServiceContext.Provid
                 .connect(new ChatConfiguration(authenticationService.getAuthenticationUser().getUserId(), authenticationService.getAuthenticationUser().getUserToken()));
     }
 
-    private void disconncetChat() {
+    private void disconnectChat() {
         ChatManager.getInstance().disconnect();
     }
 
@@ -80,7 +80,7 @@ public class App extends Application implements ApplicationServiceContext.Provid
                         connectChat();
                         break;
                     case Logout:
-                        disconncetChat();
+                        disconnectChat();
                     default:
                         break;
                 }
