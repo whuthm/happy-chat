@@ -10,6 +10,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Scheduler;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
 class UserManager extends AbstractIMService implements UserService, UserProvider.Aware{
@@ -40,7 +41,13 @@ class UserManager extends AbstractIMService implements UserService, UserProvider
                         e.onComplete();
                     }
                 })
-                .subscribeOn(diskScheduler);
+                .subscribeOn(diskScheduler)
+                .doOnNext(new Consumer<User>() {
+                    @Override
+                    public void accept(User user) throws Exception {
+                        poster.postUserChanged(user);
+                    }
+                });
     }
 
     @Override
@@ -50,8 +57,9 @@ class UserManager extends AbstractIMService implements UserService, UserProvider
                     @Override
                     public User apply(UserProtos.UserResponse userResponse) throws Exception {
                         ApiUtils.requireProtoResponseSuccessful(userResponse);
-                        if (userResponse.getData() == null)
+                        if (userResponse.getData() == null) {
                             throw new NullPointerException("UserBean == null");
+                        }
                         User user = new User();
                         user.setId(userResponse.getData().getId());
                         user.setName(userResponse.getData().getName());

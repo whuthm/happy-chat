@@ -8,12 +8,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.RequestOptions;
 import com.whuthm.happychat.R;
+import com.whuthm.happychat.common.util.Mapper;
 import com.whuthm.happychat.common.view.item.ItemAdapter;
 import com.whuthm.happychat.common.view.item.TypedItem;
-import com.whuthm.happychat.common.view.item.TypedItemViewHolder;
 import com.whuthm.happychat.common.view.item.TypedItemViewProvider;
 import com.whuthm.happychat.imlib.model.Message;
 import com.whuthm.happychat.imlib.model.MessageBody;
@@ -36,6 +35,11 @@ public class MessageTypedItemProvider extends TypedItemViewProvider {
     public static final int TYPE_IMG_RECEIVE = TYPE_IMG_SEND + 1;
 
     MessageItemClickListener messageItemClickListener;
+    private final Mapper<Message, MessageItem> mapper;
+
+    public MessageTypedItemProvider(Mapper<Message, MessageItem> mapper) {
+        this.mapper = mapper;
+    }
 
     public void setMessageItemClickListener(MessageItemClickListener messageItemClickListener) {
         this.messageItemClickListener = messageItemClickListener;
@@ -82,7 +86,7 @@ public class MessageTypedItemProvider extends TypedItemViewProvider {
                 type = isSendDirection ? TYPE_UNKNOWN_SEND : TYPE_UNKNOWN_RECEIVE;
                 break;
         }
-        return new TypedItem<>(type, new MessageItem(message));
+        return new TypedItem<>(type, mapper.transform(message));
     }
 
     public abstract static class MessageViewHolder<BODY extends MessageBody> extends ItemAdapter.ItemViewHolder<MessageItem> {
@@ -95,6 +99,9 @@ public class MessageTypedItemProvider extends TypedItemViewProvider {
 
         public MessageViewHolder(View itemView) {
             super(itemView);
+            senderNameView = findViewById(R.id.tv_sender_name);
+            senderPortraitView = findViewById(R.id.iv_sender_portrait);
+            bubbleLayout = findViewById(R.id.layout_bubble);
         }
 
         public void setItemClickListener(MessageItemClickListener itemClickListener) {
@@ -119,7 +126,7 @@ public class MessageTypedItemProvider extends TypedItemViewProvider {
                         .load(messageItem.getSenderPortraitUrl())
                         .apply(RequestOptions.centerCropTransform()
                                 .placeholder(R.drawable.dog1)
-                                .error(R.drawable.ic_launcher))
+                                .error(R.drawable.dog1))
                         .into(senderPortraitView);
             }
 

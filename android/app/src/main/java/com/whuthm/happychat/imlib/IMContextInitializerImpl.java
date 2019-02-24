@@ -34,7 +34,6 @@ class IMContextInitializerImpl implements IMContext.Initializer {
         chatContext.registerService(ConversationService.class, new ConversationManager(chatContext, new ConversationEventPoster(eventPoster), daoFactory.getConversationDao(), diskScheduler));
         chatContext.registerService(ConnectionService.class, connectionManager);
         UserManager userManager = new UserManager(chatContext, apiService, daoFactory.getUserDao(), new UserEventPoster(eventPoster), diskScheduler);
-        userManager.setUserProvider(new UserProviderImpl(userManager));
         chatContext.registerService(UserService.class, userManager);
 
         GroupManager groupManager = new GroupManager(chatContext, new GroupEventPoster(eventPoster), diskScheduler, apiService, daoFactory.getGroupDao());

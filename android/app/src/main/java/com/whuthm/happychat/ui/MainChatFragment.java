@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,8 +20,10 @@ import com.whuthm.happychat.common.view.item.ItemAdapter;
 import com.whuthm.happychat.common.view.item.ItemsRecyclerView;
 import com.whuthm.happychat.imlib.ConversationService;
 import com.whuthm.happychat.imlib.event.ConversationEvent;
+import com.whuthm.happychat.imlib.event.UserEvent;
 import com.whuthm.happychat.imlib.model.Conversation;
 import com.whuthm.happychat.imlib.model.ConversationType;
+import com.whuthm.happychat.imlib.model.User;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -118,7 +121,7 @@ public class MainChatFragment extends IMContextFragment {
 
                     @Override
                     public void onNext(List<Conversation> value) {
-                        List<ConversationItem> items = ConversationMapper.transform(value);
+                        List<ConversationItem> items = MapperProviderFactory.get(imContext).transform(MapperProviderFactory.get(imContext).conversationItem(), value);
                         adapter.setItems(items);
                     }
 
@@ -147,8 +150,21 @@ public class MainChatFragment extends IMContextFragment {
         adapter.changeItem(transform(event.getConversation()));
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUserChangedEvent(UserEvent.ChangedEvent event) {
+        Log.i(getTag(), "onUserChangedEvent");
+        int count = adapter.getItemCount();
+        for (int i = 0; i < count; i++) {
+            ConversationItem conversationItem = adapter.getItem(i);
+            if (conversationItem != null && (event.getUser().getId().equals(conversationItem.getId()) /* || (event.getUser().getId().equals(conversationItem.getLatestMessageSenderUserId())**/)) {
+                adapter.notifyItemChanged(i);
+                break;
+            }
+        }
+    }
+
     private ConversationItem transform(Conversation conversation) {
-        return ConversationMapper.transform(conversation);
+        return MapperProviderFactory.get(imContext).conversationItem().transform(conversation);
     }
 
 

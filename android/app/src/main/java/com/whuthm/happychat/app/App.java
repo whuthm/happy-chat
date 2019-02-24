@@ -15,6 +15,8 @@ import com.whuthm.happychat.imlib.ConnectionConfiguration;
 import com.whuthm.happychat.imlib.IMContext;
 import com.whuthm.happychat.imlib.IMClient;
 import com.whuthm.happychat.imlib.IMOptions;
+import com.whuthm.happychat.imlib.UserProvider;
+import com.whuthm.happychat.imlib.UserService;
 
 /**
  * 程序入口
@@ -72,6 +74,10 @@ public class App extends Application implements ApplicationServiceContext.Provid
                         chatContext.registerService(ConversationAppService.class, new ConversationAppServiceImpl(chatContext));
                         chatContext.registerService(UserAppService.class, new UserAppServiceImpl(chatContext));
                         chatContext.registerService(MessageAppService.class, new MessageAppServiceImpl(chatContext));
+                        final UserService userService = chatContext.getService(UserService.class);
+                        if (userService instanceof UserProvider.Aware) {
+                            ((UserProvider.Aware) userService).setUserProvider(chatContext.getService(UserAppService.class));
+                        }
                     }
                 })
                 .build();

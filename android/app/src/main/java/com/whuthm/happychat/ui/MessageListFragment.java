@@ -15,6 +15,7 @@ import com.whuthm.happychat.common.view.item.ItemAdapter;
 import com.whuthm.happychat.common.view.item.ItemsRecyclerView;
 import com.whuthm.happychat.common.view.item.TypedItem;
 import com.whuthm.happychat.imlib.event.MessageEvent;
+import com.whuthm.happychat.imlib.event.UserEvent;
 import com.whuthm.happychat.imlib.model.Message;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -41,7 +42,7 @@ public class MessageListFragment extends BaseConversationFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         adapter = new ItemAdapter<>(getContext());
-        itemProvider = new MessageTypedItemProvider();
+        itemProvider = new MessageTypedItemProvider(MapperProviderFactory.get(imContext).messageItem());
         adapter.setItemViewProvider(itemProvider);
 
         supportedSpec = new Spec<Message>() {
@@ -77,6 +78,19 @@ public class MessageListFragment extends BaseConversationFragment {
         Log.i(getTag(), "onMessageRemovedEvent");
         if (supportedSpec.isSatisfiedBy(event.getMessage())) {
             adapter.removeItem(itemProvider.getTypedItemBy(event.getMessage()));
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUserChangedEvent(UserEvent.ChangedEvent event) {
+        Log.i(getTag(), "onUserChangedEvent");
+        int count = adapter.getItemCount();
+        for (int i = 0; i < count; i++) {
+            TypedItem<?> typedItem = adapter.getItem(i);
+            if (typedItem != null
+                    && typedItem.getItem() instanceof MessageItem) {
+                MessageItem messageItem = (MessageItem) typedItem.getItem();
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="@dimen/dimen_6"
@@ -10,16 +11,18 @@
 
     <ImageView
         android:id="@+id/layout_conversation_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/chat" />
 
     <TextView
         android:id="@+id/layout_conversation_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/dimen_12"
-        app:layout_constraintLeft_toRightOf="@+id/layout_conversation_icon" />
+        android:layout_marginStart="@dimen/dimen_12"
+        app:layout_constraintLeft_toRightOf="@+id/layout_conversation_icon"
+        tools:text="title" />
 
     <TextView
         android:id="@+id/layout_conversation_content"
@@ -27,6 +30,7 @@
         android:layout_height="wrap_content"
         android:textColor="@android:color/black"
         app:layout_constraintLeft_toLeftOf="@+id/layout_conversation_title"
-        app:layout_constraintTop_toBottomOf="@+id/layout_conversation_title" />
+        app:layout_constraintTop_toBottomOf="@+id/layout_conversation_title"
+        tools:text="content" />
 
 </android.support.constraint.ConstraintLayout>

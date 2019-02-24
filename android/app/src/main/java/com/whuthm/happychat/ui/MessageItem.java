@@ -4,6 +4,8 @@ import com.whuthm.happychat.imlib.model.Message;
 import com.whuthm.happychat.imlib.model.MessageBody;
 import com.whuthm.happychat.imlib.model.UserInfo;
 
+import java.util.Arrays;
+
 public class MessageItem {
 
     private final String id;
@@ -61,4 +63,22 @@ public class MessageItem {
         return receivedStatus != null && receivedStatus.isListened();
     }
 
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MessageItem && getClass() == obj.getClass()) {
+            return getId().equals(((MessageItem) obj).getId());
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(new String[]{getId()});
+    }
+
 }
+
