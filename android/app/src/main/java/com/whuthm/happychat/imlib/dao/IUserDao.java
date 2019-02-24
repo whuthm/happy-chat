@@ -5,12 +5,11 @@ import com.whuthm.happychat.imlib.model.User;
 import java.util.List;
 
 public interface IUserDao {
-    
-    void addUsers(User... list);
-    
-    void addUsers(List<User> list);
-    
-    User getUsersById(String id);
-    
-    List<User> getUsersByIds(List<String> idList);
+
+    User getUser(String id);
+
+    void deleteMessage(String id);
+
+    InsertOrUpdateStatus insertOrUpdateMessage(User user);
+
 }

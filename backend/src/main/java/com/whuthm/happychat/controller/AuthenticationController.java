@@ -9,7 +9,7 @@ import com.whuthm.happychat.exception.ServerException;
 import com.whuthm.happychat.service.authentication.AuthenticationService;
 import com.whuthm.happychat.utils.ApiBaseResponses;
 import com.whuthm.happychat.utils.ApiUtils;
-import com.whuthm.happychat.controller.util.Token;
+import com.whuthm.happychat.controller.token.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

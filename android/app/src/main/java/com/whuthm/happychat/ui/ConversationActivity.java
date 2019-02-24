@@ -3,6 +3,8 @@ package com.whuthm.happychat.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.imlib.model.ConversationType;
@@ -24,6 +26,15 @@ public class ConversationActivity extends BaseConversationActivity {
     }
 
     @Override
+    protected void onInitializeArguments(@NonNull Intent intent) {
+        super.onInitializeArguments(intent);
+        String title = intent.getStringExtra(KEY_CONVERSATION_TITLE);
+        if (!TextUtils.isEmpty(title)) {
+            setTitle(title);
+        }
+    }
+
+    @Override
     protected void onArgumentsInitialized() {
         super.onArgumentsInitialized();
         conversationFragment = new ConversationFragment();
@@ -38,9 +49,14 @@ public class ConversationActivity extends BaseConversationActivity {
     }
 
     public static void startConversation(Context context, String conversationId, ConversationType conversationType) {
+        startConversation(context, conversationId, conversationType, "");
+    }
+
+    public static void startConversation(Context context, String conversationId, ConversationType conversationType, String conversationTitle) {
         Intent intent = new Intent(context, ConversationActivity.class);
         intent.putExtra(KEY_CONVERSATION_ID, conversationId);
         intent.putExtra(KEY_CONVERSATION_TYPE, conversationType);
+        intent.putExtra(KEY_CONVERSATION_TITLE, conversationTitle);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }

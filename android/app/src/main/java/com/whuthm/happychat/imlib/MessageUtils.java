@@ -11,18 +11,19 @@ import com.whuthm.happychat.imlib.model.Message;
 public class MessageUtils {
 
     public static MessageProtos.MessageBean getSendMessagePacketFrom(Message message) {
-        return MessageProtos.MessageBean.newBuilder().setId(message.getUid())
+        return MessageProtos.MessageBean.newBuilder().setId(message.getId())
                 .setBody(message.getBody())
                 .setConversationType(message.getConversationType().getValue())
                 .setFrom(message.getSenderUserId())
                 .setSendTime(message.getSendTime())
+                .setType(message.getType())
                 .setTo(message.getConversationId())
                 .build();
     }
 
     public static Message getMessageFrom(MessageProtos.MessageBean messageBean, String currentUserId) throws Exception {
         Message message = new Message();
-        message.setUid(messageBean.getId());
+        message.setId(messageBean.getId());
         message.setSid(messageBean.getSid());
         message.setType(messageBean.getType());
         message.setBody(messageBean.getBody());

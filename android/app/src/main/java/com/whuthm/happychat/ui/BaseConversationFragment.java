@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import com.whuthm.happychat.app.AuthenticationService;
 import com.whuthm.happychat.imlib.model.ConversationType;
 
-public class BaseConversationFragment extends ChatContextFragment {
+public class BaseConversationFragment extends IMContextFragment {
 
     public static final String KEY_CONVERSATION_ID = BaseConversationActivity.KEY_CONVERSATION_ID;
     public static final String KEY_CONVERSATION_TYPE = BaseConversationActivity.KEY_CONVERSATION_TYPE;

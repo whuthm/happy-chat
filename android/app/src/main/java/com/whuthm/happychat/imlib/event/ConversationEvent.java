@@ -56,5 +56,15 @@ public class ConversationEvent {
         }
     }
 
+    public interface Poster extends EventPoster {
+        void postConversationUpdated(Conversation conversation);
+
+        void postConversationRemoved(Conversation conversation);
+
+        void postConversationAdded(Conversation conversation);
+
+        void postConversationUnreadCount(Conversation conversation);
+    }
+
 
 }

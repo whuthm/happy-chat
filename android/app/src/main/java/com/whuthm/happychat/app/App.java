@@ -6,13 +6,15 @@ import android.support.multidex.MultiDex;
 
 import com.barran.lib.utils.DisplayUtil;
 import com.barran.lib.utils.log.Logs;
+import com.whuthm.happychat.BuildConfig;
 import com.whuthm.happychat.app.model.AuthenticationStatus;
 import com.whuthm.happychat.data.DBOperator;
 import com.whuthm.happychat.data.api.RetrofitClient;
 import com.whuthm.happychat.common.context.ApplicationServiceContext;
-import com.whuthm.happychat.imlib.ChatConfiguration;
-import com.whuthm.happychat.imlib.ChatContext;
-import com.whuthm.happychat.imlib.ChatManager;
+import com.whuthm.happychat.imlib.ConnectionConfiguration;
+import com.whuthm.happychat.imlib.IMContext;
+import com.whuthm.happychat.imlib.IMClient;
+import com.whuthm.happychat.imlib.IMOptions;
 
 /**
  * 程序入口
@@ -47,26 +49,34 @@ public class App extends Application implements ApplicationServiceContext.Provid
 
     private void connectChat() {
         final AuthenticationService authenticationService = applicationContext.getService(AuthenticationService.class);
-        ChatManager.getInstance()
-                .connect(new ChatConfiguration(authenticationService.getAuthenticationUser().getUserId(), authenticationService.getAuthenticationUser().getUserToken()));
+        IMClient.getInstance()
+                .connect(new ConnectionConfiguration(authenticationService.getAuthenticationUser().getUserId(), authenticationService.getAuthenticationUser().getUserToken()));
     }
 
     private void disconnectChat() {
-        ChatManager.getInstance().disconnect();
+        IMClient.getInstance().disconnect();
     }
 
     private void initApp() {
         applicationContext = new AppContext(this);
-
-        ChatManager.init(this, new ChatContext.Initializer() {
-            @Override
-            public void initialize(ChatContext chatContext) {
-
-            }
-        });
-
         RetrofitClient.initRetrofit(this);
+
         DBOperator.init(this);
+
+        IMOptions imOptions = new IMOptions.Builder(this)
+                .setImServer(BuildConfig.IM_SERVER)
+                .setImPort(BuildConfig.IM_PORT)
+                .setInitializer(new IMContext.Initializer() {
+                    @Override
+                    public void initialize(IMContext chatContext) {
+                        chatContext.registerService(ConversationAppService.class, new ConversationAppServiceImpl(chatContext));
+                        chatContext.registerService(UserAppService.class, new UserAppServiceImpl(chatContext));
+                        chatContext.registerService(MessageAppService.class, new MessageAppServiceImpl(chatContext));
+                    }
+                })
+                .build();
+
+        IMClient.init(imOptions);
 
         final AuthenticationService authenticationService = applicationContext.getService(AuthenticationService.class);
         if (authenticationService.getAuthenticationStatus() == AuthenticationStatus.LoggedIn) {
@@ -86,6 +96,7 @@ public class App extends Application implements ApplicationServiceContext.Provid
                 }
             }
         });
+
     }
 
     @Override

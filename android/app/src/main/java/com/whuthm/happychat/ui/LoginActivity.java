@@ -26,6 +26,8 @@ import com.whuthm.happychat.app.model.AuthenticationUser;
 import com.whuthm.happychat.data.api.ApiResponseObserver;
 import com.whuthm.happychat.ui.api.FailureHandlers;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+
 /**
  * 登录界面
  * 
@@ -111,6 +113,7 @@ public class LoginActivity extends BaseActivity {
                 .setClientResource(ClientProtos.ClientResource.phone)
                 .setPublicKey("");
         authenticationService.login(builder.build())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new ApiResponseObserver<AuthenticationUser>(FailureHandlers.getDefault(this)) {
 
                     @Override

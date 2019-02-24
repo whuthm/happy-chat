@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.Cache;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
@@ -59,7 +60,7 @@ public class RetrofitClient {
                 .baseUrl(Constants.BASE_URL)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create()).build();
         
-        mApiService = mRetrofit.create(ApiService.class);
+        mApiService = new ApiServiceWrapper(mRetrofit.create(ApiService.class), Schedulers.io());
     }
     
     public static void initRetrofit(Context context) {

@@ -22,17 +22,9 @@ public class ConversationDaoImpl extends AbstractGreenDao implements IConversati
     @Override
     public Conversation getConversation(String conversationId) {
         DaoSession session = getOpenHelper().getReadableDaoMaster().newSession();
-        QueryBuilder<Conversation> queryBuilder = session.getConversationDao()
-                .queryBuilder();
-        queryBuilder.where(ConversationDao.Properties.Id.eq(conversationId)).limit(1);
-        List<Conversation> list = queryBuilder.list();
+        Conversation conversation = session.getConversationDao().load(conversationId);
         session.clear();
-        if (list.size() > 0) {
-            return list.get(0);
-        }
-        else {
-            return null;
-        }
+        return conversation;
     }
     
     @Override
@@ -50,7 +42,7 @@ public class ConversationDaoImpl extends AbstractGreenDao implements IConversati
     public void deleteConversation(String conversationId) {
         DaoSession session = getOpenHelper().getWritableDaoMaster().newSession();
         session.getConversationDao().deleteByKey(conversationId);
-        
+
         session.clear();
     }
     

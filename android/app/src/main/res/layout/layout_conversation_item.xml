@@ -15,7 +15,7 @@
         android:src="@drawable/chat" />
 
     <TextView
-        android:id="@+id/layout_conversation_name"
+        android:id="@+id/layout_conversation_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/dimen_12"
@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@android:color/black"
-        app:layout_constraintLeft_toLeftOf="@+id/layout_conversation_name"
-        app:layout_constraintTop_toBottomOf="@+id/layout_conversation_name" />
+        app:layout_constraintLeft_toLeftOf="@+id/layout_conversation_title"
+        app:layout_constraintTop_toBottomOf="@+id/layout_conversation_title" />
 
 </android.support.constraint.ConstraintLayout>

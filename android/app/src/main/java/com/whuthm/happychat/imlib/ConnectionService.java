@@ -10,8 +10,4 @@ public interface ConnectionService {
 
     void disconnect();
 
-    void addConnectionStatusListener(ConnectionStatusListener listener);
-
-    void removeConnectionStatusListener(ConnectionStatusListener listener);
-
 }

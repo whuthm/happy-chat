@@ -20,6 +20,8 @@ import com.whuthm.happychat.data.AuthenticationProtos;
 import com.whuthm.happychat.data.api.ApiResponseObserver;
 import com.whuthm.happychat.ui.api.FailureHandlers;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+
 public class RegisterActivity extends BaseActivity implements View.OnClickListener {
 
     private LimitEditText mETAccount;
@@ -79,6 +81,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         builder.setUsername(username)
                 .setPassword(mETPassword.getText().toString());
         authenticationService.register(builder.build())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new ApiResponseObserver<AuthenticationUser>(FailureHandlers.getDefault(this)) {
 
                     @Override

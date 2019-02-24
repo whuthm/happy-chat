@@ -1,0 +1,28 @@
+package com.whuthm.happychat.ui;
+
+
+import com.barran.lib.app.BaseFragment;
+import com.whuthm.happychat.common.rx.DisposableRegistry;
+
+import io.reactivex.disposables.Disposable;
+
+public class UiFragment extends BaseFragment implements DisposableRegistry.Owner {
+
+    private DisposableRegistry disposables = new DisposableRegistry();
+
+    public <T extends Disposable> T addDisposable(T disposable) {
+        disposables.register(disposable);
+        return disposable;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        disposables.unregisterAll();
+    }
+
+    @Override
+    public DisposableRegistry getDisposables() {
+        return disposables;
+    }
+}

@@ -1,12 +1,9 @@
 package com.whuthm.happychat.imlib.dao.greendao;
 
 import com.whuthm.happychat.imlib.dao.IUserDao;
-import com.whuthm.happychat.imlib.model.DaoMaster;
+import com.whuthm.happychat.imlib.dao.InsertOrUpdateStatus;
 import com.whuthm.happychat.imlib.model.DaoSession;
 import com.whuthm.happychat.imlib.model.User;
-import com.whuthm.happychat.imlib.model.UserDao;
-
-import java.util.List;
 
 /**
  * Created by tanwei on 2018/9/29.
@@ -17,32 +14,28 @@ public class UserDaoImpl extends AbstractGreenDao implements IUserDao {
     UserDaoImpl(GreenDaoOpenHelper openHelper) {
         super(openHelper);
     }
-    
-    public void addUsers(User... list) {
+
+    @Override
+    public User getUser(String id) {
         DaoSession session = getOpenHelper().getWritableDaoMaster().newSession();
-        session.getUserDao().insertInTx(list);
+        User user = session.getUserDao().load(id);
         session.clear();
+        return user;
     }
-    
-    public void addUsers(List<User> list) {
+
+    @Override
+    public void deleteMessage(String id) {
         DaoSession session = getOpenHelper().getWritableDaoMaster().newSession();
-        session.getUserDao().insertInTx(list);
+        session.getUserDao().deleteByKey(id);
         session.clear();
     }
-    
-    public User getUsersById(String id) {
-        DaoSession session = getOpenHelper().getReadableDaoMaster().newSession();
-        List<User> list = session.getUserDao().queryBuilder()
-                .where(UserDao.Properties.Id.eq(id)).limit(1).list();
+
+    @Override
+    public InsertOrUpdateStatus insertOrUpdateMessage(User user) {
+        DaoSession session = getOpenHelper().getWritableDaoMaster().newSession();
+        final boolean inserted = session.insertOrReplace(user) >= 0;
         session.clear();
-        return list.isEmpty() ? null : list.get(0);
+        return new InsertOrUpdateStatus(inserted, !inserted);
     }
-    
-    public List<User> getUsersByIds(List<String> idList) {
-        DaoSession session = getOpenHelper().getReadableDaoMaster().newSession();
-        List<User> list = session.getUserDao().queryBuilder()
-                .where(UserDao.Properties.Id.in(idList)).list();
-        session.clear();
-        return list;
-    }
+
 }

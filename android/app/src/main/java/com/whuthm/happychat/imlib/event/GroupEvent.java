@@ -17,18 +17,16 @@ public class GroupEvent {
         return group;
     }
 
-    public static class AddedEvent extends GroupEvent {
+    public static class ChangedEvent extends GroupEvent {
 
-        public AddedEvent(Group group) {
+        public ChangedEvent(Group group) {
             super(group);
         }
     }
 
-    public static class UpdatedEvent extends GroupEvent {
+    public interface Poster extends EventPoster {
 
-        public UpdatedEvent(Group group) {
-            super(group);
-        }
+        void postGroupChanged(Group group);
     }
 
 }

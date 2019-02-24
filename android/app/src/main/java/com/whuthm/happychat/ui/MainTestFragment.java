@@ -17,9 +17,10 @@ import com.whuthm.happychat.imlib.model.Message;
 import java.util.UUID;
 
 import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 
-public class MainTestFragment extends ChatContextFragment {
+public class MainTestFragment extends IMContextFragment {
 
     @Nullable
     @Override
@@ -30,9 +31,9 @@ public class MainTestFragment extends ChatContextFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final MessageService messageService = chatContext.getService(MessageService.class);
+        final MessageService messageService = imContext.getService(MessageService.class);
         final AuthenticationService authenticationService = applicationServiceContext.getService(AuthenticationService.class);
-        final ConnectionService connectionService = chatContext.getService(ConnectionService.class);
+        final ConnectionService connectionService = imContext.getService(ConnectionService.class);
         view.findViewById(R.id.btn_connect)
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -61,8 +62,8 @@ public class MainTestFragment extends ChatContextFragment {
                         message.setConversationType(ConversationType.PRIVATE);
                         message.setType("txt");
                         message.setDirection(Message.Direction.SEND);
-                        message.setUid(UUID.randomUUID().toString());
-                        messageService.sendMessage(message).subscribe(new Observer<Message>() {
+                        message.setId(UUID.randomUUID().toString());
+                        messageService.sendMessage(message).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Message>() {
                             @Override
                             public void onSubscribe(Disposable d) {
 

@@ -11,6 +11,8 @@ import java.util.Map;
 
 public class MessageBody implements Serializable  {
 
+    private UserInfo userInfo;
+
     private static final long serialVersionUID = -5801796451327916354L;
 
     private static final MessageBody UNKNOWN = new MessageBody();
@@ -23,6 +25,13 @@ public class MessageBody implements Serializable  {
         registerMessageBody(TextMessageBody.class);
     }
 
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
+
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
 
     public static void registerMessageBody(Class<? extends MessageBody> bodyClass) {
         MessageTag tag = bodyClass.getAnnotation(MessageTag.class);

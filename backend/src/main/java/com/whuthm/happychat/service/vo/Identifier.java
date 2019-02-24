@@ -7,7 +7,7 @@ import java.util.Objects;
 
 /**
  * Client 身份实体
- * domain : chat, push
+ * domain : im, push
  */
 public final class Identifier {
 

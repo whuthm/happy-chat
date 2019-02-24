@@ -11,6 +11,7 @@ class MessageBeanValidation implements Validation<MessageProtos.MessageBean> {
         return obj != null && ConversationType.from(obj.getConversationType()) != null
                 && !StringUtils.isEmpty(obj.getFrom())
                 && !StringUtils.isEmpty(obj.getTo())
+                && !StringUtils.isEmpty(obj.getId())
                 && !StringUtils.isEmpty(obj.getType());
     }
 }

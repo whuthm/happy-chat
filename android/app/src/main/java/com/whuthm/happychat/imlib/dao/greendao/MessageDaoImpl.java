@@ -42,17 +42,9 @@ class MessageDaoImpl extends AbstractGreenDao implements IMessageDao {
     }
 
     @Override
-    public Message getMessage(long id) {
+    public Message getMessage(String id) {
         DaoSession session = getOpenHelper().getReadableDaoMaster().newSession();
         Message message = session.getMessageDao().load(id);
-        session.clear();
-        return message;
-    }
-
-    @Override
-    public Message getMessageByUid(String uid) {
-        DaoSession session = getOpenHelper().getReadableDaoMaster().newSession();
-        Message message = session.getMessageDao().queryBuilder().where(MessageDao.Properties.Uid.eq(uid)).unique();
         session.clear();
         return message;
     }
@@ -63,18 +55,17 @@ class MessageDaoImpl extends AbstractGreenDao implements IMessageDao {
     }
 
     @Override
-    public void deleteMessage(long id) {
+    public void deleteMessage(String id) {
         DaoSession session = getOpenHelper().getWritableDaoMaster().newSession();
         session.getMessageDao().deleteByKey(id);
         session.clear();
     }
 
     @Override
-    public long insertMessage(Message message) {
+    public void insertMessage(Message message) {
         DaoSession session = getOpenHelper().getWritableDaoMaster().newSession();
         session.getMessageDao().insert(message);
         session.clear();
-        return message.getId();
     }
 
     @Override

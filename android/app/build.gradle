@@ -6,11 +6,15 @@ android {
     buildToolsVersion '27.0.0'
     defaultConfig {
         applicationId "com.whuthm.happychat"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "IM_SERVER", "\"www.whuthm.com\"")
+        buildConfigField("String", "API_URL", "\"www.whuthm.com\"")
+        buildConfigField("int", "IM_PORT", "8080")
+
 
 //        ndk {
 //            abiFilters "armeabi"
@@ -43,6 +47,26 @@ android {
         exclude 'META-INF/license.txt'
         exclude 'META-INF/dependencies.txt'
         exclude 'META-INF/LGPL2.1'
+    }
+
+    productFlavors {
+        flavorDimensions "env"
+        emulator {
+            //模拟器访问127.0.0.1访问不成功，需要使用本机ip地址映射10.0.2.2
+            buildConfigField("String", "IM_SERVER", "\"10.0.2.2\"")
+            buildConfigField("String", "API_URL", "\"http://10.0.2.2:8080\"")
+            buildConfigField("int", "IM_PORT", "8080")
+            dimension "env"
+        }
+        custom {
+            buildConfigField("String", "IM_SERVER", "\"192.168.43.187\"")
+            buildConfigField("String", "API_URL", "\"http://192.168.43.187:8080\"")
+            buildConfigField("int", "IM_PORT", "8080")
+            dimension "env"
+        }
+        official {
+            dimension "env"
+        }
     }
 
 }

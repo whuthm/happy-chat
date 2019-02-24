@@ -12,7 +12,7 @@ public class Constants {
     public static final String HEADER_USER_ID = "user_id";
     public static final String HEADER_CLIENT_RESOURCE = "client_resource";
 
-    public static final String IDENTIFIER_DOMAIN_CHAT = "chat";
+    public static final String IDENTIFIER_DOMAIN_CHAT = "im";
     public static final String IDENTIFIER_DOMAIN_AUTH = "auth";
 
     public static final String REGEX_EMAIL = "^\\w+((-\\w+)|(\\.\\w+))*\\@[A-Za-z0-9]+((\\.|-)[A-Za-z0-9]+)*\\.[A-Za-z0-9]+$";

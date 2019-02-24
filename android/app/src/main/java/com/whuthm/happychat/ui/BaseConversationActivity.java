@@ -8,10 +8,11 @@ import android.text.TextUtils;
 
 import com.whuthm.happychat.imlib.model.ConversationType;
 
-public abstract class BaseConversationActivity extends ChatContextActivity  {
+public abstract class BaseConversationActivity extends IMContextActivity {
 
     public static final String KEY_CONVERSATION_ID = "conversation_id";
     public static final String KEY_CONVERSATION_TYPE = "conversation_type";
+    public static final String KEY_CONVERSATION_TITLE = "conversation_title";
 
     protected String conversationId;
     protected ConversationType conversationType;
@@ -29,8 +30,7 @@ public abstract class BaseConversationActivity extends ChatContextActivity  {
     }
 
     protected final void initializeArguments(@NonNull Intent intent) {
-        conversationId = intent.getStringExtra(KEY_CONVERSATION_ID);
-        conversationType = (ConversationType) intent.getSerializableExtra(KEY_CONVERSATION_TYPE);
+        onInitializeArguments(intent);
         if (checkArguments()) {
             onArgumentsInitialized();
         } else  {
@@ -39,6 +39,11 @@ public abstract class BaseConversationActivity extends ChatContextActivity  {
     }
 
     protected void onArgumentsInitialized() {
+    }
+
+    protected void onInitializeArguments(@NonNull Intent intent) {
+        conversationId = intent.getStringExtra(KEY_CONVERSATION_ID);
+        conversationType = (ConversationType) intent.getSerializableExtra(KEY_CONVERSATION_TYPE);
     }
 
     protected void onInitializeViews() {

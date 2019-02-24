@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/dimen_12"
+    android:paddingEnd="@dimen/dimen_12">
+
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_12"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Monday, 10:40 am"
+        tools:visibility="visible" />
+
+
+    <ImageView
+        android:id="@+id/iv_sender_portrait"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="@dimen/dimen_12"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_time"
+        tools:src="@drawable/dog1" />
+
+    <TextView
+        android:id="@+id/tv_sender_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/dimen_6"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/iv_sender_portrait"
+        app:layout_constraintTop_toTopOf="@+id/iv_sender_portrait"
+        tools:text="whuthm.huang"
+        tools:visibility="visible" />
+
+
+    <FrameLayout
+        android:id="@+id/layout_bubble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_4"
+        android:layout_marginEnd="@dimen/dimen_6"
+        android:background="@drawable/bg_bubble_send"
+        app:layout_constraintEnd_toStartOf="@+id/iv_sender_portrait"
+        app:layout_constraintTop_toBottomOf="@+id/tv_sender_name">
+
+        <TextView
+            android:id="@+id/tv_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="@dimen/dimen_12"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/font_size_14"
+            tools:text="312341234566789"
+            tools:textStyle="normal" />
+
+
+    </FrameLayout>
+
+    <ProgressBar
+        android:id="@+id/pb_sending"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="@dimen/dimen_6"
+        android:indeterminateBehavior="repeat"
+        android:indeterminateOnly="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/layout_bubble"
+        app:layout_constraintEnd_toStartOf="@+id/layout_bubble"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/iv_resend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/dimen_6"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/layout_bubble"
+        app:layout_constraintEnd_toStartOf="@+id/layout_bubble"
+        tools:src="@drawable/dog"
+        tools:visibility="visible" />
+
+</android.support.constraint.ConstraintLayout>

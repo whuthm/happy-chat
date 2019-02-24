@@ -4,6 +4,8 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
 
+import java.io.Serializable;
+
 /**
  * 用户实体
  *
@@ -11,28 +13,35 @@ import org.greenrobot.greendao.annotation.Generated;
  */
 
 @Entity
-public class User {
-    
+public class User implements Serializable  {
+
+    private static final long serialVersionUID = 6535994572436649430L;
     @Id
     private String id;
+
+    private String name;
     
     private String nick;
     
-    private String avatar;
+    private String portraitUrl;
     
     private int gender;
 
-    @Generated(hash = 280302525)
-    public User(String id, String nick, String avatar, int gender) {
+
+    @Generated(hash = 284437546)
+    public User(String id, String name, String nick, String portraitUrl,
+            int gender) {
         this.id = id;
+        this.name = name;
         this.nick = nick;
-        this.avatar = avatar;
+        this.portraitUrl = portraitUrl;
         this.gender = gender;
     }
 
     @Generated(hash = 586692638)
     public User() {
     }
+
 
     public String getId() {
         return this.id;
@@ -50,12 +59,21 @@ public class User {
         this.nick = nick;
     }
 
-    public String getAvatar() {
-        return this.avatar;
+
+    public String getName() {
+        return name;
     }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPortraitUrl() {
+        return portraitUrl;
+    }
+
+    public void setPortraitUrl(String portraitUrl) {
+        this.portraitUrl = portraitUrl;
     }
 
     public int getGender() {

@@ -1,5 +1,7 @@
 package com.whuthm.happychat.data;
 
+import com.whuthm.happychat.BuildConfig;
+
 /**
  * 常量配置
  * 
@@ -12,8 +14,8 @@ public class Constants {
     
     // 模拟器访问127.0.0.1访问不成功，需要使用本机ip地址映射10.0.2.2
     // 正常网址是chat.whuthm.com
-    public static final String BASE_URL = "http://10.0.2.2:8080";
-    
+    public static final String BASE_URL = BuildConfig.API_URL;
+
     public static final String HTTP_CACHE_DIR = "http_cache";
     
     public static final int HTTP_CACHE_SIZE = 5 * 1024 * 1024;

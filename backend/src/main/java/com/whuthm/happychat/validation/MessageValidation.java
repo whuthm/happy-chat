@@ -11,6 +11,7 @@ class MessageValidation implements Validation<Message> {
                 && ConversationType.from(obj.getConversationType()) != null
                 && !StringUtils.isEmpty(obj.getFrom())
                 && !StringUtils.isEmpty(obj.getTo())
+                && !StringUtils.isEmpty(obj.getId())
                 && !StringUtils.isEmpty(obj.getType());
     }
 }

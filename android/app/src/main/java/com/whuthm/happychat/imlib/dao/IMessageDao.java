@@ -9,15 +9,13 @@ public interface IMessageDao {
 
     List<Message> getHistoryMessages(HistoryMessagesRequest request);
 
-    Message getMessage(long id);
-
-    Message getMessageByUid(String uid);
+    Message getMessage(String id);
 
     void markMessagesOfConversationAsRead(String conversationId);
 
-    void deleteMessage(long id);
+    void deleteMessage(String id);
 
-    long insertMessage(Message message);
+    void insertMessage(Message message);
 
     void updateMessage(Message message);
 

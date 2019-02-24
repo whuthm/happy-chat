@@ -2,14 +2,17 @@ package com.whuthm.happychat.imlib.model;
 
 import android.support.annotation.NonNull;
 
+import com.whuthm.happychat.imlib.converter.ConversationTypeConverter;
+import com.whuthm.happychat.imlib.converter.MessageDirectionConverter;
+import com.whuthm.happychat.imlib.converter.MessageReceivedStatusConverter;
+import com.whuthm.happychat.imlib.converter.MessageSentStatusConverter;
+
 import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
-import org.greenrobot.greendao.annotation.Unique;
-
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -27,18 +30,12 @@ public class Message implements Serializable {
 
     private static final long serialVersionUID = 8769663248677565606L;
     /**
-     * 客戶端数据库表ID
-     */
-    @Id(autoincrement = true)
-    private Long id;
-
-    /**
      * 客戶端生成uuid传递给服务端，用于校验服务器已送达
      */
-    @Unique
-    private String uid;
+    @Id
+    private String id;
 
-    @Convert(columnType = String.class, converter = DirectionConverter.class)
+    @Convert(columnType = String.class, converter = MessageDirectionConverter.class)
     private Direction direction;
 
     /**
@@ -50,7 +47,7 @@ public class Message implements Serializable {
     private String type;
 
     @NotNull
-    @Convert(columnType = String.class, converter = ConversationType.Converter.class)
+    @Convert(columnType = String.class, converter = ConversationTypeConverter.class)
     private ConversationType conversationType;
 
     /**
@@ -76,24 +73,19 @@ public class Message implements Serializable {
 
     private String extra;
 
-    @Convert(columnType = String.class, converter = SentStatusConverter.class)
+    @Convert(columnType = String.class, converter = MessageSentStatusConverter.class)
     private SentStatus sentStatus;
 
-    @Convert(columnType = Integer.class, converter = ReceivedStatusConverter.class)
+    @Convert(columnType = Integer.class, converter = MessageReceivedStatusConverter.class)
     private ReceivedStatus receivedStatus;
 
 
-    @Generated(hash = 637306882)
-    public Message() {
-    }
-
-    @Generated(hash = 621950465)
-    public Message(Long id, String uid, Direction direction, Long sid, @NotNull String type,
+    @Generated(hash = 421227807)
+    public Message(String id, Direction direction, Long sid, @NotNull String type,
             @NotNull ConversationType conversationType, @NotNull String conversationId,
             @NotNull String senderUserId, String body, long sendTime, long receiveTime, String attrs,
             String extra, SentStatus sentStatus, ReceivedStatus receivedStatus) {
         this.id = id;
-        this.uid = uid;
         this.direction = direction;
         this.sid = sid;
         this.type = type;
@@ -109,13 +101,10 @@ public class Message implements Serializable {
         this.receivedStatus = receivedStatus;
     }
 
-    public Long getId() {
-        return id;
+    @Generated(hash = 637306882)
+    public Message() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getType() {
         return type;
@@ -166,7 +155,6 @@ public class Message implements Serializable {
         this.receivedStatus = receivedStatus;
     }
 
-
     public Long getSid() {
         return this.sid;
     }
@@ -202,7 +190,6 @@ public class Message implements Serializable {
         this.conversationType = conversationType;
     }
 
-
     public long getSendTime() {
         return this.sendTime;
     }
@@ -233,13 +220,13 @@ public class Message implements Serializable {
     }
 
 
-    public String getUid() {
-        return this.uid;
+    public String getId() {
+        return this.id;
     }
 
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public MessageBody getBodyObject() {
@@ -270,7 +257,7 @@ public class Message implements Serializable {
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new long[]{id});
+        return Arrays.hashCode(new String[]{id});
     }
 
     public enum SentStatus {
@@ -279,43 +266,9 @@ public class Message implements Serializable {
         SENT,
     }
 
-    public static class SentStatusConverter implements PropertyConverter<SentStatus, String> {
-
-        @Override
-        public SentStatus convertToEntityProperty(String databaseValue) {
-            try {
-                return SentStatus.valueOf(databaseValue);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-
-        @Override
-        public String convertToDatabaseValue(SentStatus entityProperty) {
-            return entityProperty.name();
-        }
-    }
-
     public enum Direction {
         SEND,
         RECEIVE,
-    }
-
-    public static class DirectionConverter implements PropertyConverter<Direction, String> {
-
-        @Override
-        public Direction convertToEntityProperty(String databaseValue) {
-            try {
-                return Direction.valueOf(databaseValue);
-            } catch (Exception e) {
-                return null;
-            }
-        }
-
-        @Override
-        public String convertToDatabaseValue(Direction entityProperty) {
-            return entityProperty.name();
-        }
     }
 
     public static class ReceivedStatus {
@@ -326,7 +279,7 @@ public class Message implements Serializable {
         public static final int FLAG_LISTENED = 2;
         //public static final int FLAG_DOWNLOADED = 4;
 
-        private ReceivedStatus(int flag) {
+        public ReceivedStatus(int flag) {
             this.flag = flag;
         }
 

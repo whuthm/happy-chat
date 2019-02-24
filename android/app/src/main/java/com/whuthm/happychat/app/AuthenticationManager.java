@@ -55,8 +55,7 @@ class AuthenticationManager extends AppContextService implements AuthenticationS
                         performChangeAuthenticationUserAndStatus(authenticationUser, AuthenticationStatus.LoggedIn);
                         return authenticationUser;
                     }
-                })
-                .observeOn(AndroidSchedulers.mainThread());
+                });
     }
 
     @Override
@@ -73,8 +72,7 @@ class AuthenticationManager extends AppContextService implements AuthenticationS
                         performChangeAuthenticationUserAndStatus(authenticationUser, AuthenticationStatus.Registered);
                         return authenticationUser;
                     }
-                })
-                .observeOn(AndroidSchedulers.mainThread());
+                });
     }
 
     @Override
@@ -90,8 +88,7 @@ class AuthenticationManager extends AppContextService implements AuthenticationS
                         e.onComplete();
                     }
                 })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .subscribeOn(Schedulers.io());
     }
 
     @Override

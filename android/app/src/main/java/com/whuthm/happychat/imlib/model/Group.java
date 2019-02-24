@@ -1,15 +1,9 @@
 package com.whuthm.happychat.imlib.model;
 
-import com.whuthm.happychat.data.StringConverter;
-
-import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Set;
 import org.greenrobot.greendao.annotation.Generated;
 
 /**
@@ -25,6 +19,8 @@ public class Group implements Serializable {
     private String id;
     
     private String name;
+
+    private String portraitUrl;
     
     /** 类型：GroupChat, Discussion */
     private String type;
@@ -32,27 +28,23 @@ public class Group implements Serializable {
     private String desc;
     
     private String creator;
-    
-    @Convert(columnType = String.class, converter = StringConverter.class)
-    private Set<String> userIds;
-    
-    @Transient
-    private List<User> users;
 
-    @Generated(hash = 908926262)
-    public Group(String id, String name, String type, String desc, String creator,
-            Set<String> userIds) {
+    @Generated(hash = 180130277)
+    public Group(String id, String name, String portraitUrl, String type,
+            String desc, String creator) {
         this.id = id;
         this.name = name;
+        this.portraitUrl = portraitUrl;
         this.type = type;
         this.desc = desc;
         this.creator = creator;
-        this.userIds = userIds;
     }
 
     @Generated(hash = 117982048)
     public Group() {
     }
+    
+//    private Set<String> memberIds;
 
     public String getId() {
         return this.id;
@@ -94,19 +86,12 @@ public class Group implements Serializable {
         this.creator = creator;
     }
 
-    public Set<String> getUserIds() {
-        return this.userIds;
+    public String getPortraitUrl() {
+        return portraitUrl;
     }
 
-    public void setUserIds(Set<String> userIds) {
-        this.userIds = userIds;
+    public void setPortraitUrl(String portraitUrl) {
+        this.portraitUrl = portraitUrl;
     }
 
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
 }

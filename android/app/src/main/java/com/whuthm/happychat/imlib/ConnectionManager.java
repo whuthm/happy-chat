@@ -6,9 +6,12 @@ import com.barran.lib.utils.log.Logs;
 import com.whuthm.happychat.data.IQProtos;
 import com.whuthm.happychat.data.MessageProtos;
 import com.whuthm.happychat.data.PacketProtos;
+import com.whuthm.happychat.imlib.event.ConnectionEvent;
 import com.whuthm.happychat.imlib.model.ConnectionStatus;
 import com.whuthm.happychat.util.PacketUtils;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 
@@ -19,23 +22,27 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.Response;
 
-class ConnectionManager extends AbstractChatContextImplService implements ConnectionService, PacketSender {
+class ConnectionManager extends AbstractIMService implements ConnectionService, PacketSender {
 
     private static final String TAG = ConnectionManager.class.getSimpleName();
 
     private ConnectionStatus connectionStatus;
-    private ChatConnection chatConnection;
+    private Connection chatConnection;
 
 
-    private IQPacketHandler iqPacketHandler;
-    private MessagePacketHandler messagePacketHandler;
+    private final Set<IQPacketHandler> iqPacketHandlers;
+    private final Set<MessagePacketHandler> messagePacketHandlers;
 
     private final Scheduler connectionScheduler;
+    private final ConnectionEvent.Poster poster;
 
-    ConnectionManager(ChatContext chatContext) {
+    ConnectionManager(IMContext chatContext, ConnectionEvent.Poster poster) {
         super(chatContext);
+        this.poster = poster;
         this.connectionScheduler = Schedulers.from(Executors.newSingleThreadExecutor(new RxThreadFactory("rx-connection")));
         this.connectionStatus = ConnectionStatus.DISCONNECTED;
+        this.iqPacketHandlers = new HashSet<>();
+        this.messagePacketHandlers = new HashSet<>();
     }
 
     public Scheduler getConnectionScheduler() {
@@ -47,12 +54,12 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
         return connectionStatus;
     }
 
-    public void setIqPacketHandler(IQPacketHandler iqPacketHandler) {
-        this.iqPacketHandler = iqPacketHandler;
+    public void addIqPacketHandler(IQPacketHandler iqPacketHandler) {
+        this.iqPacketHandlers.add(iqPacketHandler);
     }
 
-    public void setMessagePacketHandler(MessagePacketHandler messagePacketHandler) {
-        this.messagePacketHandler = messagePacketHandler;
+    public void addMessagePacketHandler(MessagePacketHandler messagePacketHandler) {
+        this.messagePacketHandlers.add(messagePacketHandler);
     }
 
     @Override
@@ -64,6 +71,8 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        iqPacketHandlers.clear();
+        messagePacketHandlers.clear();
         disconnect();
     }
 
@@ -81,8 +90,8 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
     }
 
     private void sendHeartbeatPacketWhenConnected() {
-        ChatConnection chatConnection = getChatConnection();
-        if (getConnectionStatus() == ConnectionStatus.CONNECTED && chatConnection != null) {
+        final Connection chatConnection = getChatConnection();
+        if (isConnected() && chatConnection != null) {
             try {
                 chatConnection.sendPacket(PacketUtils.createPacket(PacketProtos.Packet.Type.iq, PacketUtils.getPingIQ()));
             } catch (Exception e) {
@@ -124,18 +133,17 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
         Logs.v(TAG, "connectInternal: " + isConnectable());
         sendHeartbeatPacketWhenConnected();
         if (isConnectable()) {
-            ChatConnection chatConnection = new ChatConnection(this);
+            Connection chatConnection = new Connection(this);
             setChatConnection(chatConnection);
-            performChangeConnectionStatus(ConnectionStatus.CONNECTING);
             chatConnection.connect();
         }
     }
 
-    private ChatConnection getChatConnection() {
+    private Connection getChatConnection() {
         return chatConnection;
     }
 
-    private void setChatConnection(ChatConnection chatConnection) {
+    private void setChatConnection(Connection chatConnection) {
         this.chatConnection = chatConnection;
     }
 
@@ -150,7 +158,7 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
     }
 
     private synchronized void disconnectInternal() {
-        final ChatConnection chatConnection = getChatConnection();
+        final Connection chatConnection = getChatConnection();
         if (chatConnection != null) {
             try {
                 chatConnection.disconnect();
@@ -166,21 +174,11 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
         this.connectionStatus = connectionStatus;
     }
 
-    @Override
-    public void addConnectionStatusListener(ConnectionStatusListener listener) {
-
-    }
-
-    @Override
-    public void removeConnectionStatusListener(ConnectionStatusListener listener) {
-
-    }
-
     private void performChangeConnectionStatus(ConnectionStatus connectionStatus) {
         if (connectionStatus != getConnectionStatus()) {
             Logs.v("performChangeConnectionStatus:" + connectionStatus);
             setConnectionStatus(connectionStatus);
-            // TODO: notify connection status changed
+            poster.postConnectionStatusChanged(connectionStatus);
         }
     }
 
@@ -198,7 +196,7 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
         return getConnectionStatus() == ConnectionStatus.CONNECTED;
     }
 
-    synchronized void handlePacket(ChatConnection chatConnection, PacketProtos.Packet packet) {
+    synchronized void handlePacket(Connection chatConnection, PacketProtos.Packet packet) {
         if (this.chatConnection != chatConnection) {
             return;
         }
@@ -223,26 +221,30 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
         }
     }
 
-    private void handleMessagePacket(ChatConnection chatConnection, PacketProtos.Packet packet, MessageProtos.MessageBean messageBean) throws Exception {
-        if (messagePacketHandler != null) {
-            messagePacketHandler.handleMessagePacket(this, packet, messageBean);
+    private void handleMessagePacket(Connection chatConnection, PacketProtos.Packet packet, MessageProtos.MessageBean messageBean) throws Exception {
+        if (chatConnection == getChatConnection()) {
+            for (MessagePacketHandler messagePacketHandler : messagePacketHandlers) {
+                messagePacketHandler.handleMessagePacket(this, packet, messageBean);
+            }
         }
     }
 
-    private void handleIQPacket(ChatConnection chatConnection, PacketProtos.Packet packet, IQProtos.IQ iq) throws Exception {
+    private void handleIQPacket(Connection chatConnection, PacketProtos.Packet packet, IQProtos.IQ iq) throws Exception {
         switch (iq.getAction()) {
             case pong:
                 //心跳应答
                 break;
             default:
-                if (iqPacketHandler != null) {
-                    iqPacketHandler.handlerIQPacket(this, packet, iq);
-                }
                 break;
+        }
+        if (chatConnection == getChatConnection()) {
+            for (IQPacketHandler iqPacketHandler : iqPacketHandlers) {
+                iqPacketHandler.handlerIQPacket(this, packet, iq);
+            }
         }
     }
 
-    synchronized void handleConnectionClosed(ChatConnection chatConnection, int code, String reason) {
+    synchronized void handleConnectionClosed(Connection chatConnection, int code, String reason) {
         // TODO: 定义code， 如token未认证等
         Logs.v(TAG, "handleConnectionClosed: code=" + code + ", reason=" + reason);
         if (chatConnection == getChatConnection()) {
@@ -251,7 +253,7 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
         }
     }
 
-    synchronized void handleConnectionClosing(ChatConnection chatConnection, int code, String reason) {
+    synchronized void handleConnectionClosing(Connection chatConnection, int code, String reason) {
         // TODO: 定义code， 如token未认证等
         Logs.v(TAG, "handleConnectionClosing: code=" + code + ", reason=" + reason);
         if (chatConnection == getChatConnection()) {
@@ -260,14 +262,14 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
         }
     }
 
-    synchronized void handleConnectionOpened(ChatConnection chatConnection) {
+    synchronized void handleConnectionOpened(Connection chatConnection) {
         Logs.v(TAG, "handleConnectionOpened");
         if (chatConnection == getChatConnection()) {
             performChangeConnectionStatus(ConnectionStatus.CONNECTED);
         }
     }
 
-    synchronized void handleConnectionFailed(ChatConnection chatConnection, Throwable t,
+    synchronized void handleConnectionFailed(Connection chatConnection, Throwable t,
                                              @Nullable Response response) {
         Logs.v(TAG, "handleConnectionFailed");
         if (chatConnection == getChatConnection()) {
@@ -276,9 +278,15 @@ class ConnectionManager extends AbstractChatContextImplService implements Connec
         }
     }
 
+    synchronized void handleConnecting(Connection chatConnection) {
+        if (chatConnection == getChatConnection()) {
+            performChangeConnectionStatus(ConnectionStatus.CONNECTING);
+        }
+    }
+
     @Override
     public void sendPacket(PacketProtos.Packet packet) throws Exception {
-        final ChatConnection chatConnection = getChatConnection();
+        final Connection chatConnection = getChatConnection();
         final ConnectionStatus connectionStatus = getConnectionStatus();
         if (connectionStatus != ConnectionStatus.CONNECTED || chatConnection == null) {
             throw new Exception("Chat is not connected");

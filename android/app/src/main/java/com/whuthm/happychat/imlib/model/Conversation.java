@@ -1,5 +1,8 @@
 package com.whuthm.happychat.imlib.model;
 
+import com.whuthm.happychat.imlib.converter.ConversationNotificationStatusConverter;
+import com.whuthm.happychat.imlib.converter.ConversationTypeConverter;
+
 import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
@@ -29,10 +32,13 @@ public class Conversation  implements Serializable {
 
     @Index
     @NotNull
-    @Convert(columnType = String.class, converter = ConversationType.Converter.class)
+    @Convert(columnType = String.class, converter = ConversationTypeConverter.class)
     private ConversationType type;
-    
-    private long latestMessageId;
+    private String title;
+    private String portraitUrl;
+    private int unreadCount;
+
+    private String latestMessageId;
 
     @ToOne(joinProperty = "latestMessageId")
     private Message latestMessage;
@@ -44,21 +50,34 @@ public class Conversation  implements Serializable {
     /** Used for active entity operations. */
     @Generated(hash = 151466175)
     private transient ConversationDao myDao;
-    @Generated(hash = 1231441308)
-    private transient Long latestMessage__resolvedKey;
+    @Generated(hash = 1328906609)
+    private transient String latestMessage__resolvedKey;
 
+    @Convert(columnType = Integer.class, converter = ConversationNotificationStatusConverter.class)
+    private NotificationStatus notificationStatus;
+
+    private boolean top;
+
+    private String draft;
 
     public Conversation() {
         
     }
 
-    @Generated(hash = 266679905)
-    public Conversation(String id, @NotNull ConversationType type, long latestMessageId,
-            long latestMessageTime) {
+    @Generated(hash = 1256204788)
+    public Conversation(String id, @NotNull ConversationType type, String title, String portraitUrl,
+            int unreadCount, String latestMessageId, long latestMessageTime,
+            NotificationStatus notificationStatus, boolean top, String draft) {
         this.id = id;
         this.type = type;
+        this.title = title;
+        this.portraitUrl = portraitUrl;
+        this.unreadCount = unreadCount;
         this.latestMessageId = latestMessageId;
         this.latestMessageTime = latestMessageTime;
+        this.notificationStatus = notificationStatus;
+        this.top = top;
+        this.draft = draft;
     }
 
     @Override
@@ -67,6 +86,30 @@ public class Conversation  implements Serializable {
             return id.equals(((Conversation) obj).id);
         }
         return super.equals(obj);
+    }
+
+    public NotificationStatus getNotificationStatus() {
+        return notificationStatus;
+    }
+
+    public void setNotificationStatus(NotificationStatus notificationStatus) {
+        this.notificationStatus = notificationStatus;
+    }
+
+    public boolean isTop() {
+        return top;
+    }
+
+    public void setTop(boolean top) {
+        this.top = top;
+    }
+
+    public String getDraft() {
+        return draft;
+    }
+
+    public void setDraft(String draft) {
+        this.draft = draft;
     }
 
     @Override
@@ -86,11 +129,11 @@ public class Conversation  implements Serializable {
         this.type = type;
     }
 
-    public long getLatestMessageId() {
+    public String getLatestMessageId() {
         return latestMessageId;
     }
 
-    public void setLatestMessageId(long latestMessageId) {
+    public void setLatestMessageId(String latestMessageId) {
         this.latestMessageId = latestMessageId;
     }
 
@@ -110,6 +153,30 @@ public class Conversation  implements Serializable {
 
     public void setLatestMessageTime(long latestMessageTime) {
         this.latestMessageTime = latestMessageTime;
+    }
+
+    public  enum NotificationStatus {
+        DO_NOT_DISTURB(0),
+        NOTIFY(1);
+
+        private final int value;
+
+        NotificationStatus(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return this.value;
+        }
+
+        public static NotificationStatus from(int value) {
+            for (NotificationStatus status : NotificationStatus.values()) {
+                if (status.getValue() == value) {
+                    return status;
+                }
+            }
+            return null;
+        }
     }
 
     /**
@@ -146,6 +213,34 @@ public class Conversation  implements Serializable {
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getPortraitUrl() {
+        return this.portraitUrl;
+    }
+
+    public void setPortraitUrl(String portraitUrl) {
+        this.portraitUrl = portraitUrl;
+    }
+
+    public int getUnreadCount() {
+        return this.unreadCount;
+    }
+
+    public void setUnreadCount(int unreadCount) {
+        this.unreadCount = unreadCount;
+    }
+
+    public boolean getTop() {
+        return this.top;
     }
 
     /** called by internal mechanisms, do not call yourself. */
