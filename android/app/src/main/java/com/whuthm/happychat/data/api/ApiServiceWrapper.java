@@ -34,6 +34,11 @@ public class ApiServiceWrapper implements ApiService {
     }
 
     @Override
+    public Observable<BaseProtos.BaseResponse> getEmailValidationCode(BaseProtos.StringBean request) {
+        return wrap(wrapped.getEmailValidationCode(request));
+    }
+
+    @Override
     public Observable<BaseProtos.BaseResponse> register(AuthenticationProtos.RegisterRequest request) {
         return wrap(wrapped.register(request));
     }
@@ -41,6 +46,11 @@ public class ApiServiceWrapper implements ApiService {
     @Override
     public Observable<UserProtos.UserResponse> getUserById(String userId) {
         return wrap(wrapped.getUserById(userId));
+    }
+
+    @Override
+    public Observable<UserProtos.UsersResponse> getUsers() {
+        return wrap(wrapped.getUsers());
     }
 
     @Override

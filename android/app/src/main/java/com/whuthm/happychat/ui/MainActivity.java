@@ -1,5 +1,6 @@
 package com.whuthm.happychat.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -16,15 +17,21 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class MainActivity extends IMContextActivity {
 
-    private static final int TAB_CONVERSATION = 0;
-    private static final int TAB_ME = 1;
-    private static final int TAB_TEST = 2;
+    private static final int TAB_CHAT = 0;
+    private static final int TAB_CONTACTS = 1;
+    private static final int TAB_GROUPS = 2;
+    private static final int TAB_ME = 3;
+    private static final int TAB_TEST = 4;
 
     private TabLayout mTabLayout;
 
     private MainChatFragment conversationFragment;
 
     private MainMeFragment meFragment;
+
+    private MainContactsFragment contactsFragment;
+
+    private MainGroupsFragment groupsFragment;
 
     private MainTestFragment testFragment;
 
@@ -43,6 +50,7 @@ public class MainActivity extends IMContextActivity {
 
         imContext.getService(ConversationAppService.class).syncAllConversations();
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onConnectionStatusChangedEvent(ConnectionEvent.StatusChangedEvent event) {
         updateConnectionViews(event.getConnectionStatus());
@@ -56,6 +64,9 @@ public class MainActivity extends IMContextActivity {
                 setTitle(getString(R.string.app_name_with_connection_status, "连接中..."));
             } else {
                 setTitle(getString(R.string.app_name_with_connection_status, "未连接"));
+            }
+            if (connectionStatus == ConnectionStatus.UNAUTHORIZED) {
+                finish();
             }
         }
     }
@@ -73,23 +84,33 @@ public class MainActivity extends IMContextActivity {
 
         conversationFragment = new MainChatFragment();
         meFragment = new MainMeFragment();
+        contactsFragment = new MainContactsFragment();
+        groupsFragment = new MainGroupsFragment();
         testFragment = new MainTestFragment();
 
         mTabLayout.addTab(
-                mTabLayout.newTab().setText(R.string.text_main_conversation_list),
-                TAB_CONVERSATION, true);
+                mTabLayout.newTab().setText(R.string.text_main_chat),
+                TAB_CHAT, true);
+        mTabLayout.addTab(mTabLayout.newTab().setText(R.string.text_main_contacts), TAB_CONTACTS);
+        mTabLayout.addTab(mTabLayout.newTab().setText(R.string.text_main_groups), TAB_GROUPS);
         mTabLayout.addTab(mTabLayout.newTab().setText(R.string.text_main_me), TAB_ME);
-        mTabLayout.addTab(mTabLayout.newTab().setText(R.string.text_main_test), TAB_TEST);
+        //mTabLayout.addTab(mTabLayout.newTab().setText(R.string.text_main_test), TAB_TEST);
 
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 switch (tab.getPosition()) {
-                    case TAB_CONVERSATION:
+                    case TAB_CHAT:
                         mFragmentStack.switchTo(conversationFragment);
                         break;
                     case TAB_ME:
                         mFragmentStack.switchTo(meFragment);
+                        break;
+                    case TAB_CONTACTS:
+                        mFragmentStack.switchTo(contactsFragment);
+                        break;
+                    case TAB_GROUPS:
+                        mFragmentStack.switchTo(groupsFragment);
                         break;
                     case TAB_TEST:
                         mFragmentStack.switchTo(testFragment);

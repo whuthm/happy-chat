@@ -43,4 +43,8 @@
     <dimen name="font_size_14">14sp</dimen>
     <dimen name="font_size_12">12sp</dimen>
 
+
+    <dimen name="digital_red_dot_size">16dp</dimen>
+    <dimen name="red_dot_size">8dp</dimen>
+
 </resources>

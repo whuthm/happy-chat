@@ -1,4 +1,4 @@
-package com.whuthm.happychat.service;
+package com.whuthm.happychat.service.im;
 
 import com.whuthm.happychat.data.IQProtos;
 import com.whuthm.happychat.data.PacketProtos;

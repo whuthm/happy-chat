@@ -12,8 +12,6 @@ class AppContext extends ApplicationServiceContext {
     public AppContext(Application application) {
         super(application);
         daoFactory = new AppDaoFactoryImpl(application);
-
-        registerService(AuthenticationService.class, new AuthenticationManager(this));
     }
 
     AppDaoFactory getDaoFactory() {

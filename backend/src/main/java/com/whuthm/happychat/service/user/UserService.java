@@ -2,6 +2,8 @@ package com.whuthm.happychat.service.user;
 
 import com.whuthm.happychat.domain.model.User;
 
+import java.util.List;
+
 public interface UserService {
 
     User getUser(String userId);
@@ -9,5 +11,7 @@ public interface UserService {
     User getUserByName(String username);
 
     User addUser(User user);
+
+    List<User> getUsers();
 
 }

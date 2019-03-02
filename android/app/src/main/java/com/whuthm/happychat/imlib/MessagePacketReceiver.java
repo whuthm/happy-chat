@@ -22,7 +22,7 @@ public class MessagePacketReceiver implements MessagePacketHandler {
         if (message != null &&  messageReceiver != null && messageReceiver.onReceive(message)) {
             // 需要发送已接收回执
             packetSender.sendPacket(PacketUtils.createPacket(PacketProtos.Packet.Type.iq,
-                    PacketUtils.getMessageDeliveredACKIQ(IQProtos.MessageDeliveredACKIQ.newBuilder().setId(message.getId()).build())));
+                    PacketUtils.getMessageDeliveredACKIQ(IQProtos.MessageDeliveredACKIQ.newBuilder().setId(message.getUid()).build())));
         }
     }
 }

@@ -3,8 +3,11 @@ package com.whuthm.happychat.service.user;
 import com.whuthm.happychat.domain.model.User;
 import com.whuthm.happychat.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,5 +43,12 @@ class UserManager implements UserService {
         User newUser = userRepository.save(user);
         users.put(user.getId(), newUser);
         return newUser;
+    }
+
+    @Override
+    public List<User> getUsers() {
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        Page<User> page = userRepository.findAll(pageRequest);
+        return page.getContent();
     }
 }

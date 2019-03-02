@@ -7,6 +7,8 @@ import io.reactivex.Observable;
 
 public interface MessageAppService {
 
+    Observable<Message> resendMessage(String messageUid);
+
     Observable<Message> sendTextMessage(String conversationId, ConversationType conversationType, String text);
 
 }

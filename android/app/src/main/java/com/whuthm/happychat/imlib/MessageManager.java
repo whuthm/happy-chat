@@ -8,6 +8,7 @@ import com.whuthm.happychat.imlib.dao.IMessageDao;
 import com.whuthm.happychat.imlib.event.MessageEvent;
 import com.whuthm.happychat.imlib.model.Message;
 import com.whuthm.happychat.imlib.vo.HistoryMessagesRequest;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -15,10 +16,12 @@ import java.util.concurrent.Callable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 
 class MessageManager extends AbstractIMService implements MessageService, MessageReceiver {
 
@@ -50,6 +53,12 @@ class MessageManager extends AbstractIMService implements MessageService, Messag
                         e.onComplete();
                     }
                 })
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e(TAG, "getHistoryMessages", throwable);
+                    }
+                })
                 .subscribeOn(diskScheduler);
     }
 
@@ -63,8 +72,8 @@ class MessageManager extends AbstractIMService implements MessageService, Messag
                     @Override
                     public void accept(Disposable disposable) throws Exception {
                         Log.i(TAG, "sendMessage sending");
-                        if (TextUtils.isEmpty(message.getId())) {
-                            message.setId(UUID.randomUUID().toString());
+                        if (TextUtils.isEmpty(message.getUid())) {
+                            message.setUid(UUID.randomUUID().toString());
                         }
                         message.setSenderUserId(getCurrentUserId());
                         message.setDirection(Message.Direction.SEND);
@@ -93,6 +102,28 @@ class MessageManager extends AbstractIMService implements MessageService, Messag
                 });
     }
 
+    @Override
+    public Observable<Message> resendMessage(String messageUid) {
+        return getMessageFromLocalByUid(messageUid)
+                .flatMap(new Function<Message, ObservableSource<Message>>() {
+                    @Override
+                    public ObservableSource<Message> apply(Message message) throws Exception {
+                        return sendMessage(message);
+                    }
+                });
+    }
+
+    private Observable<Message> getMessageFromLocalByUid(final String messageUid) {
+        return Observable
+                .fromCallable(new Callable<Message>() {
+                    @Override
+                    public Message call() throws Exception {
+                        return dao.getMessageByUid(messageUid);
+                    }
+                })
+                .subscribeOn(diskScheduler);
+    }
+
     private void saveMessage(final Message message) {
         Observable
                 .fromCallable(new Callable<Message>() {
@@ -103,11 +134,17 @@ class MessageManager extends AbstractIMService implements MessageService, Messag
                     }
                 })
                 .subscribeOn(diskScheduler)
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e(TAG, "saveMessage", throwable);
+                    }
+                })
                 .subscribe(Observers.<Message>empty());
     }
 
     private void saveMessageInternal(Message message) {
-        Message messageInDb = getMessageDao().getMessage(message.getId());
+        Message messageInDb = getMessageDao().getMessageByUid(message.getUid());
         if (messageInDb != null) {
             getMessageDao().updateMessage(message);
             performMessageUpdated(message);
@@ -117,20 +154,6 @@ class MessageManager extends AbstractIMService implements MessageService, Messag
         }
     }
 
-    @Override
-    public Observable<Message> resendMessage(Message message) {
-        return sendMessage(message);
-    }
-
-    @Override
-    public Observable<Message> markMessagesOfConversationAsRead(String conversationId) {
-        return null;
-    }
-
-    @Override
-    public Observable<Message> markAllMessagesAsRead() {
-        return null;
-    }
 
     @Override
     public boolean onReceive(Message message) {
@@ -138,7 +161,7 @@ class MessageManager extends AbstractIMService implements MessageService, Messag
             getMessageDao().insertMessage(message);
             performMessageAdded(message);
         } catch (Exception ex) {
-            Message messageInLocal = getMessageDao().getMessage(message.getId());
+            Message messageInLocal = getMessageDao().getMessageByUid(message.getUid());
             // 消息在本地已存在
             if (messageInLocal != null) {
                 message.setId(messageInLocal.getId());

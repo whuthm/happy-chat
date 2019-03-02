@@ -12,4 +12,6 @@ public interface UserAppService extends UserProvider {
 
     Observable<User> getCurrentUserFromServer();
 
+    User getOrFetchUser(String userId);
+
 }

@@ -4,9 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.whuthm.happychat.imlib.model.message.ImageMessageBody;
 import com.whuthm.happychat.imlib.model.message.TextMessageBody;
+import com.whuthm.happychat.util.StringUtils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MessageBody implements Serializable  {
@@ -27,6 +30,16 @@ public class MessageBody implements Serializable  {
 
     public void setUserInfo(UserInfo userInfo) {
         this.userInfo = userInfo;
+    }
+
+    public static List<String> getUnCountedTypes() {
+        List<String> unCountedTypes = new ArrayList<>();
+            for (String type : BODY_CLASSES.keySet()) {
+                if (!StringUtils.isEmpty(type) && !isCounted(type)) {
+                    unCountedTypes.add(type);
+                }
+            }
+        return unCountedTypes;
     }
 
     public UserInfo getUserInfo() {

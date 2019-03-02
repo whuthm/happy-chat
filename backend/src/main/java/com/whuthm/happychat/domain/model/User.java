@@ -12,23 +12,23 @@ public class User {
 	@Column(name = "name", unique = true, nullable = false)
     private String name;
 
+    @Column(name = "email", unique = true, nullable = false)
+    private String email;
+
     @Column(name = "nick")
     private String nick;
 
     @Column(name = "gender")
     private int gender;
 
-    @Column(name = "avatar")
-    private String avatar;
+    @Column(name = "portraitUrl")
+    private String portraitUrl;
 
 	@Column(name = "password", nullable = false)
 	private String password;
 
 	@Column(name = "salt", nullable = false)
 	private String salt;
-
-    @Column(name = "role", nullable = false)
-    private int role;
 
     public String getId() {
         return id;
@@ -62,14 +62,6 @@ public class User {
         this.salt = salt;
     }
 
-    public int getRole() {
-        return role;
-    }
-
-    public void setRole(int role) {
-        this.role = role;
-    }
-
     public String getNick() {
         return nick;
     }
@@ -86,28 +78,19 @@ public class User {
         this.gender = gender;
     }
 
-    public String getAvatar() {
-        return avatar;
+    public String getEmail() {
+        return email;
     }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public enum Role {
+    public String getPortraitUrl() {
+        return portraitUrl;
+    }
 
-        SuperAdmin(1),
-        Admin(10001),
-        Normal(20001);
-
-        final int value;
-
-        Role(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
+    public void setPortraitUrl(String portraitUrl) {
+        this.portraitUrl = portraitUrl;
     }
 }

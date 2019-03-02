@@ -1,6 +1,5 @@
 package com.whuthm.happychat.app;
 
-import android.os.UserManager;
 import android.util.Log;
 
 import com.whuthm.happychat.imlib.AbstractIMService;
@@ -23,7 +22,7 @@ import io.reactivex.observers.DisposableObserver;
 
 class UserAppServiceImpl extends AbstractIMService implements UserAppService {
 
-    private final static String TAG = UserManager.class.getSimpleName();
+    private final static String TAG = UserAppServiceImpl.class.getSimpleName();
 
     private final Map<String, User> users;
     private final Set<String> fetching;
@@ -55,12 +54,17 @@ class UserAppServiceImpl extends AbstractIMService implements UserAppService {
     }
 
     @Override
-    public User getUser(String id) {
-        final User user = users.get(id);
-        if (user == null && !StringUtils.isEmpty(id)) {
-            fetchUser(id);
+    public User getOrFetchUser(String userId) {
+        final User user = users.get(userId);
+        if (user == null && !StringUtils.isEmpty(userId)) {
+            fetchUser(userId);
         }
         return user;
+    }
+
+    @Override
+    public User getUser(String userId) {
+        return users.get(userId);
     }
 
     private void fetchUser(final String id) {

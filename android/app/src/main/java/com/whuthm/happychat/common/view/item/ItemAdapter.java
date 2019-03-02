@@ -20,7 +20,6 @@ public class ItemAdapter<ITEM> extends RecyclerView.Adapter<ItemAdapter.ItemView
     private final Context context;
     private List<ITEM> items;
     private ItemViewProvider<ITEM> itemViewProvider;
-    private Comparator<ITEM> sortComparator;
 
     public ItemAdapter(Context context) {
         this.context = context;
@@ -31,10 +30,6 @@ public class ItemAdapter<ITEM> extends RecyclerView.Adapter<ItemAdapter.ItemView
         this.items = items;
     }
 
-    public void setSortComparator(Comparator<ITEM> sortComparator) {
-        this.sortComparator = sortComparator;
-    }
-
     public Context getContext() {
         return context;
     }
@@ -42,6 +37,10 @@ public class ItemAdapter<ITEM> extends RecyclerView.Adapter<ItemAdapter.ItemView
     public void setItems(List<ITEM> items) {
         this.items = items;
         notifyDataSetChanged();
+    }
+
+    public List<ITEM> getItems() {
+        return items;
     }
 
     public void setItemViewProvider(ItemViewProvider<ITEM> itemViewProvider) {
@@ -66,29 +65,42 @@ public class ItemAdapter<ITEM> extends RecyclerView.Adapter<ItemAdapter.ItemView
         if (item != null) {
             final int oldItemCount = getItemCount();
             this.items.add(item);
-            if (shouldSortItems()) {
-                notifyDataSetChanged();
-                return;
-            }
             notifyItemInserted(oldItemCount);
         }
     }
 
     public void addItem(int index, ITEM item) {
-        if (items == null) {
-            items = new ArrayList<>();
+        if (this.items == null) {
+            this.items = new ArrayList<>();
         }
-        if (item != null && this.items != null) {
+        if (item != null) {
             final int oldItemCount = getItemCount();
             if (index < 0 || index > oldItemCount) {
                 index = oldItemCount;
             }
             this.items.add(index, item);
-            if (shouldSortItems()) {
-                notifyDataSetChanged();
-                return;
-            }
             notifyItemInserted(index);
+        }
+    }
+
+    public void addItems(final List<ITEM> items) {
+        if (this.items == null) {
+            this.items = new ArrayList<>();
+        }
+        if (items != null && items.size() > 0) {
+            final int positionStart = getItemCount();
+            this.items.addAll(items);
+            notifyItemRangeInserted(positionStart, items.size());
+        }
+    }
+
+    public void addItems(int index, final List<ITEM> items) {
+        if (this.items == null) {
+            this.items = new ArrayList<>();
+        }
+        if (items != null && items.size() > 0 && index >= 0 && index <= getItemCount()) {
+            this.items.addAll(index, items);
+            notifyItemRangeInserted(index, items.size());
         }
     }
 
@@ -96,10 +108,6 @@ public class ItemAdapter<ITEM> extends RecyclerView.Adapter<ItemAdapter.ItemView
         int index = indexOf(item);
         if (index >=0 && index < getItemCount()) {
             this.items.set(index, item);
-            if (shouldSortItems()) {
-                notifyDataSetChanged();
-                return;
-            }
             notifyItemChanged(index);
         }
     }
@@ -121,10 +129,6 @@ public class ItemAdapter<ITEM> extends RecyclerView.Adapter<ItemAdapter.ItemView
                     }
                 }
             }
-            if (shouldSortItems()) {
-                notifyDataSetChanged();
-                return;
-            }
             if (positionEnd >= positionStart && positionStart >= 0) {
                 notifyItemRangeChanged(positionStart, positionEnd - positionStart + 1);
             }
@@ -136,16 +140,6 @@ public class ItemAdapter<ITEM> extends RecyclerView.Adapter<ItemAdapter.ItemView
             this.items.clear();
             notifyDataSetChanged();
         }
-    }
-
-    private void sortItems() {
-        if (sortComparator != null && getItemCount() > 1) {
-            Collections.sort(items, sortComparator);
-        }
-    }
-
-    private boolean shouldSortItems() {
-        return sortComparator != null;
     }
 
     @Override

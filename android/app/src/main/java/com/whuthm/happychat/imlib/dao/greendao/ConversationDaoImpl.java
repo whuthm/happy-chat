@@ -23,6 +23,9 @@ public class ConversationDaoImpl extends AbstractGreenDao implements IConversati
     public Conversation getConversation(String conversationId) {
         DaoSession session = getOpenHelper().getReadableDaoMaster().newSession();
         Conversation conversation = session.getConversationDao().load(conversationId);
+        if (conversation != null) {
+            conversation.getLatestMessage();
+        }
         session.clear();
         return conversation;
     }
@@ -34,6 +37,10 @@ public class ConversationDaoImpl extends AbstractGreenDao implements IConversati
                 .queryBuilder();
         queryBuilder.orderDesc(ConversationDao.Properties.LatestMessageTime);
         List<Conversation> list = queryBuilder.list();
+        for (Conversation conversation : list) {
+            // 懒加载
+            conversation.getLatestMessage();
+        }
         session.clear();
         return list;
     }
@@ -42,7 +49,6 @@ public class ConversationDaoImpl extends AbstractGreenDao implements IConversati
     public void deleteConversation(String conversationId) {
         DaoSession session = getOpenHelper().getWritableDaoMaster().newSession();
         session.getConversationDao().deleteByKey(conversationId);
-
         session.clear();
     }
     
@@ -50,7 +56,6 @@ public class ConversationDaoImpl extends AbstractGreenDao implements IConversati
     public void insertOrUpdateConversation(Conversation conversation) {
         DaoSession session = getOpenHelper().getWritableDaoMaster().newSession();
         session.getConversationDao().insertOrReplace(conversation);
-        
         session.clear();
     }
 }

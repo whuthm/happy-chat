@@ -10,14 +10,20 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.whuthm.happychat.R;
+import com.whuthm.happychat.app.UserAppService;
 import com.whuthm.happychat.common.util.Mapper;
 import com.whuthm.happychat.common.view.item.ItemAdapter;
 import com.whuthm.happychat.common.view.item.TypedItem;
 import com.whuthm.happychat.common.view.item.TypedItemViewProvider;
+import com.whuthm.happychat.imlib.IMContext;
 import com.whuthm.happychat.imlib.model.Message;
 import com.whuthm.happychat.imlib.model.MessageBody;
 import com.whuthm.happychat.imlib.model.MessageTag;
 import com.whuthm.happychat.imlib.model.message.TextMessageBody;
+import com.whuthm.happychat.utils.DateUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MessageTypedItemProvider extends TypedItemViewProvider {
 
@@ -36,8 +42,10 @@ public class MessageTypedItemProvider extends TypedItemViewProvider {
 
     MessageItemClickListener messageItemClickListener;
     private final Mapper<Message, MessageItem> mapper;
+    private final IMContext imContext;
 
-    public MessageTypedItemProvider(Mapper<Message, MessageItem> mapper) {
+    public MessageTypedItemProvider(IMContext imContext, Mapper<Message, MessageItem> mapper) {
+        this.imContext = imContext;
         this.mapper = mapper;
     }
 
@@ -52,18 +60,21 @@ public class MessageTypedItemProvider extends TypedItemViewProvider {
         final LayoutInflater inflater = LayoutInflater.from(context);
         switch (viewType) {
             case TYPE_TXT_SEND:
-                return new TxtMessageViewHolder(inflater.inflate(R.layout.message_item_txt_send, parent, false));
+                return new TextMessageItemViewHolder(inflater.inflate(R.layout.message_item_txt_send, parent, false));
             case TYPE_TXT_RECEIVE:
-                return new TxtMessageViewHolder(inflater.inflate(R.layout.message_item_txt_receive, parent, false));
+                return new TextMessageItemViewHolder(inflater.inflate(R.layout.message_item_txt_receive, parent, false));
         }
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected void onItemViewHolderCreated(ItemAdapter.ItemViewHolder<?> holder) {
-        super.onItemViewHolderCreated(holder);
-        if (holder instanceof MessageViewHolder) {
-            ((MessageViewHolder) holder).setItemClickListener(messageItemClickListener);
+    protected void onItemViewHolderCreated(ItemAdapter<TypedItem<?>> adapter, ItemAdapter.ItemViewHolder<?> holder) {
+        super.onItemViewHolderCreated(adapter, holder);
+        if (holder instanceof MessageItemViewHolder) {
+            ((MessageItemViewHolder) holder).setItemClickListener(messageItemClickListener);
+            ((MessageItemViewHolder) holder).setItemAdapter(adapter);
+            ((MessageItemViewHolder) holder).setImContext(imContext);
         }
     }
 
@@ -89,23 +100,47 @@ public class MessageTypedItemProvider extends TypedItemViewProvider {
         return new TypedItem<>(type, mapper.transform(message));
     }
 
-    public abstract static class MessageViewHolder<BODY extends MessageBody> extends ItemAdapter.ItemViewHolder<MessageItem> {
+    List<TypedItem<?>> getTypedItemsBy(List<Message> messages) {
+        List<TypedItem<?>> items = new ArrayList<>();
+        for (Message message : messages) {
+            items.add(getTypedItemBy(message));
+        }
+        return items;
+    }
+
+    public abstract static class MessageItemViewHolder<BODY extends MessageBody> extends ItemAdapter.ItemViewHolder<MessageItem> {
 
         protected TextView senderNameView;
         protected ImageView senderPortraitView;
         protected View bubbleLayout;
+        protected TextView timeView;
+        protected View resendView;
+        protected View sendingView;
 
         private  MessageItemClickListener itemClickListener;
+        private ItemAdapter<TypedItem<?>> itemAdapter;
+        private IMContext imContext;
 
-        public MessageViewHolder(View itemView) {
+        public MessageItemViewHolder(View itemView) {
             super(itemView);
             senderNameView = findViewById(R.id.tv_sender_name);
             senderPortraitView = findViewById(R.id.iv_sender_portrait);
             bubbleLayout = findViewById(R.id.layout_bubble);
+            timeView = findViewById(R.id.tv_time);
+            resendView = findViewById(R.id.iv_resend);
+            sendingView = findViewById(R.id.pb_sending);
         }
 
         public void setItemClickListener(MessageItemClickListener itemClickListener) {
             this.itemClickListener = itemClickListener;
+        }
+
+        public void setItemAdapter(ItemAdapter<TypedItem<?>> itemAdapter) {
+            this.itemAdapter = itemAdapter;
+        }
+
+        public void setImContext(IMContext imContext) {
+            this.imContext = imContext;
         }
 
         @SuppressWarnings("unchecked")
@@ -118,7 +153,29 @@ public class MessageTypedItemProvider extends TypedItemViewProvider {
             }
 
             if (senderNameView != null) {
-                senderNameView.setText(messageItem.getSenderDisplayName());
+                if (messageItem.getConversationType().isMultiUser()) {
+                    senderNameView.setText(messageItem.getSenderDisplayName());
+                    senderNameView.setVisibility(View.VISIBLE);
+                } else {
+                    senderNameView.setVisibility(View.GONE);
+                }
+            }
+
+            if (timeView != null) {
+                if (position == 0) {
+                    timeView.setText(DateUtils.getTimestampString(messageItem.getSendTime()));
+                    timeView.setVisibility(View.VISIBLE);
+                } else {
+                    // show time stamp if interval with last message is > 30 seconds
+                    final TypedItem<?> previousTypedItem = itemAdapter != null ? itemAdapter.getItem(position - 1) : null;
+                    final MessageItem previousMessageItem = previousTypedItem != null && previousTypedItem.getItem() instanceof MessageItem ? (MessageItem) previousTypedItem.getItem() : null;
+                    if (previousMessageItem != null && DateUtils.isCloseEnough(messageItem.getSendTime(), previousMessageItem.getSendTime())) {
+                        timeView.setVisibility(View.GONE);
+                    } else {
+                        timeView.setText(DateUtils.getTimestampString(messageItem.getSendTime()));
+                        timeView.setVisibility(View.VISIBLE);
+                    }
+                }
             }
 
             if (senderPortraitView != null) {
@@ -160,16 +217,38 @@ public class MessageTypedItemProvider extends TypedItemViewProvider {
                     }
                 });
             }
+
+            if (resendView != null) {
+                resendView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (itemClickListener != null) {
+                            itemClickListener.onResendClick(messageItem);
+                        }
+                    }
+                });
+                resendView.setVisibility(messageItem.getSentStatus() == Message.SentStatus.FAILED ? View.VISIBLE : View.GONE);
+            }
+
+            if (sendingView != null) {
+                sendingView.setVisibility(messageItem.getSentStatus() == Message.SentStatus.SENDING ? View.VISIBLE : View.GONE);
+            }
+
+
+            if ((senderPortraitView != null || senderNameView != null) && imContext != null) {
+                imContext.getService(UserAppService.class).getOrFetchUser(messageItem.getSenderId());
+            }
         }
 
         protected abstract void bindView(MessageItem messageItem, BODY body, int position);
+
     }
 
-    public static class TxtMessageViewHolder extends MessageViewHolder<TextMessageBody> {
+    public static class TextMessageItemViewHolder extends MessageItemViewHolder<TextMessageBody> {
 
         private TextView txtView;
 
-        public TxtMessageViewHolder(View itemView) {
+        public TextMessageItemViewHolder(View itemView) {
             super(itemView);
             txtView = findViewById(R.id.tv_txt);
         }

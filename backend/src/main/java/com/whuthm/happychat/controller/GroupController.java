@@ -12,6 +12,7 @@ import com.whuthm.happychat.utils.ApiUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -21,7 +22,7 @@ public class GroupController {
     @Autowired
     GroupService groupService;
 
-    @RequestMapping("/v1/group/create")
+    @RequestMapping(value = "/v1/group/create", method = {RequestMethod.POST})
     BaseProtos.BaseResponse create() {
         groupService.createGroup(null, null, null, null);
         return ApiBaseResponses.SUCCESS.getResponse();

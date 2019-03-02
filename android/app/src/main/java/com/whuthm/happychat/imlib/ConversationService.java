@@ -12,4 +12,6 @@ public interface ConversationService {
 
     Observable<List<Conversation>> getAllConversations();
 
+    Observable<Conversation> markAllMessagesOfConversationAsRead(String conversationId);
+
 }

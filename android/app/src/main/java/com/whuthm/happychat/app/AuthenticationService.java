@@ -22,8 +22,4 @@ public interface AuthenticationService {
 
     AuthenticationStatus getAuthenticationStatus();
 
-    void addAuthenticationStatusListener(AuthenticationStatusListener l);
-
-    void removeAuthenticationStatusListener(AuthenticationStatusListener l);
-
 }

@@ -3,7 +3,6 @@ package com.whuthm.happychat.ui;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +11,8 @@ import android.widget.EditText;
 import com.barran.lib.view.text.ColorfulTextView;
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.app.MessageAppService;
-import com.whuthm.happychat.app.UserAppService;
-import com.whuthm.happychat.imlib.MessageService;
+import com.whuthm.happychat.imlib.event.EventBusUtils;
 import com.whuthm.happychat.imlib.model.Message;
-import com.whuthm.happychat.imlib.model.MessageTag;
-import com.whuthm.happychat.imlib.model.message.TextMessageBody;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
@@ -47,9 +43,15 @@ public class MessageInputFragment extends BaseConversationFragment {
                         .sendTextMessage(getConversationId(), getConversationType(), text)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new DisposableObserver<Message>() {
+
+                            @Override
+                            protected void onStart() {
+                                super.onStart();
+                            }
+
                             @Override
                             public void onNext(Message value) {
-
+                                EventBusUtils.safePost(new PresenterEvent.MessageSentEvent(value));
                             }
 
                             @Override

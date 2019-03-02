@@ -26,7 +26,7 @@ public class ApiUtils {
         if (error instanceof ServerException) {
             return ApiBaseResponses.SERVER_ERROR.getResponse();
         } else if (error instanceof IllegalArgumentException) {
-            return ApiBaseResponses.UNKNOWN_ERROR.getResponse();
+            return ApiBaseResponses.INCORRECT_PARAMETERS.getResponse();
         } else {
             return ApiBaseResponses.UNKNOWN_ERROR.getResponse();
         }

@@ -23,10 +23,8 @@
 
     <ImageView
         android:id="@+id/iv_sender_portrait"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        style="@style/PortraitStyle"
         android:layout_marginTop="@dimen/dimen_12"
-        android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_time"
         tools:src="@drawable/dog1" />
@@ -47,8 +45,8 @@
         android:id="@+id/layout_bubble"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dimen_4"
         android:layout_marginStart="@dimen/dimen_6"
+        android:layout_marginTop="@dimen/dimen_4"
         android:background="@drawable/bg_bubble_send"
         app:layout_constraintStart_toEndOf="@+id/iv_sender_portrait"
         app:layout_constraintTop_toBottomOf="@+id/tv_sender_name">

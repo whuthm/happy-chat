@@ -15,10 +15,6 @@ public interface MessageService {
 
     Observable<Message> sendMessage(Message message);
 
-    Observable<Message> resendMessage(Message message);
-
-    Observable<Message> markMessagesOfConversationAsRead(String conversationId);
-
-    Observable<Message> markAllMessagesAsRead();
+    Observable<Message> resendMessage(String messageUid);
 
 }

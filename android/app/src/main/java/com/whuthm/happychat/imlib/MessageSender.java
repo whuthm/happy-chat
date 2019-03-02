@@ -30,10 +30,10 @@ class MessageSender implements IQPacketHandler {
     private void sendMessageInternal(Message message) throws Exception {
         try {
             MessageProtos.MessageBean messageBean = MessageUtils.getSendMessagePacketFrom(message);
-            this.sendingMessages.put(message.getId(), message);
+            this.sendingMessages.put(message.getUid(), message);
             packetSender.sendPacket(PacketUtils.createPacket(PacketProtos.Packet.Type.message, messageBean));
             synchronized (message) {
-                if (this.sendingMessages.containsKey(message.getId())) {
+                if (this.sendingMessages.containsKey(message.getUid())) {
                     message.wait(8 * 1000);
                 }
                 if (message.getSid() == null) {
@@ -43,7 +43,7 @@ class MessageSender implements IQPacketHandler {
         } catch (Exception e) {
             throw e;
         } finally {
-            this.sendingMessages.remove(message.getId());
+            this.sendingMessages.remove(message.getUid());
         }
     }
 

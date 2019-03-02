@@ -3,12 +3,23 @@ package com.whuthm.happychat.app;
 import android.text.TextUtils;
 
 import com.whuthm.happychat.app.dao.IAuthenticationUserDao;
+import com.whuthm.happychat.app.event.AuthenticationStatusChangedEvent;
 import com.whuthm.happychat.app.model.AuthenticationStatus;
 import com.whuthm.happychat.app.model.AuthenticationUser;
+import com.whuthm.happychat.common.context.ApplicationServiceContext;
+import com.whuthm.happychat.common.rx.Observers;
 import com.whuthm.happychat.data.AuthenticationProtos;
 import com.whuthm.happychat.data.BaseProtos;
 import com.whuthm.happychat.data.api.ApiUtils;
 import com.whuthm.happychat.data.api.RetrofitClient;
+import com.whuthm.happychat.imlib.ConnectionConfiguration;
+import com.whuthm.happychat.imlib.IMClient;
+import com.whuthm.happychat.imlib.event.ConnectionEvent;
+import com.whuthm.happychat.imlib.event.EventBusUtils;
+import com.whuthm.happychat.imlib.model.ConnectionStatus;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,19 +35,33 @@ class AuthenticationManager extends AppContextService implements AuthenticationS
 
     private AuthenticationUser authenticationUser;
     private AuthenticationStatus authenticationStatus = AuthenticationStatus.None;
-    private Set<AuthenticationStatusListener> authenticationStatusListeners;
 
-    AuthenticationManager(AppContext appContext) {
+    private AuthenticationManager(AppContext appContext) {
         super(appContext);
-        this.authenticationStatusListeners = new HashSet<>();
          this.authenticationUser = getDao().getAuthenticationUser();
         if (authenticationUser != null && !TextUtils.isEmpty(authenticationUser.getUserId()) && !TextUtils.isEmpty(authenticationUser.getUserToken())) {
             this.authenticationStatus = AuthenticationStatus.LoggedIn;
         }
     }
 
+    public static void init(AppContext appContext) {
+        AuthenticationManager authenticationManager = new AuthenticationManager(appContext);
+        appContext.registerService(AuthenticationService.class, authenticationManager);
+        EventBusUtils.safeRegister(authenticationManager);
+        if (authenticationManager.getAuthenticationStatus() == AuthenticationStatus.LoggedIn) {
+            authenticationManager.connectChat();
+        }
+    }
+
     private IAuthenticationUserDao getDao() {
         return getAppDaoFactory().getAuthenticationUserDao();
+    }
+
+    @Subscribe
+    public void onConnectionStatusChangedEvent(ConnectionEvent.StatusChangedEvent event) {
+        if (event.getConnectionStatus() == ConnectionStatus.UNAUTHORIZED) {
+            logout().subscribe(Observers.<AuthenticationUser>empty());
+        }
     }
 
     @Override
@@ -101,16 +126,6 @@ class AuthenticationManager extends AppContextService implements AuthenticationS
         return authenticationStatus;
     }
 
-    @Override
-    public synchronized void addAuthenticationStatusListener(AuthenticationStatusListener l) {
-        this.authenticationStatusListeners.add(l);
-    }
-
-    @Override
-    public synchronized void removeAuthenticationStatusListener(AuthenticationStatusListener l) {
-        this.authenticationStatusListeners.remove(l);
-    }
-
     private synchronized void performChangeAuthenticationUserAndStatus(AuthenticationUser authenticationUser, AuthenticationStatus authenticationStatus) {
         getDao().saveAuthenticationUser(authenticationUser);
         this.authenticationUser = authenticationUser;
@@ -120,10 +135,27 @@ class AuthenticationManager extends AppContextService implements AuthenticationS
     private synchronized void performChangeAuthenticationStatus(AuthenticationStatus authenticationStatus) {
         if (this.authenticationStatus != authenticationStatus) {
             this.authenticationStatus = authenticationStatus;
-            for (AuthenticationStatusListener l : this.authenticationStatusListeners) {
-                l.onAuthenticationStatusChanged(authenticationStatus);
+            EventBusUtils.safePost(new AuthenticationStatusChangedEvent(authenticationStatus));
+            switch (authenticationStatus) {
+                case LoggedIn:
+                    connectChat();
+                    break;
+                case Logout:
+                    disconnectChat();
+                    break;
+                default:
+                    break;
             }
         }
+    }
+
+    private void connectChat() {
+        IMClient.getInstance()
+                .connect(new ConnectionConfiguration(getAuthenticationUser().getUserId(), getAuthenticationUser().getUserToken()));
+    }
+
+    private void disconnectChat() {
+        IMClient.getInstance().disconnect();
     }
 }
 

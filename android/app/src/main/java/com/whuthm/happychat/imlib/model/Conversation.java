@@ -38,35 +38,35 @@ public class Conversation  implements Serializable {
     private String portraitUrl;
     private int unreadCount;
 
-    private String latestMessageId;
+    private Long latestMessageId;
 
     @ToOne(joinProperty = "latestMessageId")
     private Message latestMessage;
     
     private long latestMessageTime;
-    /** Used to resolve relations */
-    @Generated(hash = 2040040024)
-    private transient DaoSession daoSession;
-    /** Used for active entity operations. */
-    @Generated(hash = 151466175)
-    private transient ConversationDao myDao;
-    @Generated(hash = 1328906609)
-    private transient String latestMessage__resolvedKey;
-
     @Convert(columnType = Integer.class, converter = ConversationNotificationStatusConverter.class)
     private NotificationStatus notificationStatus;
 
     private boolean top;
 
     private String draft;
+    /** Used to resolve relations */
+    @Generated(hash = 2040040024)
+    private transient DaoSession daoSession;
+    /** Used for active entity operations. */
+    @Generated(hash = 151466175)
+    private transient ConversationDao myDao;
+    @Generated(hash = 1231441308)
+    private transient Long latestMessage__resolvedKey;
+
 
     public Conversation() {
         
     }
 
-    @Generated(hash = 1256204788)
+    @Generated(hash = 104694593)
     public Conversation(String id, @NotNull ConversationType type, String title, String portraitUrl,
-            int unreadCount, String latestMessageId, long latestMessageTime,
+            int unreadCount, Long latestMessageId, long latestMessageTime,
             NotificationStatus notificationStatus, boolean top, String draft) {
         this.id = id;
         this.type = type;
@@ -129,22 +129,12 @@ public class Conversation  implements Serializable {
         this.type = type;
     }
 
-    public String getLatestMessageId() {
+    public Long getLatestMessageId() {
         return latestMessageId;
     }
 
-    public void setLatestMessageId(String latestMessageId) {
+    public void setLatestMessageId(Long latestMessageId) {
         this.latestMessageId = latestMessageId;
-    }
-
-    @Keep
-    public Message getLatestMessage() {
-        return latestMessage;
-    }
-
-    @Keep
-    public void setLatestMessage(Message latestMessage) {
-        this.latestMessage = latestMessage;
     }
 
     public long getLatestMessageTime() {
@@ -177,6 +167,34 @@ public class Conversation  implements Serializable {
             }
             return null;
         }
+    }
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getPortraitUrl() {
+        return this.portraitUrl;
+    }
+
+    public void setPortraitUrl(String portraitUrl) {
+        this.portraitUrl = portraitUrl;
+    }
+
+    public int getUnreadCount() {
+        return this.unreadCount;
+    }
+
+    public void setUnreadCount(int unreadCount) {
+        this.unreadCount = unreadCount;
+    }
+
+    public boolean getTop() {
+        return this.top;
     }
 
     /**
@@ -215,32 +233,33 @@ public class Conversation  implements Serializable {
         myDao.update(this);
     }
 
-    public String getTitle() {
-        return this.title;
+    /** To-one relationship, resolved on first access. */
+    @Generated(hash = 1740249692)
+    public Message getLatestMessage() {
+        Long __key = this.latestMessageId;
+        if (latestMessage__resolvedKey == null || !latestMessage__resolvedKey.equals(__key)) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            MessageDao targetDao = daoSession.getMessageDao();
+            Message latestMessageNew = targetDao.load(__key);
+            synchronized (this) {
+                latestMessage = latestMessageNew;
+                latestMessage__resolvedKey = __key;
+            }
+        }
+        return latestMessage;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getPortraitUrl() {
-        return this.portraitUrl;
-    }
-
-    public void setPortraitUrl(String portraitUrl) {
-        this.portraitUrl = portraitUrl;
-    }
-
-    public int getUnreadCount() {
-        return this.unreadCount;
-    }
-
-    public void setUnreadCount(int unreadCount) {
-        this.unreadCount = unreadCount;
-    }
-
-    public boolean getTop() {
-        return this.top;
+    /** called by internal mechanisms, do not call yourself. */
+    @Generated(hash = 952483817)
+    public void setLatestMessage(Message latestMessage) {
+        synchronized (this) {
+            this.latestMessage = latestMessage;
+            latestMessageId = latestMessage == null ? null : latestMessage.getId();
+            latestMessage__resolvedKey = latestMessageId;
+        }
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -249,6 +268,5 @@ public class Conversation  implements Serializable {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getConversationDao() : null;
     }
-
 
 }

@@ -1,5 +1,7 @@
 package com.whuthm.happychat.imlib;
 
+import android.util.Log;
+
 import com.whuthm.happychat.data.UserProtos;
 import com.whuthm.happychat.data.api.ApiService;
 import com.whuthm.happychat.data.api.ApiUtils;
@@ -13,7 +15,9 @@ import io.reactivex.Scheduler;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
-class UserManager extends AbstractIMService implements UserService, UserProvider.Aware{
+class UserManager extends AbstractIMService implements UserService, UserProvider.Aware {
+
+    private static final String TAG = UserManager.class.getSimpleName();
 
     private final ApiService apiService;
     private final IUserDao dao;
@@ -64,10 +68,16 @@ class UserManager extends AbstractIMService implements UserService, UserProvider
                         user.setId(userResponse.getData().getId());
                         user.setName(userResponse.getData().getName());
                         user.setNick(userResponse.getData().getNick());
-                        user.setPortraitUrl(userResponse.getData().getAvatar());
+                        user.setPortraitUrl(userResponse.getData().getPortraitUrl());
                         user.setGender(userResponse.getData().getGender());
                         saveUserInternal(user);
                         return user;
+                    }
+                })
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e(TAG, "getUserFromServer", throwable);
                     }
                 });
     }

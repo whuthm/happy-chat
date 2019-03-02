@@ -8,7 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.app.AuthenticationService;
 import com.whuthm.happychat.app.UserAppService;
@@ -26,7 +30,8 @@ import io.reactivex.observers.DisposableObserver;
 
 public class MainMeFragment extends IMContextFragment {
 
-    private EditText editNick;
+    private TextView nameView;
+    private ImageView portraitView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,19 +49,8 @@ public class MainMeFragment extends IMContextFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        editNick = view.findViewById(R.id.frag_me_input_nick);
-        editNick.setText(applicationServiceContext.getService(AuthenticationService.class).getAuthenticationUser().getUserNick());
-
-        view.findViewById(R.id.frag_me_btn_save)
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        String userNick = editNick.getText().toString().trim();
-                        if (!TextUtils.isEmpty(userNick)) {
-                            //AuthenticationUser.setUserNick(userNick);
-                        }
-                    }
-                });
+        nameView = view.findViewById(R.id.tv_name);
+        portraitView = view.findViewById(R.id.iv_portrait);
 
         imContext.getService(UserAppService.class)
                 .getCurrentUserFromServer()
@@ -65,7 +59,13 @@ public class MainMeFragment extends IMContextFragment {
 
                     @Override
                     public void onNext(User value) {
-                        editNick.setText(value.getName());
+                        nameView.setText(PresenterUtils.getUserDisplayName(value));
+                        Glide.with(getContext())
+                                .load(value.getPortraitUrl())
+                                .apply(RequestOptions.centerCropTransform()
+                                        .placeholder(R.drawable.dog1)
+                                        .error(R.drawable.dog1))
+                                .into(portraitView);
                     }
 
                     @Override

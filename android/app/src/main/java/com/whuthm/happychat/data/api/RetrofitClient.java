@@ -47,7 +47,7 @@ public class RetrofitClient {
         mOkHttpClient = builder
                 .cache(new Cache(new File(context.getCacheDir().getAbsolutePath(),
                         Constants.HTTP_CACHE_DIR), Constants.HTTP_CACHE_SIZE))
-                .addInterceptor(new HttpInterceptor(headers))
+                .addInterceptor(new HttpInterceptor(context, headers))
                 .addNetworkInterceptor(new NetworkInterceptor(context))
                 .connectTimeout(Constants.HTTP_TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(Constants.HTTP_TIMEOUT, TimeUnit.SECONDS)

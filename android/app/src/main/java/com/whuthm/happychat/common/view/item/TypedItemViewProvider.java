@@ -22,11 +22,11 @@ public abstract class TypedItemViewProvider implements ItemAdapter.ItemViewProvi
     @Override
     public TypedItemViewHolder<?> getItemViewHolder(ItemAdapter<TypedItem<?>> adapter, ViewGroup parent, int viewType) {
         ItemAdapter.ItemViewHolder<?> holder = onCreateItemViewHolder(adapter, parent, viewType);
-        onItemViewHolderCreated(holder);
+        onItemViewHolderCreated(adapter, holder);
         return TypedItemViewHolder.wrap(holder);
     }
 
-    protected void onItemViewHolderCreated(ItemAdapter.ItemViewHolder<?> holder) {
+    protected void onItemViewHolderCreated(ItemAdapter<TypedItem<?>> adapter, ItemAdapter.ItemViewHolder<?> holder) {
     }
 
 }

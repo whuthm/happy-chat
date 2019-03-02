@@ -4,6 +4,7 @@ import com.whuthm.happychat.imlib.event.ConversationEvent;
 import com.whuthm.happychat.imlib.event.EventPoster;
 import com.whuthm.happychat.imlib.event.EventPosterWrapper;
 import com.whuthm.happychat.imlib.model.Conversation;
+import com.whuthm.happychat.imlib.vo.ConversationProperties;
 
 class ConversationEventPoster extends EventPosterWrapper implements ConversationEvent.Poster {
     public ConversationEventPoster(EventPoster wrapped) {
@@ -11,11 +12,11 @@ class ConversationEventPoster extends EventPosterWrapper implements Conversation
     }
 
     @Override
-    public void postConversationUpdated(Conversation conversation) {
-        if (conversation == null) {
+    public void postConversationUpdated(Conversation conversation, ConversationProperties properties) {
+        if (conversation == null || properties == null || !properties.containsProperties()) {
             return;
         }
-        post(new ConversationEvent.UpdatedEvent(conversation));
+        post(new ConversationEvent.UpdatedEvent(conversation, properties));
     }
 
     @Override
@@ -34,11 +35,4 @@ class ConversationEventPoster extends EventPosterWrapper implements Conversation
         post(new ConversationEvent.AddedEvent(conversation));
     }
 
-    @Override
-    public void postConversationUnreadCount(Conversation conversation) {
-        if (conversation == null) {
-            return;
-        }
-        post(new ConversationEvent.UpdatedEvent(conversation, ConversationEvent.UpdatedEvent.Type.UnreadCount));
-    }
 }

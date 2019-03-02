@@ -245,20 +245,28 @@ class ConnectionManager extends AbstractIMService implements ConnectionService, 
     }
 
     synchronized void handleConnectionClosed(Connection chatConnection, int code, String reason) {
-        // TODO: 定义code， 如token未认证等
         Logs.v(TAG, "handleConnectionClosed: code=" + code + ", reason=" + reason);
         if (chatConnection == getChatConnection()) {
             setChatConnection(null);
-            performChangeConnectionStatus(ConnectionStatus.DISCONNECTED);
+            performChangeConnectionStatus(getConnectionStatusByCloseCode(code));
         }
     }
 
     synchronized void handleConnectionClosing(Connection chatConnection, int code, String reason) {
-        // TODO: 定义code， 如token未认证等
         Logs.v(TAG, "handleConnectionClosing: code=" + code + ", reason=" + reason);
         if (chatConnection == getChatConnection()) {
             setChatConnection(null);
-            performChangeConnectionStatus(ConnectionStatus.DISCONNECTED);
+            performChangeConnectionStatus(getConnectionStatusByCloseCode(code));
+        }
+    }
+
+
+    private ConnectionStatus getConnectionStatusByCloseCode(int code) {
+        // incorrect token
+        if (code == 3001) {
+            return ConnectionStatus.UNAUTHORIZED;
+        } else {
+            return ConnectionStatus.DISCONNECTED;
         }
     }
 

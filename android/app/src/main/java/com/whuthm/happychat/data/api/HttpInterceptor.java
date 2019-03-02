@@ -1,5 +1,13 @@
 package com.whuthm.happychat.data.api;
 
+import android.content.Context;
+
+import com.whuthm.happychat.app.AuthenticationService;
+import com.whuthm.happychat.app.model.AuthenticationUser;
+import com.whuthm.happychat.common.context.ApplicationServiceContext;
+import com.whuthm.happychat.data.ClientProtos;
+import com.whuthm.happychat.util.StringUtils;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -14,14 +22,12 @@ import okhttp3.Response;
  */
 
 public class HttpInterceptor implements Interceptor {
+
+    private final Context context;
+    private final Map<String, String> headers;
     
-    private Map<String, String> headers;
-    
-    public HttpInterceptor() {
-        
-    }
-    
-    public HttpInterceptor(Map<String, String> headers) {
+    public HttpInterceptor(Context context, Map<String, String> headers) {
+        this.context = context;
         this.headers = headers;
     }
     
@@ -34,6 +40,19 @@ public class HttpInterceptor implements Interceptor {
             for (String key : headers.keySet()) {
                 builder.addHeader(key, headers.get(key));
             }
+        }
+        AuthenticationService authenticationService = ApplicationServiceContext.of(context).getService(AuthenticationService.class);
+        AuthenticationUser authenticationUser = authenticationService.getAuthenticationUser();
+        if (authenticationUser != null) {
+            if (!StringUtils.isEmpty(authenticationUser.getUserToken())) {
+                builder.addHeader("token", authenticationUser.getUserToken());
+            }
+
+            if (!StringUtils.isEmpty(authenticationUser.getUserId())) {
+                builder.addHeader("user_id", authenticationUser.getUserId());
+            }
+
+            builder.addHeader("client_resource", ClientProtos.ClientResource.phone.name());
         }
         return chain.proceed(builder.build());
         

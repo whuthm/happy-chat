@@ -1,64 +1,119 @@
 package com.whuthm.happychat.ui;
 
-import com.whuthm.happychat.app.UserAppService;
-import com.whuthm.happychat.imlib.IMContext;
 import com.whuthm.happychat.imlib.model.Conversation;
 import com.whuthm.happychat.imlib.model.ConversationType;
-import com.whuthm.happychat.imlib.model.User;
+import com.whuthm.happychat.imlib.model.Message;
 
 import java.util.Arrays;
 
 public class ConversationItem {
 
     private final String id;
-    private final Conversation conversation;
+    private final ConversationType type;
+    private String title;
+    private String portraitUrl;
+    private int targetGender;
+    private long latestMessageTime;
+    private Message latestMessage;
+    private int unreadCount;
+    private boolean top;
 
-    private final IMContext imContext;
+    private CharSequence content;
 
-    public ConversationItem(IMContext imContext, Conversation conversation) {
-        this.id = conversation.getId();
-        this.conversation = conversation;
-        this.imContext = imContext;
+    private String messageSenderDisplayName;
+    private Conversation.NotificationStatus notificationStatus;
+
+    public ConversationItem(String id, ConversationType type) {
+        this.id = id;
+        this.type = type;
     }
 
-    public String getTitle() {
-        if (conversation.getType() == ConversationType.PRIVATE) {
-            User user = imContext.getService(UserAppService.class).getUser(conversation.getId());
-            if (user != null) {
-                return user.getName();
-            }
-        }
-        return "";
+    public int getTargetGender() {
+        return targetGender;
+    }
+
+    public void setTargetGender(int targetGender) {
+        this.targetGender = targetGender;
+    }
+
+    public ConversationType getType() {
+        return type;
     }
 
     public String getId() {
         return id;
     }
 
-    public ConversationType getType() {
-        return conversation.getType();
+    public String getTitle() {
+        return title;
     }
 
-    public CharSequence getContent() {
-        return "";
-    }
-
-    public long getTime() {
-        return conversation.getLatestMessageTime();
-    }
-
-    public boolean isTop() {
-        return conversation.isTop();
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getPortraitUrl() {
-        if (conversation.getType() == ConversationType.PRIVATE) {
-            User user = imContext.getService(UserAppService.class).getUser(conversation.getId());
-            if (user != null) {
-                return user.getPortraitUrl();
-            }
-        }
-        return "";
+        return portraitUrl;
+    }
+
+    public void setPortraitUrl(String portraitUrl) {
+        this.portraitUrl = portraitUrl;
+    }
+
+    public long getLatestMessageTime() {
+        return latestMessageTime;
+    }
+
+    public void setLatestMessageTime(long latestMessageTime) {
+        this.latestMessageTime = latestMessageTime;
+    }
+
+    public Message getLatestMessage() {
+        return latestMessage;
+    }
+
+    public void setLatestMessage(Message latestMessage) {
+        this.latestMessage = latestMessage;
+    }
+
+    public int getUnreadCount() {
+        return unreadCount;
+    }
+
+    public void setUnreadCount(int unreadCount) {
+        this.unreadCount = unreadCount;
+    }
+
+    public boolean isTop() {
+        return top;
+    }
+
+    public void setTop(boolean top) {
+        this.top = top;
+    }
+
+    public CharSequence getContent() {
+        return content;
+    }
+
+    public void setContent(CharSequence content) {
+        this.content = content;
+    }
+
+    public Conversation.NotificationStatus getNotificationStatus() {
+        return notificationStatus;
+    }
+
+    public void setNotificationStatus(Conversation.NotificationStatus notificationStatus) {
+        this.notificationStatus = notificationStatus;
+    }
+
+    public String getMessageSenderDisplayName() {
+        return messageSenderDisplayName;
+    }
+
+    public void setMessageSenderDisplayName(String messageSenderDisplayName) {
+        this.messageSenderDisplayName = messageSenderDisplayName;
     }
 
     @Override

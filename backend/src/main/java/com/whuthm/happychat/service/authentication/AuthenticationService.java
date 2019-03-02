@@ -12,4 +12,6 @@ public interface AuthenticationService {
 
     User register(AuthenticationProtos.RegisterRequest registerRequest) throws Exception;
 
+    String getOrCreateEmailValidationCode(String email) throws Exception;
+
 }

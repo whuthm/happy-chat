@@ -23,10 +23,8 @@
 
     <ImageView
         android:id="@+id/iv_sender_portrait"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        style="@style/PortraitStyle"
         android:layout_marginTop="@dimen/dimen_12"
-        android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_time"
         tools:src="@drawable/dog1" />
@@ -81,13 +79,14 @@
 
     <ImageView
         android:id="@+id/iv_resend"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         android:layout_marginEnd="@dimen/dimen_6"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_message_sent_failed"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/layout_bubble"
         app:layout_constraintEnd_toStartOf="@+id/layout_bubble"
-        tools:src="@drawable/dog"
         tools:visibility="visible" />
 
 </android.support.constraint.ConstraintLayout>

@@ -19,6 +19,11 @@ class MessageAppServiceImpl extends AbstractIMService implements MessageAppServi
     }
 
     @Override
+    public Observable<Message> resendMessage(String messageUid) {
+        return getImContext().getService(MessageService.class).resendMessage(messageUid);
+    }
+
+    @Override
     public Observable<Message> sendTextMessage(String conversationId, ConversationType conversationType, String text) {
         if (!TextUtils.isEmpty(text)) {
             Message message = new Message();

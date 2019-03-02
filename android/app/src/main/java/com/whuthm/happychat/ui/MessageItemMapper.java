@@ -14,8 +14,19 @@ class MessageItemMapper implements Mapper<Message, MessageItem> {
 
     @Override
     public MessageItem transform(Message message) {
-
-        return new MessageItem(message);
+        MessageItem messageItem = new MessageItem(message.getUid());
+        messageItem.setConversationId(message.getConversationId());
+        messageItem.setConversationType(message.getConversationType());
+        messageItem.setSenderId(message.getSenderUserId());
+        messageItem.setSenderDisplayName(PresenterUtils.getMessageSenderDisplayName(imContext, message));
+        messageItem.setSenderPortraitUrl(PresenterUtils.getMessageSenderPortraitUrl(imContext, message));
+        messageItem.setSenderGender(PresenterUtils.getMessageSenderGender(imContext, message));
+        messageItem.setDirection(message.getDirection());
+        messageItem.setReceivedStatus(message.getReceivedStatus());
+        messageItem.setSentStatus(message.getSentStatus());
+        messageItem.setSendTime(message.getSendTime());
+        messageItem.setBody(message.getBodyObject());
+        return messageItem;
     }
 
 }

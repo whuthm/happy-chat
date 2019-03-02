@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Unique;
 import org.greenrobot.greendao.converter.PropertyConverter;
 
 /**
@@ -29,11 +30,15 @@ import org.greenrobot.greendao.converter.PropertyConverter;
 public class Message implements Serializable {
 
     private static final long serialVersionUID = 8769663248677565606L;
+
+    @Id
+    private Long id;
+
     /**
      * 客戶端生成uuid传递给服务端，用于校验服务器已送达
      */
-    @Id
-    private String id;
+    @Unique
+    private String uid;
 
     @Convert(columnType = String.class, converter = MessageDirectionConverter.class)
     private Direction direction;
@@ -73,6 +78,8 @@ public class Message implements Serializable {
 
     private String extra;
 
+    private boolean deleted;
+
     @Convert(columnType = String.class, converter = MessageSentStatusConverter.class)
     private SentStatus sentStatus;
 
@@ -80,12 +87,13 @@ public class Message implements Serializable {
     private ReceivedStatus receivedStatus;
 
 
-    @Generated(hash = 421227807)
-    public Message(String id, Direction direction, Long sid, @NotNull String type,
+    @Generated(hash = 689547289)
+    public Message(Long id, String uid, Direction direction, Long sid, @NotNull String type,
             @NotNull ConversationType conversationType, @NotNull String conversationId,
             @NotNull String senderUserId, String body, long sendTime, long receiveTime, String attrs,
-            String extra, SentStatus sentStatus, ReceivedStatus receivedStatus) {
+            String extra, boolean deleted, SentStatus sentStatus, ReceivedStatus receivedStatus) {
         this.id = id;
+        this.uid = uid;
         this.direction = direction;
         this.sid = sid;
         this.type = type;
@@ -97,6 +105,7 @@ public class Message implements Serializable {
         this.receiveTime = receiveTime;
         this.attrs = attrs;
         this.extra = extra;
+        this.deleted = deleted;
         this.sentStatus = sentStatus;
         this.receivedStatus = receivedStatus;
     }
@@ -148,6 +157,9 @@ public class Message implements Serializable {
     }
 
     public ReceivedStatus getReceivedStatus() {
+        if (receivedStatus == null) {
+            receivedStatus = new ReceivedStatus();
+        }
         return receivedStatus;
     }
 
@@ -170,6 +182,14 @@ public class Message implements Serializable {
 
     public void setConversationId(String conversationId) {
         this.conversationId = conversationId;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     @NonNull
@@ -219,14 +239,20 @@ public class Message implements Serializable {
         this.extra = extra;
     }
 
-
-    public String getId() {
-        return this.id;
+    public Long getId() {
+        return id;
     }
 
-
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public MessageBody getBodyObject() {
@@ -257,7 +283,11 @@ public class Message implements Serializable {
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new String[]{id});
+        return Arrays.hashCode(new Long[]{id});
+    }
+
+    public boolean getDeleted() {
+        return this.deleted;
     }
 
     public enum SentStatus {
@@ -281,6 +311,9 @@ public class Message implements Serializable {
 
         public ReceivedStatus(int flag) {
             this.flag = flag;
+        }
+
+        public ReceivedStatus() {
         }
 
 

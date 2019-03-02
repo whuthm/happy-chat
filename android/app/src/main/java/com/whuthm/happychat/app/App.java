@@ -7,6 +7,7 @@ import android.support.multidex.MultiDex;
 import com.barran.lib.utils.DisplayUtil;
 import com.barran.lib.utils.log.Logs;
 import com.whuthm.happychat.BuildConfig;
+import com.whuthm.happychat.app.event.AuthenticationStatusChangedEvent;
 import com.whuthm.happychat.app.model.AuthenticationStatus;
 import com.whuthm.happychat.data.DBOperator;
 import com.whuthm.happychat.data.api.RetrofitClient;
@@ -18,6 +19,8 @@ import com.whuthm.happychat.imlib.IMOptions;
 import com.whuthm.happychat.imlib.UserProvider;
 import com.whuthm.happychat.imlib.UserService;
 
+import org.greenrobot.eventbus.Subscribe;
+
 /**
  * 程序入口
  *
@@ -26,7 +29,7 @@ import com.whuthm.happychat.imlib.UserService;
 
 public class App extends Application implements ApplicationServiceContext.Provider {
 
-    private ApplicationServiceContext applicationContext;
+    private AppContext appContext;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -49,18 +52,8 @@ public class App extends Application implements ApplicationServiceContext.Provid
         DisplayUtil.init(this);
     }
 
-    private void connectChat() {
-        final AuthenticationService authenticationService = applicationContext.getService(AuthenticationService.class);
-        IMClient.getInstance()
-                .connect(new ConnectionConfiguration(authenticationService.getAuthenticationUser().getUserId(), authenticationService.getAuthenticationUser().getUserToken()));
-    }
-
-    private void disconnectChat() {
-        IMClient.getInstance().disconnect();
-    }
 
     private void initApp() {
-        applicationContext = new AppContext(this);
         RetrofitClient.initRetrofit(this);
 
         DBOperator.init(this);
@@ -84,29 +77,12 @@ public class App extends Application implements ApplicationServiceContext.Provid
 
         IMClient.init(imOptions);
 
-        final AuthenticationService authenticationService = applicationContext.getService(AuthenticationService.class);
-        if (authenticationService.getAuthenticationStatus() == AuthenticationStatus.LoggedIn) {
-            connectChat();
-        }
-        authenticationService.addAuthenticationStatusListener(new AuthenticationStatusListener() {
-            @Override
-            public void onAuthenticationStatusChanged(AuthenticationStatus status) {
-                switch (status) {
-                    case LoggedIn:
-                        connectChat();
-                        break;
-                    case Logout:
-                        disconnectChat();
-                    default:
-                        break;
-                }
-            }
-        });
-
+        appContext = new AppContext(this);
+        AuthenticationManager.init(appContext);
     }
 
     @Override
     public ApplicationServiceContext provideApplicationContext() {
-        return applicationContext;
+        return appContext;
     }
 }

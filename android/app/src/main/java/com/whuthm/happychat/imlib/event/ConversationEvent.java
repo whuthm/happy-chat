@@ -2,6 +2,7 @@ package com.whuthm.happychat.imlib.event;
 
 
 import com.whuthm.happychat.imlib.model.Conversation;
+import com.whuthm.happychat.imlib.vo.ConversationProperties;
 
 /**
  * Created by huangming on 2017/8/18.
@@ -35,35 +36,25 @@ public class ConversationEvent {
 
     public static class UpdatedEvent extends ConversationEvent {
 
-        public enum Type {
-            UnreadCount,
-            Other
-        }
+        public final ConversationProperties properties;
 
-        private final Type type;
-
-        public UpdatedEvent(Conversation conversation) {
-            this(conversation, Type.Other);
-        }
-
-        public UpdatedEvent(Conversation conversation, Type type) {
+        public UpdatedEvent(Conversation conversation, ConversationProperties properties) {
             super(conversation);
-            this.type = type;
+            this.properties = properties;
         }
 
-        public Type getType() {
-            return type;
+        public ConversationProperties getProperties() {
+            return properties;
         }
     }
 
     public interface Poster extends EventPoster {
-        void postConversationUpdated(Conversation conversation);
+        void postConversationUpdated(Conversation conversation, ConversationProperties properties);
 
         void postConversationRemoved(Conversation conversation);
 
         void postConversationAdded(Conversation conversation);
 
-        void postConversationUnreadCount(Conversation conversation);
     }
 
 

@@ -62,7 +62,7 @@ public class MainTestFragment extends IMContextFragment {
                         message.setConversationType(ConversationType.PRIVATE);
                         message.setType("txt");
                         message.setDirection(Message.Direction.SEND);
-                        message.setId(UUID.randomUUID().toString());
+                        message.setUid(UUID.randomUUID().toString());
                         messageService.sendMessage(message).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Message>() {
                             @Override
                             public void onSubscribe(Disposable d) {

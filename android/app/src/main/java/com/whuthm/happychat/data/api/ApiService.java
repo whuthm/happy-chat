@@ -21,6 +21,10 @@ public interface ApiService {
     @POST("/v1/auth/login")
     Observable<AuthenticationProtos.LoginResponse> login(
             @Body AuthenticationProtos.LoginRequest request);
+
+    @POST("/v1/auth/emailvcode")
+    Observable<BaseProtos.BaseResponse> getEmailValidationCode(
+            @Body BaseProtos.StringBean request);
     
     @POST("/v1/auth/register")
     Observable<BaseProtos.BaseResponse> register(
@@ -28,6 +32,9 @@ public interface ApiService {
     
     @GET("/v1/users/{id}")
     Observable<UserProtos.UserResponse> getUserById(@Path("id") String userId);
+
+    @GET("/v1/users")
+    Observable<UserProtos.UsersResponse> getUsers();
     
     @POST("/v1/group/create")
     Observable<BaseProtos.BaseResponse> createGroup();

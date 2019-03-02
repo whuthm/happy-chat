@@ -4,33 +4,68 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="@dimen/dimen_6"
+    android:background="@drawable/bg_item_default"
     android:paddingLeft="@dimen/dimen_12"
+    android:paddingTop="@dimen/dimen_6"
     android:paddingRight="@dimen/dimen_12"
-    android:paddingTop="@dimen/dimen_6">
+    android:paddingBottom="@dimen/dimen_6">
 
     <ImageView
-        android:id="@+id/layout_conversation_icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/chat" />
+        android:id="@+id/iv_portrait"
+        style="@style/PortraitStyle"
+        android:src="@drawable/chat"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/layout_conversation_title"
-        android:layout_width="wrap_content"
+        android:id="@+id/tv_digital_red_dot"
+        style="@style/DigitalRedDotStyle"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/iv_portrait"
+        app:layout_constraintTop_toTopOf="@+id/iv_portrait" />
+
+    <View
+        android:id="@+id/view_red_dot"
+        style="@style/RedDotStyle"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/iv_portrait"
+        app:layout_constraintTop_toTopOf="@+id/iv_portrait" />
+
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dimen_12"
-        app:layout_constraintLeft_toRightOf="@+id/layout_conversation_icon"
-        tools:text="title" />
+        android:layout_marginEnd="@dimen/dimen_12"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintEnd_toStartOf="@id/tv_time"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/iv_portrait"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="titletitletitletitletitletitletitlettitletitltitletitletitletitletitletitletitlettitletitl" />
 
     <TextView
-        android:id="@+id/layout_conversation_content"
+        android:id="@+id/tv_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="time" />
+
+
+    <TextView
+        android:id="@+id/tv_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@android:color/black"
-        app:layout_constraintLeft_toLeftOf="@+id/layout_conversation_title"
-        app:layout_constraintTop_toBottomOf="@+id/layout_conversation_title"
-        tools:text="content" />
+        app:layout_constraintLeft_toLeftOf="@+id/tv_title"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title"
+        tools:text="contentcontentcontentcontentcontentcontentcontentcontent" />
 
 </android.support.constraint.ConstraintLayout>

@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +41,10 @@ public class AuthenticationUtils {
         } else {
             return new String(MessageDigest.getInstance("MD5").digest(password.getBytes("utf-8")), "utf-8");
         }
+    }
+
+    public static String getRandomCode() {
+        return String.valueOf(new Random().nextInt(899999) + 100000);
     }
 
 }

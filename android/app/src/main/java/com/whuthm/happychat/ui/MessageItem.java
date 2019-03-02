@@ -1,83 +1,133 @@
 package com.whuthm.happychat.ui;
 
+import com.whuthm.happychat.imlib.model.ConversationType;
 import com.whuthm.happychat.imlib.model.Message;
 import com.whuthm.happychat.imlib.model.MessageBody;
-import com.whuthm.happychat.imlib.model.UserInfo;
 
 import java.util.Arrays;
 
 public class MessageItem {
 
-    private final String id;
-    private final Message message;
+    private final String uid;
+    private String senderId;
+    private String senderDisplayName;
+    private String senderPortraitUrl;
+    private int senderGender;
+    private String conversationId;
+    private ConversationType conversationType;
+    private MessageBody body;
+    private Message.ReceivedStatus receivedStatus;
+    private Message.SentStatus sentStatus;
+    private Message.Direction direction;
+    private long sendTime;
 
-    public MessageItem(Message message) {
-        this.message = message;
-        this.id = message.getId();
+    public MessageItem(String uid) {
+        this.uid = uid;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public String getSenderId() {
+        return senderId;
+    }
+
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
     }
 
     public String getSenderDisplayName() {
-        final MessageBody messageBody = message.getBodyObject();
-        final UserInfo userInfo = messageBody != null ? messageBody.getUserInfo() : null;
-        return userInfo != null ? userInfo.getName() : null;
+        return senderDisplayName;
     }
 
-    public MessageBody getBody() {
-        return message.getBodyObject();
+    public void setSenderDisplayName(String senderDisplayName) {
+        this.senderDisplayName = senderDisplayName;
     }
 
     public String getSenderPortraitUrl() {
-        final MessageBody messageBody = message.getBodyObject();
-        final UserInfo userInfo = messageBody != null ? messageBody.getUserInfo() : null;
-        return userInfo != null ? userInfo.getPortraitUrl() : null;
+        return senderPortraitUrl;
+    }
+
+    public void setSenderPortraitUrl(String senderPortraitUrl) {
+        this.senderPortraitUrl = senderPortraitUrl;
     }
 
     public int getSenderGender() {
-        final MessageBody messageBody = message.getBodyObject();
-        final UserInfo userInfo = messageBody != null ? messageBody.getUserInfo() : null;
-        return userInfo != null ? userInfo.getGender() : 0;
+        return senderGender;
     }
 
-    public String getSenderUserId() {
-        return message.getSenderUserId();
+    public void setSenderGender(int senderGender) {
+        this.senderGender = senderGender;
     }
 
     public String getConversationId() {
-        return message.getConversationId();
+        return conversationId;
     }
 
-    public boolean isSendDirection() {
-        return message.getDirection() == Message.Direction.SEND;
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
     }
 
-    public boolean isSentFailed() {
-        return message.getSentStatus() == Message.SentStatus.FAILED;
+    public ConversationType getConversationType() {
+        return conversationType;
     }
 
-    public boolean isSending() {
-        return message.getSentStatus() == Message.SentStatus.SENDING;
+    public void setConversationType(ConversationType conversationType) {
+        this.conversationType = conversationType;
     }
 
-    public boolean isListened() {
-        final Message.ReceivedStatus receivedStatus = message.getReceivedStatus();
-        return receivedStatus != null && receivedStatus.isListened();
+    public MessageBody getBody() {
+        return body;
     }
 
-    public String getId() {
-        return id;
+    public void setBody(MessageBody body) {
+        this.body = body;
+    }
+
+    public Message.ReceivedStatus getReceivedStatus() {
+        return receivedStatus;
+    }
+
+    public void setReceivedStatus(Message.ReceivedStatus receivedStatus) {
+        this.receivedStatus = receivedStatus;
+    }
+
+    public Message.SentStatus getSentStatus() {
+        return sentStatus;
+    }
+
+    public void setSentStatus(Message.SentStatus sentStatus) {
+        this.sentStatus = sentStatus;
+    }
+
+    public Message.Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Message.Direction direction) {
+        this.direction = direction;
+    }
+
+    public long getSendTime() {
+        return sendTime;
+    }
+
+    public void setSendTime(long sendTime) {
+        this.sendTime = sendTime;
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof MessageItem && getClass() == obj.getClass()) {
-            return getId().equals(((MessageItem) obj).getId());
+            return getUid().equals(((MessageItem) obj).getUid());
         }
         return super.equals(obj);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new String[]{getId()});
+        return Arrays.hashCode(new String[]{getUid()});
     }
 
 }

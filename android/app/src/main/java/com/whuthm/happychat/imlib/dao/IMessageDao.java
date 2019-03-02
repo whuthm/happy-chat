@@ -9,14 +9,20 @@ public interface IMessageDao {
 
     List<Message> getHistoryMessages(HistoryMessagesRequest request);
 
-    Message getMessage(String id);
+    Message getMessageByUid(String uid);
+
+    Message getMessage(long id);
+
+    Message getLatestMessage();
 
     void markMessagesOfConversationAsRead(String conversationId);
 
-    void deleteMessage(String id);
+    void markMessageAsDeleted(long id);
 
     void insertMessage(Message message);
 
     void updateMessage(Message message);
+
+    int getUnreadCountOf(String conversationId);
 
 }

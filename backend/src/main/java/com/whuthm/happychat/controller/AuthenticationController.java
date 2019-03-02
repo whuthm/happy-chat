@@ -7,6 +7,7 @@ import com.whuthm.happychat.data.ClientProtos;
 import com.whuthm.happychat.domain.model.User;
 import com.whuthm.happychat.exception.ServerException;
 import com.whuthm.happychat.service.authentication.AuthenticationService;
+import com.whuthm.happychat.service.email.EmailService;
 import com.whuthm.happychat.utils.ApiBaseResponses;
 import com.whuthm.happychat.utils.ApiUtils;
 import com.whuthm.happychat.controller.token.Token;
@@ -24,6 +25,21 @@ public class AuthenticationController {
 
     @Autowired
     AuthenticationService authenticationService;
+    @Autowired
+    EmailService emailService;
+
+    @Token(check = false)
+    @RequestMapping(value = "/v1/auth/emailvcode", method = {RequestMethod.POST})
+    BaseProtos.BaseResponse getEmailValidationCode(@RequestBody BaseProtos.StringBean request) {
+        LOGGER.info("getEmailValidationCode");
+        try {
+            String code = authenticationService.getOrCreateEmailValidationCode(request.getData());
+            emailService.sendEmail(request.getData(), "Email", code);
+            return ApiBaseResponses.SUCCESS.getResponse();
+        } catch (Exception ex) {
+            return ApiUtils.getErrorResponse(ex);
+        }
+    }
 
     @Token(check = false)
     @RequestMapping(value = "/v1/auth/login", method = {RequestMethod.POST})

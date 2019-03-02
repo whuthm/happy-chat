@@ -16,6 +16,7 @@ import com.barran.lib.ui.recycler.VerticalDividerDecoration;
 import com.barran.lib.view.text.ColorfulTextView;
 import com.whuthm.happychat.R;
 import com.whuthm.happychat.app.ConversationAppService;
+import com.whuthm.happychat.common.util.ObjectUtils;
 import com.whuthm.happychat.common.view.item.ItemAdapter;
 import com.whuthm.happychat.common.view.item.ItemsRecyclerView;
 import com.whuthm.happychat.imlib.ConversationService;
@@ -28,6 +29,7 @@ import com.whuthm.happychat.imlib.model.User;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -45,9 +47,6 @@ public class MainChatFragment extends IMContextFragment {
 
     private ColorfulTextView addConversation;
 
-    private ConversationService conversationService;
-    private ConversationAppService conversationAppService;
-
     private ItemAdapter<ConversationItem> adapter;
 
     @Override
@@ -58,7 +57,7 @@ public class MainChatFragment extends IMContextFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_add) {
-            ConversationActivity.startConversation(getContext(), "36bf78a8-881d-47ad-94a4-68abb05a60ac", ConversationType.PRIVATE, "vs");
+
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -75,18 +74,14 @@ public class MainChatFragment extends IMContextFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        conversationService = imContext.getService(ConversationService.class);
-        conversationAppService = imContext.getService(ConversationAppService.class);
-
         recyclerView = view.findViewById(R.id.recycler_view);
         addConversation = view.findViewById(R.id.frag_conversation_list_add);
 
         adapter = new ItemAdapter<>(getContext());
-        adapter.setSortComparator(new ConversationItemComparator());
         adapter.setItemViewProvider(new ItemAdapter.ItemViewProvider<ConversationItem>() {
             @Override
             public ItemAdapter.ItemViewHolder<ConversationItem> getItemViewHolder(ItemAdapter<ConversationItem> adapter, ViewGroup parent, int viewType) {
-                return new ConversationItemHolder(LayoutInflater.from(getContext()).inflate(R.layout.layout_conversation_item, parent, false));
+                return new ConversationItemViewHolder(LayoutInflater.from(getContext()).inflate(R.layout.layout_conversation_item, parent, false), imContext);
             }
 
             @Override
@@ -115,13 +110,14 @@ public class MainChatFragment extends IMContextFragment {
             }
         });
 
-        conversationAppService.getAllConversations()
+        imContext.getService(ConversationAppService.class).getAllConversations()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(addDisposable(new DisposableObserver<List<Conversation>>() {
 
                     @Override
                     public void onNext(List<Conversation> value) {
                         List<ConversationItem> items = MapperProviderFactory.get(imContext).transform(MapperProviderFactory.get(imContext).conversationItem(), value);
+                        Collections.sort(items, new ConversationItemComparator());
                         adapter.setItems(items);
                     }
 
@@ -148,18 +144,59 @@ public class MainChatFragment extends IMContextFragment {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onConversationUpdatedEvent(ConversationEvent.UpdatedEvent event) {
         adapter.changeItem(transform(event.getConversation()));
+        if (event.getProperties().containsLatestMessageProperty()) {
+            // TODO top
+            if (adapter.getItems() != null) {
+                Collections.sort(adapter.getItems(), new ConversationItemComparator());
+                adapter.notifyDataSetChanged();
+            }
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onUserChangedEvent(UserEvent.ChangedEvent event) {
         Log.i(getTag(), "onUserChangedEvent");
+        final User user = event.getUser();
         int count = adapter.getItemCount();
+        int positionStart = -1;
+        int positionEnd = -1;
         for (int i = 0; i < count; i++) {
+            boolean changed = false;
             ConversationItem conversationItem = adapter.getItem(i);
-            if (conversationItem != null && (event.getUser().getId().equals(conversationItem.getId()) /* || (event.getUser().getId().equals(conversationItem.getLatestMessageSenderUserId())**/)) {
-                adapter.notifyItemChanged(i);
-                break;
+            if (conversationItem.getType() == ConversationType.PRIVATE) {
+                final String displayName = PresenterUtils.getUserDisplayName(user);
+                if (!ObjectUtils.equals(displayName, conversationItem.getTitle())) {
+                    conversationItem.setTitle(displayName);
+                    changed = true;
+                }
+                if (!ObjectUtils.equals(user.getPortraitUrl(), conversationItem.getPortraitUrl())) {
+                    conversationItem.setPortraitUrl(user.getPortraitUrl());
+                    changed = true;
+                }
+                if (user.getGender() != conversationItem.getTargetGender()) {
+                    conversationItem.setTargetGender(user.getGender());
+                    changed = true;
+                }
+
+            } else if (conversationItem.getType().isMultiUser()) {
+                // 展示消息发送人
+                String senderDisplayName = PresenterUtils.getMessageSenderDisplayName(imContext, conversationItem.getLatestMessage());
+                if (!ObjectUtils.equals(senderDisplayName, conversationItem.getMessageSenderDisplayName())) {
+                    conversationItem.setMessageSenderDisplayName(senderDisplayName);
+                    changed = true;
+                }
             }
+            if (changed) {
+                if (i < positionStart || positionStart < 0) {
+                    positionStart = i;
+                }
+                if (i > positionEnd) {
+                    positionEnd = i;
+                }
+            }
+        }
+        if (positionStart>= 0 && positionEnd < count) {
+            adapter.notifyItemRangeChanged(positionStart, positionEnd - positionStart + 1);
         }
     }
 
